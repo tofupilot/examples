@@ -132,7 +132,9 @@ def internal_resistance():
 
 def thermal_runaway_detection():
     passed = simulate_test_result(0.98)
-    value_measured = 60 if passed else 65
+    value_measured = (
+        round(random.uniform(55, 65), 2) if passed else round(random.uniform(66, 70), 2)
+    )
     return passed, value_measured, "°C", 55, 65
 
 
@@ -143,17 +145,15 @@ def state_of_health():
         if passed
         else round(random.uniform(85, 94), 1)
     )
-    return passed, value_measured, "%", 95, 100
+    return passed, value_measured, "%", 95, None
 
 
 def state_of_charge():
     passed = simulate_test_result(0.98)
     value_measured = (
-        round(random.uniform(95, 100), 1)
-        if passed
-        else round(random.uniform(85, 94), 1)
+        round(random.uniform(40, 60), 1) if passed else round(random.uniform(25, 35), 1)
     )
-    return passed, value_measured, "%", 95, 100
+    return passed, value_measured, "%", 40, 60
 
 
 def visual_inspection():
@@ -224,7 +224,7 @@ def handle_procedure(
 ):
     run_passed, steps, failed_step = run_all_tests(tests)
 
-    if procedure_id == "FVT3":  # Assembly Procedure
+    if procedure_id == "FVT3" and run_passed == True:  # Assembly Procedure
         internal_resistance = steps[2]["measurement_value"]
         voltage_value = steps[1]["measurement_value"]
         report_variables = {
@@ -347,4 +347,4 @@ def execute_procedures(end):
 
 
 # Run all procedures for 20 units
-execute_procedures(1)
+execute_procedures(20)
