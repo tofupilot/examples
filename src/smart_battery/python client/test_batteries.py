@@ -297,7 +297,7 @@ def execute_procedures(end):
             revision_pcb,
             batch_number,
             None,
-            ["./2_mockup/pcb_coating.jpeg"],
+            ["./pcb_coating.jpeg"],
         )
         if not passed_pcb:
             continue

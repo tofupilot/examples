@@ -103,6 +103,6 @@ def test_calibrate_temperature(step):
 
 
 def test_visual_inspection():
-    attachment = ["./2_mockup/pcb_coating.jpeg"]
+    attachment = ["./pcb_coating.jpeg"]
     assert attachment is not None
     conf.set(attachments=attachment)
