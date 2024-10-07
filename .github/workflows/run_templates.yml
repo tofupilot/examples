@@ -34,3 +34,30 @@ jobs:
           for file in src/climatic_chamber/python-client/*.py; do
             python "$file"
           done
+
+      # Set TOFUPILOT_API_KEY and run all Python files in corresponding folder
+      - name: Run Drone scripts for first drone organization
+        env:
+          TOFUPILOT_API_KEY: ${{ secrets.DRONE1_API_KEY }}
+        run: |
+          for file in src/drone/python-client/*.py; do
+            python "$file"
+          done
+
+        # Set TOFUPILOT_API_KEY and run all Python files in corresponding folder
+      - name: Run Drone scripts for second drone organization
+        env:
+          TOFUPILOT_API_KEY: ${{ secrets.DRONE2_API_KEY }}
+        run: |
+          for file in src/drone/python-client/*.py; do
+            python "$file"
+          done
+
+      # Set TOFUPILOT_API_KEY and run all Python files in corresponding folder
+      - name: Run Drone scripts for third drone organizatoin
+        env:
+          TOFUPILOT_API_KEY: ${{ secrets.DRONE3_API_KEY }}
+        run: |
+          for file in src/drone/python-client/*.py; do
+            python "$file"
+          done
