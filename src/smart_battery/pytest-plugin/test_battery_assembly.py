@@ -12,7 +12,7 @@ random_digits_assembly = "".join([str(random.randint(0, 9)) for _ in range(5)])
 serial_number_assembly = (
     f"{part_number_assembly}{revision_assembly}{static_segment}{random_digits_assembly}"
 )
-# To be imporved - for the moment creates a link with sub-units of a fixed serial number
+# To be improved - for the moment creates a link with sub-units of a fixed serial number
 sub_units = [
     {"serial_number": "00786C4J26221"},
     {"serial_number": "00143B4J73889"},
