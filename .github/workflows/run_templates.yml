@@ -31,7 +31,7 @@ jobs:
         env:
           TOFUPILOT_API_KEY: ${{ secrets.CLIMATIC_CHAMBER_API_KEY }}
         run: |
-          for file in src/climatic_chamber/python-client/*.py; do
+          for file in src/climatic-chamber/python-client/*.py; do
             python "$file"
           done
 
