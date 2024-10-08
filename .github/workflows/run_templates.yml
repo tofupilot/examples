@@ -2,8 +2,8 @@ name: Run Python Templates
 
 on:
   schedule:
-    # Run every weekday at 9:00 AM UTC
-    - cron: '0 9 * * 1-5'
+    # Run every weekday at 8:00 AM UTC
+    - cron: '0 8 * * 1-5'
 
 jobs:
   run-climatic-chamber-scripts:
