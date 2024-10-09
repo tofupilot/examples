@@ -1,7 +1,6 @@
 from tofupilot import TofuPilotClient
 from datetime import datetime, timedelta
 import random
-import uuid
 
 client = TofuPilotClient()
 
@@ -224,7 +223,7 @@ def handle_procedure(
 ):
     run_passed, steps, failed_step = run_all_tests(tests)
 
-    if procedure_id == "FVT3" and run_passed == True:  # Assembly Procedure
+    if procedure_id == "FVT3" and run_passed:  # Assembly Procedure
         internal_resistance = steps[2]["measurement_value"]
         voltage_value = steps[1]["measurement_value"]
         report_variables = {
@@ -249,7 +248,7 @@ def handle_procedure(
         run_passed=run_passed,
         steps=steps,
         sub_units=sub_units,
-        attachments=attachments if attachments is not None else None,
+        attachments=attachments,
         report_variables=report_variables,
     )
     return run_passed, failed_step
@@ -297,7 +296,7 @@ def execute_procedures(end):
             revision_pcb,
             batch_number,
             None,
-            ["./pcb_coating.jpeg"],
+            ["src/drone/python-client/pcb_coating.jpeg"],
         )
         if not passed_pcb:
             continue
