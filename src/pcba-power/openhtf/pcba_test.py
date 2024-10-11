@@ -58,12 +58,12 @@ def test_battery_switch(test):
         return htf.PhaseResult.STOP
 
 @htf.measures(
-    htf.Measurement('efficiency').in_range(85, 98).with_units(units.PERCENT))
+    htf.Measurement('efficiency').in_range(85, 98).with_units(units.Unit('%')))
 def test_converter_efficiency(test):
     passed = simulate_test_result(0.99) 
     input_power = 500
     output_power = round(random.uniform(450, 480)) if passed else round(random.uniform(400, 425))
-    test.measurements.efficiency = (output_power / input_power) * 100
+    test.measurements.efficiency = round(((output_power / input_power) * 100),1)
 
 def test_power_saving_mode():
     if simulate_test_result(1):
