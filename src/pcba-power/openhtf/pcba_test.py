@@ -71,8 +71,9 @@ def test_power_saving_mode():
     else:
         return htf.PhaseResult.STOP
     
-def visual_control_pcb_coating():
+def visual_control_pcb_coating(test):
     if simulate_test_result(1):
+        test.attach_from_file("pcba-power/openhtf/pcb_coating.jpeg")
         return htf.PhaseResult.CONTINUE
     else:
         return htf.PhaseResult.STOP
