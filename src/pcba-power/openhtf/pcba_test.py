@@ -1,13 +1,7 @@
 import openhtf as htf
-from openhtf.output.callbacks import json_factory
-import tofupilot as tp
 from openhtf.util import units
 import random
-import os
-
-
-# Initialize the TofuPilot client
-client = tp.TofuPilotClient()
+from tofupilot import UploadToTofuPilot
 
 
 # Utility function to simulate the test result with a given pass probability
@@ -95,15 +89,11 @@ test = htf.Test(
     revision="A",
 )
 
+test.add_output_callbacks(UploadToTofuPilot())
 
-# Output the results to a JSON file
-file_path = "result.json"
-test.add_output_callbacks(json_factory.OutputToJSON(file_path))
 # Generate random Serial Number
 random_digits = "".join([str(random.randint(0, 9)) for _ in range(5)])
 serial_number = f"00220A4J{random_digits}"
+
 # Execute the test
 test.execute(lambda: serial_number)
-
-# Send the report to TofuPilot
-client.create_run_from_report(file_path)
