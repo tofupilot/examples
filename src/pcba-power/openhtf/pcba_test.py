@@ -84,7 +84,7 @@ test = htf.Test(
     test_converter_efficiency,
     test_power_saving_mode,
     visual_control_pcb_coating,
-    procedure_id="FVT197",
+    procedure_id="FVT1",
     part_number="00220",
     revision="A",
 )
