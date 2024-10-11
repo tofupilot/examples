@@ -94,7 +94,7 @@ def backlash_response_time_test():
 
 #  Runs the motor at full speed and then tests the braking system
 def full_speed_braking_test():
-    passed = simulate_test_result(0.99)
+    passed = simulate_test_result(0.8)
     value_measured = (
         round(random.uniform(1.5, 2), 2) if passed else round(random.uniform(2.1, 3), 2)
     )
@@ -103,7 +103,7 @@ def full_speed_braking_test():
 
 # Monitors the motor’s temperature when running under load.
 def thermal_reading():
-    passed = simulate_test_result(0.99)
+    passed = simulate_test_result(0.75)
     value_measured = (
         round(random.uniform(75, 80), 1)
         if passed
@@ -113,7 +113,7 @@ def thermal_reading():
 
 
 def motor_noise():
-    passed = simulate_test_result(0.85)
+    passed = simulate_test_result(0.92)
     value_measured = (
         round(random.uniform(45, 50)) if passed else round(random.uniform(51, 55))
     )
@@ -122,7 +122,7 @@ def motor_noise():
 
 # Runs the motor at full speed
 def final_rpm_reading():
-    passed = simulate_test_result(0.98)
+    passed = simulate_test_result(1)
     value_measured = (
         round(random.uniform(2900, 3100))
         if passed
@@ -151,20 +151,20 @@ def run_test(test, duration):
 
 def run_all_tests():
     tests = [
-        (visual_inspection_connector, timedelta(seconds=5)),
+        (visual_inspection_connector, timedelta(seconds=8)),
         (power_on_test, timedelta(seconds=1)),
         (power_supply_check_voltage, timedelta(seconds=3)),
         (power_supply_check_current, timedelta(seconds=3)),
-        (motor_startup_test, timedelta(seconds=5)),
-        (motor_startup_rpm, timedelta(seconds=5)),
+        (motor_startup_test, timedelta(seconds=15)),
+        (motor_startup_rpm, timedelta(seconds=20)),
         (speed_consistency_no_load_test, timedelta(seconds=10)),
         (encoder_feedback_measurement, timedelta(seconds=4)),
         (backlash_response_time_test, timedelta(seconds=6)),
         (full_speed_braking_test, timedelta(seconds=12)),
-        (thermal_reading, timedelta(seconds=30)),
-        (motor_noise, timedelta(seconds=8)),
+        (thermal_reading, timedelta(seconds=10)),
+        (motor_noise, timedelta(seconds=18)),
         (encoder_feedback_test, timedelta(seconds=4)),
-        (final_rpm_reading, timedelta(seconds=10)),
+        (final_rpm_reading, timedelta(seconds=15)),
     ]
 
     steps = []
@@ -206,10 +206,11 @@ def handle_test(end):
             report_variables={
                 "motor_serial_number": serial_number,
                 "production_date": str(datetime.now().strftime("%d.%m.%Y")),
+                "report_date": str(datetime.now().strftime("%d.%m.%Y")),
             },
             attachments=["./motors/motor_connector.png"],
         )
 
 
 # Run mock-up for multiple units
-handle_test(20)
+handle_test(10)
