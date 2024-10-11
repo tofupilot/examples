@@ -6,7 +6,7 @@ on:
     - cron: '0 8 * * 1-5'
 
 jobs:
-  run-climatic-chamber-scripts:
+  run-python-plugin-scripts:
     runs-on: ubuntu-latest
 
     steps:
