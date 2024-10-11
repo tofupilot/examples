@@ -134,7 +134,6 @@ def check_gain_bandwidth_at_15GHz(test):
     .with_units(units.DECIBEL_MILLIWATTS)
 )
 def check_gain_bandwidth_at_15p5GHz(test):
-    """Check the gain and bandwidth at 15 GHz."""
     passed = simulate_test_result(0.99)
     value_measured = round(random.uniform(-7.2, -6.8), 1) if passed else round(random.uniform(-7.8, -7.3),1)    
     test.measurements.gain_bandwidth_15p5GHz = value_measured
@@ -146,7 +145,6 @@ def check_gain_bandwidth_at_15p5GHz(test):
     .with_units(units.DECIBEL_MILLIWATTS)
 )
 def check_gain_bandwidth_at_16GHz(test):
-    """Check the gain and bandwidth at 15 GHz."""
     passed = simulate_test_result(0.99)
     value_measured = round(random.uniform(-7.2, -6.8), 1) if passed else round(random.uniform(-7.8, -7.3),1)        
     test.measurements.gain_bandwidth_16GHz = value_measured
