@@ -9,26 +9,19 @@ def simulate_test_result(passed_prob):
     return random.random() < passed_prob
 
 
-@htf.measures(htf.Measurement("device_firmware"))
+@htf.measures(htf.Measurement("firmware_version").equals("1.4.3"))
 def pcba_firmware_version(test):
-    if simulate_test_result(1):
-        test.measurements.device_firmware = "1.4.3"
-    else:
-        test.measurements.device_firmware = "Unknown"
+    firmware_version = "1.4.3" if simulate_test_result(0.99) else "1.4.2"
 
 
-def check_button():
-    if simulate_test_result(1):
-        return htf.PhaseResult.CONTINUE
-    else:
-        return htf.PhaseResult.STOP
+@htf.measures(htf.Measurement("button_status").equals(True))
+def check_button(test):
+    button_status = simulate_test_result(1)
 
 
-def check_led_switch_on():
-    if simulate_test_result(0.98):
-        return htf.PhaseResult.CONTINUE
-    else:
-        return htf.PhaseResult.STOP
+@htf.measures(htf.Measurement("led_status").equals(True))
+def check_led_switch_on(test):
+    button_status = simulate_test_result(0.98)
 
 
 @htf.measures(htf.Measurement("input_voltage").in_range(20, 60).with_units(units.VOLT))
@@ -80,11 +73,9 @@ def test_converter_efficiency(test):
     test.measurements.efficiency = round(((output_power / input_power) * 100), 1)
 
 
-def test_power_saving_mode():
-    if simulate_test_result(1):
-        return htf.PhaseResult.CONTINUE
-    else:
-        return htf.PhaseResult.STOP
+@htf.measures(htf.Measurement("power_mode_functional").equals(True))
+def test_power_saving_mode(test):
+    test.measurement.power_mode_functional = simulate_test_result(1)
 
 
 def visual_control_pcb_coating(test):
