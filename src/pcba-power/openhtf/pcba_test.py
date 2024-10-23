@@ -1,12 +1,13 @@
 import openhtf as htf
 from openhtf.util import units
 import random
-from tofupilot import UploadToTofuPilot
+from tofupilot.openhtf import TofuPilot
 
 
 # Utility function to simulate the test result with a given pass probability
 def simulate_test_result(passed_prob):
     return random.random() < passed_prob
+
 
 @htf.measures(htf.Measurement("device_firmware"))
 def pcba_firmware_version(test):
@@ -15,11 +16,13 @@ def pcba_firmware_version(test):
     else:
         test.measurements.device_firmware = "Unknown"
 
+
 def check_button():
     if simulate_test_result(1):
         return htf.PhaseResult.CONTINUE
     else:
         return htf.PhaseResult.STOP
+
 
 def check_led_switch_on():
     if simulate_test_result(0.98):
@@ -27,23 +30,36 @@ def check_led_switch_on():
     else:
         return htf.PhaseResult.STOP
 
-@htf.measures(
-    htf.Measurement('input_voltage').in_range(20, 60).with_units(units.VOLT))
+
+@htf.measures(htf.Measurement("input_voltage").in_range(20, 60).with_units(units.VOLT))
 def test_voltage_input(test):
-    passed = simulate_test_result(0.99) 
-    test.measurements.input_voltage = round(random.uniform(40, 60)) if passed else round(random.uniform(20, 30))
+    passed = simulate_test_result(0.99)
+    test.measurements.input_voltage = (
+        round(random.uniform(40, 60)) if passed else round(random.uniform(20, 30))
+    )
+
 
 @htf.measures(
-    htf.Measurement('output_voltage').in_range(220, 240).with_units(units.VOLT))
+    htf.Measurement("output_voltage").in_range(220, 240).with_units(units.VOLT)
+)
 def test_voltage_output(test):
-    passed = simulate_test_result(0.99) 
-    test.measurements.output_voltage = round(random.uniform(220, 240)) if passed else round(random.uniform(190, 200))
+    passed = simulate_test_result(0.99)
+    test.measurements.output_voltage = (
+        round(random.uniform(220, 240)) if passed else round(random.uniform(190, 200))
+    )
+
 
 @htf.measures(
-    htf.Measurement('current_protection_triggered').in_range(maximum=25).with_units(units.AMPERE))
+    htf.Measurement("current_protection_triggered")
+    .in_range(maximum=25)
+    .with_units(units.AMPERE)
+)
 def test_overcurrent_protection(test):
     passed = simulate_test_result(0.80)
-    test.measurements.current_protection_triggered = round(random.uniform(26, 32),1) if passed else round(random.uniform(20, 24),1)
+    test.measurements.current_protection_triggered = (
+        round(random.uniform(26, 32), 1) if passed else round(random.uniform(20, 24), 1)
+    )
+
 
 def test_battery_switch(test):
     if simulate_test_result(0.98):
@@ -51,26 +67,33 @@ def test_battery_switch(test):
     else:
         return htf.PhaseResult.STOP
 
+
 @htf.measures(
-    htf.Measurement('efficiency').in_range(85, 98).with_units(units.Unit('%')))
+    htf.Measurement("efficiency").in_range(85, 98).with_units(units.Unit("%"))
+)
 def test_converter_efficiency(test):
-    passed = simulate_test_result(0.99) 
+    passed = simulate_test_result(0.99)
     input_power = 500
-    output_power = round(random.uniform(450, 480)) if passed else round(random.uniform(400, 425))
-    test.measurements.efficiency = round(((output_power / input_power) * 100),1)
+    output_power = (
+        round(random.uniform(450, 480)) if passed else round(random.uniform(400, 425))
+    )
+    test.measurements.efficiency = round(((output_power / input_power) * 100), 1)
+
 
 def test_power_saving_mode():
     if simulate_test_result(1):
         return htf.PhaseResult.CONTINUE
     else:
         return htf.PhaseResult.STOP
-    
+
+
 def visual_control_pcb_coating(test):
     if simulate_test_result(1):
         test.attach_from_file("pcba-power/openhtf/pcb_coating.jpeg")
         return htf.PhaseResult.CONTINUE
     else:
         return htf.PhaseResult.STOP
+
 
 # Define the test plan with all steps
 test = htf.Test(
@@ -89,11 +112,10 @@ test = htf.Test(
     revision="A",
 )
 
-test.add_output_callbacks(UploadToTofuPilot())
-
 # Generate random Serial Number
 random_digits = "".join([str(random.randint(0, 9)) for _ in range(5)])
 serial_number = f"00220A4J{random_digits}"
 
 # Execute the test
-test.execute(lambda: serial_number)
+with TofuPilot(test):
+    test.execute(lambda: serial_number)
