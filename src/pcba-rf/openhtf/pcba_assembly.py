@@ -20,12 +20,14 @@ def visual_inspection():
 # Validate the backplane interface connectivity
 @htf.measures(htf.Measurement("interface").equals(True))
 def backplane_interface_validation(test):
-    test.measurements.pcb_inspection = simulate_test_result(0.95)
+    test.measurements.interface = simulate_test_result(0.95)
 
 
 @htf.measures(htf.Measurement("firmware_version").equals("1.4.3"))
 def pcba_firmware_version(test):
-    firmware_version = "1.4.3" if simulate_test_result(0.99) else "1.4.2"
+    test.measurements.firmware_version = (
+        "1.4.3" if simulate_test_result(0.99) else "1.4.2"
+    )
 
 
 # Measure the power consumption of the UUT (in Watts)
@@ -33,7 +35,7 @@ def pcba_firmware_version(test):
     htf.Measurement("power_consumption").in_range(maximum=80.0).with_units(units.WATT)
 )
 def check_power_consumption(test):
-    passed = simulate_test_result(0.99)
+    passed = simulate_test_result(1)
     value_measured = (
         round(random.uniform(75, 80), 1) if passed else round(random.uniform(81, 85), 1)
     )
@@ -59,7 +61,7 @@ def check_thermal_sensor(test):
     .with_units(units.VOLT)
 )
 def check_power_supply_12V(test):
-    passed = simulate_test_result(0.95)
+    passed = simulate_test_result(1)
     value_measured = (
         round(random.uniform(12, 12.5), 1)
         if passed
@@ -74,7 +76,7 @@ def check_power_supply_12V(test):
     .with_units(units.VOLT)
 )
 def check_power_supply_3V3(test):
-    passed = simulate_test_result(0.90)
+    passed = simulate_test_result(1)
     value_measured = (
         round(random.uniform(3.3, 3.6), 2)
         if passed
@@ -86,22 +88,22 @@ def check_power_supply_3V3(test):
 # Verify read/write eeprom in following functions
 @htf.measures(htf.Measurement("eeprom_reading_status").equals(True))
 def read_eeprom(test):
-    test.measurements.eeprom_reading_status = simulate_test_result(0.98)
+    test.measurements.eeprom_reading_status = simulate_test_result(1)
 
 
 @htf.measures(htf.Measurement("eeprom_writing_status").equals(True))
 def write_eeprom(test):
-    test.measurements.eeprom_writing_status = simulate_test_result(0.97)
+    test.measurements.eeprom_writing_status = simulate_test_result(1)
 
 
 @htf.measures(htf.Measurement("emmc_status").equals(True))
 def read_and_write_eMMC(test):
-    test.measurements.emmc_status = simulate_test_result(0.96)
+    test.measurements.emmc_status = simulate_test_result(0.98)
 
 
 @htf.measures(htf.Measurement("jtag_connector_status").equals(True))
 def check_JTAG_connector(test):
-    test.measurements.jtag_connector_status = simulate_test_result(0.99)
+    test.measurements.jtag_connector_status = simulate_test_result(1)
 
 
 @htf.measures(
@@ -110,7 +112,7 @@ def check_JTAG_connector(test):
     .with_units(units.DECIBEL_MILLIWATTS)
 )
 def check_gain_bandwidth_at_15GHz(test):
-    passed = simulate_test_result(0.98)
+    passed = simulate_test_result(1)
     value_measured = (
         round(random.uniform(-7.2, -6.8), 1)
         if passed
@@ -140,7 +142,7 @@ def check_gain_bandwidth_at_15p5GHz(test):
     .with_units(units.DECIBEL_MILLIWATTS)
 )
 def check_gain_bandwidth_at_16GHz(test):
-    passed = simulate_test_result(0.99)
+    passed = simulate_test_result(1)
     value_measured = (
         round(random.uniform(-7.2, -6.8), 1)
         if passed
@@ -166,7 +168,7 @@ def main(test_qty):
             check_gain_bandwidth_at_15GHz,
             check_gain_bandwidth_at_15p5GHz,
             check_gain_bandwidth_at_16GHz,
-            procedure_id="FVT18",
+            procedure_id="FVT1",
             part_number="00389",
             sub_units=[{"serial_number": "00375A4J34856"}],
             revision="A",

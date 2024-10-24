@@ -11,17 +11,19 @@ def simulate_test_result(passed_prob):
 
 @htf.measures(htf.Measurement("firmware_version").equals("1.4.3"))
 def pcba_firmware_version(test):
-    firmware_version = "1.4.3" if simulate_test_result(0.99) else "1.4.2"
+    test.measurements.firmware_version = (
+        "1.4.3" if simulate_test_result(0.99) else "1.4.2"
+    )
 
 
 @htf.measures(htf.Measurement("button_status").equals(True))
 def check_button(test):
-    button_status = simulate_test_result(1)
+    test.measurements.button_status = simulate_test_result(1)
 
 
 @htf.measures(htf.Measurement("led_status").equals(True))
 def check_led_switch_on(test):
-    button_status = simulate_test_result(0.98)
+    test.measurements.led_status = simulate_test_result(1)
 
 
 @htf.measures(htf.Measurement("input_voltage").in_range(20, 60).with_units(units.VOLT))
@@ -36,7 +38,7 @@ def test_voltage_input(test):
     htf.Measurement("output_voltage").in_range(220, 240).with_units(units.VOLT)
 )
 def test_voltage_output(test):
-    passed = simulate_test_result(0.99)
+    passed = simulate_test_result(1)
     test.measurements.output_voltage = (
         round(random.uniform(220, 240)) if passed else round(random.uniform(190, 200))
     )
@@ -50,11 +52,11 @@ def test_voltage_output(test):
 def test_overcurrent_protection(test):
     passed = simulate_test_result(0.80)
     test.measurements.current_protection_triggered = (
-        round(random.uniform(26, 32), 1) if passed else round(random.uniform(20, 24), 1)
+        round(random.uniform(20, 22), 1) if passed else round(random.uniform(30, 35), 1)
     )
 
 
-def test_battery_switch(test):
+def test_battery_switch():
     if simulate_test_result(0.98):
         return htf.PhaseResult.CONTINUE
     else:
@@ -73,14 +75,14 @@ def test_converter_efficiency(test):
     test.measurements.efficiency = round(((output_power / input_power) * 100), 1)
 
 
-@htf.measures(htf.Measurement("power_mode_functional").equals(True))
+@htf.measures(htf.Measurement("power_mode_functional").equals("on"))
 def test_power_saving_mode(test):
-    test.measurement.power_mode_functional = simulate_test_result(1)
+    test.measurements.power_mode_functional = "on" if simulate_test_result(1) else "off"
 
 
 def visual_control_pcb_coating(test):
     if simulate_test_result(1):
-        test.attach_from_file("pcba-power/openhtf/pcb_coating.jpeg")
+        test.attach_from_file("src/pcba-power/openhtf/pcb_coating.jpeg")
         return htf.PhaseResult.CONTINUE
     else:
         return htf.PhaseResult.STOP
