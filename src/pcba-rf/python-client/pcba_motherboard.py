@@ -1,8 +1,6 @@
 from tofupilot import TofuPilotClient
 from datetime import datetime, timedelta
 import random
-import uuid
-
 
 client = TofuPilotClient()
 
@@ -35,7 +33,7 @@ def frequency_range_test():
 
 
 def bandwidth_test():
-    passed = simulate_test_result(0.8)
+    passed = simulate_test_result(0.85)
     value_measured = (
         round(random.uniform(100, 18000), 2)
         if passed
@@ -109,30 +107,34 @@ def run_all_tests():
 
 # Manage the test execution and create a test run for each unit
 def handle_test(end):
-    for _ in range(end):
-        # Generate a unique serial number for each Unit Under Test (UUT)
-        part_number = "00375"
-        revision = "A"
-        static_segment = "4J"
-        batch_number = "1024"
-        random_digits = "".join([str(random.randint(0, 9)) for _ in range(5)])
-        serial_number = f"{part_number}{revision}{static_segment}{random_digits}"
+    with open("src/pcba-rf/serial_numbers.txt", "a") as f:
+        for _ in range(end):
+            random_digits = "".join([str(random.randint(0, 9)) for _ in range(5)])
+            serial_number = f"00375A4J{random_digits}"
 
-        # Run all tests
-        steps = run_all_tests()
+            f.write(f"{serial_number}\n")
 
-        # Create a Run on TofuPilot
-        client.create_run(
-            procedure_id="FVT2",
-            unit_under_test={
-                "part_number": part_number,
-                "revision": revision,
-                "serial_number": serial_number,
-                "batch_number": batch_number,
-            },
-            run_passed=all(step["step_passed"] for step in steps),
-            steps=steps,
-        )
+            failure_count = 0
+            while True:
+                steps = run_all_tests()
+                run_passed = all(step["step_passed"] for step in steps)
+
+                client.create_run(
+                    procedure_id="FVT1",
+                    unit_under_test={
+                        "part_number": "00375",
+                        "revision": "A",
+                        "serial_number": serial_number,
+                        "batch_number": "1024",
+                    },
+                    run_passed=run_passed,
+                    steps=steps,
+                )
+
+                if run_passed or failure_count >= 5:
+                    break
+                else:
+                    failure_count += 1
 
 
 if __name__ == "__main__":

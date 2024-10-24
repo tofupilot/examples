@@ -1,6 +1,7 @@
 import openhtf as htf
 from openhtf.util import units
 import random
+from pathlib import Path
 from tofupilot.openhtf import TofuPilot
 
 
@@ -151,8 +152,16 @@ def check_gain_bandwidth_at_16GHz(test):
     test.measurements.gain_bandwidth_16GHz = value_measured
 
 
+def load_subunits_serial_numbers(filepath):
+    with open(filepath, "r") as f:
+        return [line.strip() for line in f]
+
+
 def main(test_qty):
-    for _ in range(test_qty):
+    filepath = Path("src/pcba-rf/serial_numbers.txt")
+    subunits_serial_numbers = load_subunits_serial_numbers(filepath)
+
+    for i in range(test_qty):
         test = htf.Test(
             visual_inspection,
             backplane_interface_validation,
@@ -168,9 +177,9 @@ def main(test_qty):
             check_gain_bandwidth_at_15GHz,
             check_gain_bandwidth_at_15p5GHz,
             check_gain_bandwidth_at_16GHz,
-            procedure_id="FVT1",
+            procedure_id="FVT19",
             part_number="00389",
-            sub_units=[{"serial_number": "00375A4J34856"}],
+            sub_units=[{"serial_number": subunits_serial_numbers[i]}],
             revision="A",
         )
 
