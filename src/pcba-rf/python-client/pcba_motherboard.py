@@ -135,5 +135,5 @@ def handle_test(end):
         )
 
 
-# Run mock-up for 1 unit
-handle_test(10)
+if __name__ == "__main__":
+    handle_test(10)

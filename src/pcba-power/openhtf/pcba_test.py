@@ -86,27 +86,33 @@ def visual_control_pcb_coating(test):
         return htf.PhaseResult.STOP
 
 
-# Define the test plan with all steps
-test = htf.Test(
-    pcba_firmware_version,
-    check_button,
-    check_led_switch_on,
-    test_voltage_input,
-    test_voltage_output,
-    test_overcurrent_protection,
-    test_battery_switch,
-    test_converter_efficiency,
-    test_power_saving_mode,
-    visual_control_pcb_coating,
-    procedure_id="FVT1",
-    part_number="00220",
-    revision="A",
-)
+def main(test_qty):
+    for _ in range(test_qty):
+        # Define the test plan with all steps
+        test = htf.Test(
+            pcba_firmware_version,
+            check_button,
+            check_led_switch_on,
+            test_voltage_input,
+            test_voltage_output,
+            test_overcurrent_protection,
+            test_battery_switch,
+            test_converter_efficiency,
+            test_power_saving_mode,
+            visual_control_pcb_coating,
+            procedure_id="FVT1",
+            part_number="00220",
+            revision="A",
+        )
 
-# Generate random Serial Number
-random_digits = "".join([str(random.randint(0, 9)) for _ in range(5)])
-serial_number = f"00220A4J{random_digits}"
+        # Generate random Serial Number
+        random_digits = "".join([str(random.randint(0, 9)) for _ in range(5)])
+        serial_number = f"00220A4J{random_digits}"
 
-# Execute the test
-with TofuPilot(test):
-    test.execute(lambda: serial_number)
+        # Execute the test
+        with TofuPilot(test):
+            test.execute(lambda: serial_number)
+
+
+if __name__ == "__main__":
+    main(5)

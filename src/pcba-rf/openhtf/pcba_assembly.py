@@ -149,36 +149,37 @@ def check_gain_bandwidth_at_16GHz(test):
     test.measurements.gain_bandwidth_16GHz = value_measured
 
 
-def main():
-    test = htf.Test(
-        visual_inspection,
-        backplane_interface_validation,
-        pcba_firmware_version,
-        check_power_supply_12V,
-        check_power_supply_3V3,
-        check_power_consumption,
-        check_thermal_sensor,
-        read_eeprom,
-        write_eeprom,
-        read_and_write_eMMC,
-        check_JTAG_connector,
-        check_gain_bandwidth_at_15GHz,
-        check_gain_bandwidth_at_15p5GHz,
-        check_gain_bandwidth_at_16GHz,
-        procedure_id="FVT3",
-        part_number="00389",
-        sub_units=[{"serial_number": "00375A4J34856"}],
-        revision="A",
-    )
+def main(test_qty):
+    for _ in range(test_qty):
+        test = htf.Test(
+            visual_inspection,
+            backplane_interface_validation,
+            pcba_firmware_version,
+            check_power_supply_12V,
+            check_power_supply_3V3,
+            check_power_consumption,
+            check_thermal_sensor,
+            read_eeprom,
+            write_eeprom,
+            read_and_write_eMMC,
+            check_JTAG_connector,
+            check_gain_bandwidth_at_15GHz,
+            check_gain_bandwidth_at_15p5GHz,
+            check_gain_bandwidth_at_16GHz,
+            procedure_id="FVT18",
+            part_number="00389",
+            sub_units=[{"serial_number": "00375A4J34856"}],
+            revision="A",
+        )
 
-    # Generate random Serial Number
-    random_digits = "".join([str(random.randint(0, 9)) for _ in range(5)])
-    serial_number = f"00389B4J{random_digits}"
+        # Generate random Serial Number
+        random_digits = "".join([str(random.randint(0, 9)) for _ in range(5)])
+        serial_number = f"00389B4J{random_digits}"
 
-    # Execute the test
-    with TofuPilot(test):
-        test.execute(lambda: serial_number)
+        # Execute the test
+        with TofuPilot(test):
+            test.execute(lambda: serial_number)
 
 
 if __name__ == "__main__":
-    main()
+    main(10)
