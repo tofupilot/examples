@@ -191,6 +191,9 @@ def main(test_qty):
         with TofuPilot(test):
             test.execute(lambda: serial_number)
 
+    with open(filepath, "w") as f:
+        pass  # Empty file after use
+
 
 if __name__ == "__main__":
     main(10)
