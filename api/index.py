@@ -5,7 +5,18 @@ from tofupilot import TofuPilotClient
 
 class handler(BaseHTTPRequestHandler):
 
-    def do_GET(self):
+    def do_OPTIONS(self):
+        # Handle preflight requests for CORS
+        self.send_response(200)
+        self.send_header("Access-Control-Allow-Origin", "*")
+        self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Authorization, Content-Type")
+        self.end_headers()
+
+    def do_POST(self):
+        # Add CORS headers
+        self.send_header("Access-Control-Allow-Origin", "*")
+
         auth_header = self.headers.get("Authorization")
         _, token = auth_header.split(" ")
 
