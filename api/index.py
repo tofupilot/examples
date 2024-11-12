@@ -22,7 +22,11 @@ class handler(BaseHTTPRequestHandler):
 
         client = TofuPilotClient(api_key=token, base_url="http://localhost:3000")
 
-        client.create_run(procedure_id="FVT1", serial_number="SN15", part_number="PN15")
+        client.create_run(
+            procedure_id="FVT1",
+            unit_under_test={"serial_number": "SN15", "part_number": "PN15"},
+            run_passed=True,
+        )
 
         self.send_response(200)
         self.send_header("Content-type", "text/plain")
