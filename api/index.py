@@ -1,31 +1,18 @@
 from http.server import BaseHTTPRequestHandler
 
-import openhtf as htf
-from openhtf.util import units
-from tofupilot.openhtf import TofuPilot
-
-
-def phase_one(test):
-    return htf.PhaseResult.CONTINUE
-
-
-@htf.measures(
-    htf.Measurement("temperature").in_range(0, 100).with_units(units.DEGREE_CELSIUS)
-)
-def phase_temperature(test):
-    test.measurements.temperature = 25
-
-
-def main():
-    test = htf.Test(phase_one, phase_temperature)
-    with TofuPilot(test):  # just works
-        test.execute(lambda: "PCB001")
+from tofupilot import TofuPilotClient
 
 
 class handler(BaseHTTPRequestHandler):
 
     def do_GET(self):
-        main()
+        auth_header = self.headers.get("Authorization")
+        _, token = auth_header.split(" ")
+
+        client = TofuPilotClient(api_key=token, base_url="http://localhost:3000")
+
+        client.create_run(procedure_id="FVT1", serial_number="SN15", part_number="PN15")
+
         self.send_response(200)
         self.send_header("Content-type", "text/plain")
         self.end_headers()
