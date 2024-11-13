@@ -3,6 +3,8 @@ import json
 
 from tofupilot import TofuPilotClient
 
+from src.scripts.client_simple import client_simple
+
 
 class handler(BaseHTTPRequestHandler):
 
@@ -26,7 +28,7 @@ class handler(BaseHTTPRequestHandler):
             return
 
         try:
-            _, token = auth_header.split(" ")
+            _, api_key = auth_header.split(" ")
         except ValueError:
             self.send_response(400)  # Bad Request
             self.end_headers()
@@ -48,13 +50,7 @@ class handler(BaseHTTPRequestHandler):
         # Extract base_url, defaulting to None if not provided
         base_url = body_data.get("base_url", None)
 
-        client = TofuPilotClient(api_key=token, base_url=base_url)
-
-        client.create_run(
-            procedure_id="FVT1",
-            unit_under_test={"serial_number": "SN15", "part_number": "PN15"},
-            run_passed=True,
-        )
+        client_simple(api_key, base_url)
 
         self.send_response(200)
         self.send_header("Content-type", "text/plain")
