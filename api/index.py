@@ -1,9 +1,9 @@
 from http.server import BaseHTTPRequestHandler
 import json
 
-from tofupilot import TofuPilotClient
 
-from src.scripts.client_simple import client_simple
+import src.scripts.client as client
+import src.scripts.openhtf as openhtf
 
 
 class handler(BaseHTTPRequestHandler):
@@ -49,8 +49,12 @@ class handler(BaseHTTPRequestHandler):
 
         # Extract base_url, defaulting to None if not provided
         base_url = body_data.get("base_url", None)
+        framework = body_data.get("framework", "openhtf")
 
-        client_simple(api_key, base_url)
+        if framework == "client":
+            client.simple(api_key, base_url)
+        elif framework == "openhtf":
+            openhtf.simple(api_key, base_url)
 
         self.send_response(200)
         self.send_header("Content-type", "text/plain")

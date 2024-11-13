@@ -10,7 +10,7 @@ from datetime import timedelta
 from tofupilot import TofuPilotClient
 
 
-def client_simple(api_key: Optional[str], base_url: Optional[str]):
+def simple(api_key: Optional[str], base_url: Optional[str]):
 
     # Initialize the TofuPilot client.
     client = TofuPilotClient(api_key=api_key, base_url=base_url)
