@@ -5,6 +5,8 @@ This script initializes a test run for a unit with the serial number "00102" and
 The test run is marked as successful (passed) with a single step.
 """
 
+from typing import Optional
+
 import openhtf as htf
 from tofupilot.openhtf import TofuPilot
 
