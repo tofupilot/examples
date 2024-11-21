@@ -1,0 +1,16 @@
+{
+    "configurations": [
+        {
+            "name": "pcba",
+            "type": "python",
+            "workingDir": "$PROJECT_DIR$",
+            "environment": {
+                "PYTHONUNBUFFERED": "1",
+                "PYTHONPATH": "$PROJECT_DIR$",
+                "TOFUPILOT_API_KEY": "",
+            },
+            "file": "$PROJECT_DIR$/pcba.py",
+            "arguments": ["-vvv"],
+        }
+    ]
+}
