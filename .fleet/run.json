@@ -11,6 +11,18 @@
             },
             "file": "$PROJECT_DIR$/pcba.py",
             "arguments": ["-vvv"],
+        },
+        {
+            "name": "sensors",
+            "type": "python",
+            "workingDir": "$PROJECT_DIR$",
+            "environment": {
+                "PYTHONUNBUFFERED": "1",
+                "PYTHONPATH": "$PROJECT_DIR$",
+                "TOFUPILOT_API_KEY": "02200a2e-22cb-40c7-ab58-33df195b4420",
+            },
+            "file": "$PROJECT_DIR$/sensor_check.py",
+            "arguments": ["-vvv"],
         }
     ]
 }
