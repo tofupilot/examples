@@ -61,3 +61,12 @@ jobs:
           for file in src/drone/python-client/*.py; do
             python "$file"
           done
+
+      # Set TOFUPILOT_API_KEY and run all Python files in corresponding folder
+      - name: Run Drone scripts for third drone organizatoin
+        env:
+          TOFUPILOT_API_KEY: ${{ secrets.DEMO1_API_KEY }}
+        run: |
+          for file in src/drone/python-client/*.py; do
+            python "$file"
+          done
