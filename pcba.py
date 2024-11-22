@@ -8,7 +8,7 @@ from openhtf.util import units
 from openhtf.util.configuration import CONF
 from tofupilot.openhtf import TofuPilot
 
-from plug.custom.mock_drone_com import MockDroneCom
+from plug.com.mock_drone_com import MockDroneCom
 from plug.power.mock_psu_control import MockPsuControl
 from plug.programmer.dfu_util import DfuUtil
 from plug.system.lsusb import Lsusb
