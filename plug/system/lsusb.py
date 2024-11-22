@@ -13,7 +13,7 @@ class Lsusb(BasePlug):
     """
 
     def __init__(self):
-        self.simulated_mode: bool = CONF.get('simulated', False)
+        self.simulated_mode: bool = getattr(CONF, 'simulated', False)
 
     def list_devices(self) -> List[str]:
         if self.simulated_mode:

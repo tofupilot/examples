@@ -25,7 +25,7 @@ class Acroname2x4(BasePlug):
     serial_number: Optional[str] = None
 
     def __init__(self):
-        self.simulated_mode: bool = CONF.get('simulated', False)
+        self.simulated_mode: bool = getattr(CONF, 'simulated', False)
         if not self.simulated_mode:
             self.stem: USBHub2x4 = USBHub2x4()
 
