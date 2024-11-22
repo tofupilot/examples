@@ -345,5 +345,5 @@ def execute_procedures(end):
         )
 
 
-# Run all procedures for 20 units
-execute_procedures(20)
+if __name__ == "__main__":
+    execute_procedures(20)

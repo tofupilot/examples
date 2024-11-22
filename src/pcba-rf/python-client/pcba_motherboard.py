@@ -1,44 +1,62 @@
 from tofupilot import TofuPilotClient
 from datetime import datetime, timedelta
 import random
-import uuid
-
 
 client = TofuPilotClient()
+
 
 # Simulate FPY (First Pass Yield) for each step
 def simulate_test_result(passed_prob):
     return random.random() < passed_prob
+
 
 # Boolean Steps
 def power_supply_test():
     passed = simulate_test_result(1)
     return passed, None, None, None, None
 
+
 def ddr4_memory_check():
-    passed = simulate_test_result(0.99)
+    passed = simulate_test_result(1)
     return passed, None, None, None, None
+
 
 # Numeric Measurement Steps
 def frequency_range_test():
-    passed = simulate_test_result(0.95)
-    value_measured = round(random.uniform(100, 18000), 2) if passed else round(random.uniform(50, 99), 2) #To CHANGE
+    passed = simulate_test_result(0.99)
+    value_measured = (
+        round(random.uniform(100, 18000), 2)
+        if passed
+        else round(random.uniform(50, 99), 2)
+    )  # To CHANGE
     return passed, value_measured, "MHz", 100, 18000
+
 
 def bandwidth_test():
-    passed = simulate_test_result(0.75)
-    value_measured = round(random.uniform(100, 18000), 2) if passed else round(random.uniform(50, 99), 2) #To CHANGE
+    passed = simulate_test_result(0.85)
+    value_measured = (
+        round(random.uniform(100, 18000), 2)
+        if passed
+        else round(random.uniform(50, 99), 2)
+    )  # To CHANGE
     return passed, value_measured, "MHz", 100, 18000
 
+
 def input_signal_power_test():
-    passed = simulate_test_result(0.98)
-    value_measured = round(random.uniform(8, 12), 2) if passed else round(random.uniform(0, 7), 2)
+    passed = simulate_test_result(0.99)
+    value_measured = (
+        round(random.uniform(8, 12), 2) if passed else round(random.uniform(0, 7), 2)
+    )
     return passed, value_measured, "dBm", None, 20
 
+
 def output_signal_power_test():
-    passed = simulate_test_result(0.98)
-    value_measured = round(random.uniform(8, 12), 2) if passed else round(random.uniform(0, 7), 2)
+    passed = simulate_test_result(0.99)
+    value_measured = (
+        round(random.uniform(8, 12), 2) if passed else round(random.uniform(0, 7), 2)
+    )
     return passed, value_measured, "dBm", 7, 15
+
 
 def adc_dac_resolution_check():
     passed = simulate_test_result(1)
@@ -63,6 +81,7 @@ def run_test(test, duration):
     }
     return step
 
+
 # Execute all steps for the PCBA Motherboard Test
 def run_all_tests():
     tests = [
@@ -85,32 +104,38 @@ def run_all_tests():
 
     return steps
 
+
 # Manage the test execution and create a test run for each unit
 def handle_test(end):
-   for _ in range(end):
-        # Generate a unique serial number for each Unit Under Test (UUT)
-        part_number = "00375"
-        revision = "A"
-        static_segment = "4J"
-        batch_number = "1024"
-        random_digits = "".join([str(random.randint(0, 9)) for _ in range(5)])
-        serial_number = f"{part_number}{revision}{static_segment}{random_digits}"
+    with open("src/pcba-rf/serial_numbers.txt", "a") as f:
+        for _ in range(end):
+            random_digits = "".join([str(random.randint(0, 9)) for _ in range(5)])
+            serial_number = f"00375A4J{random_digits}"
 
-        # Run all tests
-        steps = run_all_tests()
+            f.write(f"{serial_number}\n")
 
-        # Create a Run on TofuPilot
-        client.create_run(
-            procedure_id="FVT2",
-            unit_under_test={
-                "part_number": part_number,
-                "revision": revision,
-                "serial_number": serial_number,
-                "batch_number": batch_number,
-            },
-            run_passed=all(step["step_passed"] for step in steps),
-            steps=steps,
-        )
+            failure_count = 0
+            while True:
+                steps = run_all_tests()
+                run_passed = all(step["step_passed"] for step in steps)
 
-# Run mock-up for 1 unit
-handle_test(9)
+                client.create_run(
+                    procedure_id="FVT1",
+                    unit_under_test={
+                        "part_number": "00375",
+                        "revision": "A",
+                        "serial_number": serial_number,
+                        "batch_number": "1024",
+                    },
+                    run_passed=run_passed,
+                    steps=steps,
+                )
+
+                if run_passed or failure_count >= 5:
+                    break
+                else:
+                    failure_count += 1
+
+
+if __name__ == "__main__":
+    handle_test(10)
