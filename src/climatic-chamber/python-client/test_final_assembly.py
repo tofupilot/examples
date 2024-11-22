@@ -161,26 +161,26 @@ def run_all_tests():
     return steps
 
 
-def handle_test():
-    # Generate a unique serial number for each UUT (Unit Under Test)
-    serial_number = str(uuid.uuid4())[:8]
+def handle_test(test_qty):
+    for _ in range(test_qty):
+        # Generate a unique serial number for each UUT (Unit Under Test)
+        serial_number = str(uuid.uuid4())[:8]
 
-    # Run all tests
-    steps = run_all_tests()
+        # Run all tests
+        steps = run_all_tests()
 
-    # Create a Run on TofuPilot
-    client.create_run(
-        procedure_id="FVT1",
-        unit_under_test={
-            "part_number": "UNIT42",
-            "revision": "1.0",
-            "serial_number": serial_number,
-        },
-        run_passed=all(step["step_passed"] for step in steps),
-        steps=steps,
-    )
+        # Create a Run on TofuPilot
+        client.create_run(
+            procedure_id="FVT1",
+            unit_under_test={
+                "part_number": "UNIT42",
+                "revision": "1.0",
+                "serial_number": serial_number,
+            },
+            run_passed=all(step["step_passed"] for step in steps),
+            steps=steps,
+        )
 
 
-# Run mock-up for x units
-for _ in range(20):
-    handle_test()
+if __name__ == "__main__":
+    handle_test(10)
