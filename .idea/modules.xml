@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/microcontroller_programming.iml" filepath="$PROJECT_DIR$/.idea/microcontroller_programming.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/openhtf_templates.iml" filepath="$PROJECT_DIR$/.idea/openhtf_templates.iml" />
     </modules>
   </component>
 </project>

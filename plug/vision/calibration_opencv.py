@@ -6,20 +6,20 @@ import glob
 import os
 
 
-def calibrate_camera(checkerboard_dims, square_size, image_save_path):
+def calibrate_camera(checkerboard_dims, square_size, image_path):
     """
     Calibrate the camera using the captured images.
 
     Args:
         checkerboard_dims (tuple): Number of inner corners per chessboard row and column (columns, rows).
         square_size (float): Size of a square in your defined unit (e.g., millimeters).
-        image_save_path (str): Directory containing captured images.
+        image_path (str): Directory containing calibration images.
 
     Returns:
         dict: Calibration results including reprojection error, camera matrix, and distortion coefficients.
     """
     # Prepare object points
-    objp = np.zeros((checkerboard_dims[1]*checkerboard_dims[0], 3), np.float32)
+    objp = np.zeros((checkerboard_dims[1] * checkerboard_dims[0], 3), np.float32)
     objp[:, :2] = np.mgrid[0:checkerboard_dims[0], 0:checkerboard_dims[1]].T.reshape(-1, 2)
     objp *= square_size
 
@@ -28,7 +28,7 @@ def calibrate_camera(checkerboard_dims, square_size, image_save_path):
     imgpoints = []  # 2D points in image plane
 
     # Get list of images
-    images = glob.glob(os.path.join(image_save_path, 'calibration_image_*.jpg'))
+    images = glob.glob(os.path.join(image_path, 'calibration_image_*.jpg'))
 
     if not images:
         print('No calibration images found.')
@@ -71,7 +71,7 @@ def calibrate_camera(checkerboard_dims, square_size, image_save_path):
         return None
 
     # Save calibration parameters
-    calibration_file = os.path.join(image_save_path, 'calibration_parameters.yaml')
+    calibration_file = os.path.join(image_path, 'calibration_parameters.yaml')
     cv_file = cv2.FileStorage(calibration_file, cv2.FILE_STORAGE_WRITE)
     cv_file.write('camera_matrix', camera_matrix)
     cv_file.write('distortion_coefficients', distortion_coefficients)
@@ -86,44 +86,53 @@ def calibrate_camera(checkerboard_dims, square_size, image_save_path):
     }
 
 
-def validate_calibration(calibration_results, camera_id, simulated_mode=False):
+def validate_calibration(calibration_results, camera_id=None, simulated_mode=False, sample_image_path=None):
     """
-    Validate the calibration results by undistorting a live image.
+    Validate the calibration results by undistorting an image.
 
     Args:
         calibration_results (dict): Calibration results containing camera matrix and distortion coefficients.
-        camera_id (int): ID of the camera to use for validation.
-        simulated_mode (bool): If True, simulate the validation process.
+        camera_id (int, optional): ID of the camera to use for validation.
+        simulated_mode (bool): If True, uses sample image for validation.
+        sample_image_path (str, optional): Path to sample images directory.
     """
-    if simulated_mode:
-        print("Simulated mode enabled. Skipping validation.")
-        return
-
     camera_matrix = calibration_results['camera_matrix']
     distortion_coefficients = calibration_results['distortion_coefficients']
 
-    cap = cv2.VideoCapture(camera_id)
-    if not cap.isOpened():
-        print('Cannot open camera for validation.')
-        return
+    if simulated_mode:
+        # Use a sample image for validation
+        if sample_image_path is None:
+            print('Sample image path not provided for validation in simulated mode.')
+            return
+        validation_image_path = os.path.join(sample_image_path, 'validation_image.jpg')
+        img = cv2.imread(validation_image_path)
+        if img is None:
+            print('Failed to load sample validation image.')
+            return
+    else:
+        # Capture image from camera
+        cap = cv2.VideoCapture(camera_id)
+        if not cap.isOpened():
+            print('Cannot open camera for validation.')
+            return
 
-    ret, frame = cap.read()
-    if not ret:
-        print('Failed to capture frame for validation.')
+        ret, img = cap.read()
         cap.release()
-        return
 
-    h, w = frame.shape[:2]
+        if not ret:
+            print('Failed to capture frame for validation.')
+            return
+
+    h, w = img.shape[:2]
     new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(
         camera_matrix, distortion_coefficients, (w, h), 1, (w, h)
     )
 
     # Undistort
-    undistorted_img = cv2.undistort(frame, camera_matrix, distortion_coefficients, None, new_camera_matrix)
+    undistorted_img = cv2.undistort(img, camera_matrix, distortion_coefficients, None, new_camera_matrix)
 
     # Display images side by side
-    combined = np.hstack((frame, undistorted_img))
+    combined = np.hstack((img, undistorted_img))
     cv2.imshow('Validation - Original (Left) vs Undistorted (Right)', combined)
     cv2.waitKey(5000)  # Display for 5 seconds
     cv2.destroyAllWindows()
-    cap.release()

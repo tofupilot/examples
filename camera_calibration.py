@@ -1,11 +1,14 @@
 # camera_calibration.py
-
+import json
 import os
+
+import numpy as np
 import openhtf as htf
 from openhtf import measures
 from openhtf.plugs import plug, user_input
 from openhtf.util.configuration import CONF
 from tofupilot.openhtf import TofuPilot
+from openhtf import measures
 
 from plug.vision.camera import Camera
 
@@ -20,7 +23,7 @@ CONF.declare('image_save_path', default_value='calibration_images', description=
 CONF.declare('camera_id', default_value=0, description='Camera device ID.')
 
 # Simulated run with no hardware or real run?
-CONF.declare('simulated', default_value=False, description='Simulated mode toggle.')
+CONF.declare('simulated', default_value=True, description='Simulated mode toggle.')
 
 # Ensure the image save directory exists
 os.makedirs(CONF.image_save_path, exist_ok=True)
@@ -45,19 +48,19 @@ def capture_calibration_images(test, camera):
 
 ## Step 3: Run calibration algorithm
 @plug(camera=Camera)
-@measures(
-    htf.Measurement('reprojection_error').with_units('pixel'),
-    htf.Measurement('camera_matrix'),
-    htf.Measurement('distortion_coefficients')
+@htf.measures(
+    htf.Measurement('reprojection_error').with_units('pixel')
 )
 def run_calibration(test, camera):
     test.logger.info('Starting camera calibration.')
     calibration_results = camera.calibrate(CONF.checkerboard_dims, CONF.square_size, CONF.image_save_path)
     if calibration_results:
-        test.measurements.reprojection_error = calibration_results['reprojection_error']
-        test.measurements.camera_matrix = calibration_results['camera_matrix']
-        test.measurements.distortion_coefficients = calibration_results['distortion_coefficients']
-        test.logger.info(f"Calibration successful with reprojection error: {calibration_results['reprojection_error']}")
+        reprojection_error = float(calibration_results['reprojection_error'])
+        test.measurements.reprojection_error = reprojection_error
+        test.logger.info(f"Calibration successful with reprojection error: {reprojection_error}")
+
+        # Store calibration data in test state using dictionary syntax
+        test.state['calibration_data'] = calibration_results
     else:
         test.logger.error('Calibration failed.')
         return htf.PhaseResult.STOP
@@ -66,12 +69,15 @@ def run_calibration(test, camera):
 @plug(camera=Camera)
 def validate_calibration(test, camera):
     test.logger.info('Validating calibration results.')
-    calibration_results = {
-        'camera_matrix': test.measurements.camera_matrix,
-        'distortion_coefficients': test.measurements.distortion_coefficients
-    }
-    camera.validate(calibration_results)
+    # Retrieve calibration data from test state using dictionary syntax
+    calibration_data = test.state.get('calibration_data', None)
+    if not calibration_data:
+        test.logger.error('Calibration data not found.')
+        return htf.PhaseResult.STOP
+
+    camera.validate(calibration_data)
     test.logger.info('Calibration validation completed.')
+
 
 ## Teardown
 @plug(camera=Camera)
@@ -91,8 +97,8 @@ def main():
         procedure_id="CCT-1"
     )
 
-    # with TofuPilot(test):
-    test.execute(test_start=user_input.prompt_for_test_start())
+    with TofuPilot(test):
+        test.execute(test_start=user_input.prompt_for_test_start())
 
 if __name__ == "__main__":
     main()
