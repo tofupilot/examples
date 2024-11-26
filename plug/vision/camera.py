@@ -2,6 +2,7 @@
 
 import cv2
 import time
+import os
 
 from openhtf.plugs import BasePlug
 from openhtf.util.configuration import CONF
@@ -12,6 +13,8 @@ class Camera(BasePlug):
     """
     Handles communication with the camera and integrates calibration functions.
     """
+    simulated_mode: bool
+    camera_id: int
 
     def __init__(self):
         self.simulated_mode: bool = getattr(CONF, 'simulated', False)
@@ -26,7 +29,7 @@ class Camera(BasePlug):
             bool: True if the camera is successfully connected, False otherwise.
         """
         if self.simulated_mode:
-            print("Simulated mode enabled. Mocking camera connection.")
+            print("Simulated mode enabled. Skipping camera connection.")
             return True
 
         self.cap = cv2.VideoCapture(self.camera_id)
@@ -51,12 +54,6 @@ class Camera(BasePlug):
         Returns:
             frame: Captured image frame, or None if capture failed.
         """
-        if self.simulated_mode:
-            print("Simulated image capture.")
-            time.sleep(0.5)
-            # Return a dummy image or load from a file if needed
-            return None  # Simulate no image captured in simulated mode
-
         ret, frame = self.cap.read()
         if not ret:
             print("Failed to capture image from camera.")
@@ -71,11 +68,6 @@ class Camera(BasePlug):
             frame: The image frame to save.
             image_path (str): The path to save the image.
         """
-        if self.simulated_mode:
-            print(f"Simulated image save to {image_path}")
-            time.sleep(0.1)
-            return
-
         cv2.imwrite(image_path, frame)
         print(f"Image saved to {image_path}")
 
@@ -87,6 +79,11 @@ class Camera(BasePlug):
             num_images (int): Number of images to capture.
             image_save_path (str): Directory to save captured images.
         """
+        if self.simulated_mode:
+            print("Simulated mode: Using sample calibration images.")
+            # No need to capture images; calibration will use sample images directly
+            return
+
         images_captured = 0
         while images_captured < num_images:
             frame = self.capture_image()
@@ -96,7 +93,7 @@ class Camera(BasePlug):
             cv2.imshow('Calibration - Press SPACE to capture', frame)
             key = cv2.waitKey(1)
             if key % 256 == 32:  # SPACE pressed
-                image_path = f"{image_save_path}/calibration_image_{images_captured}.jpg"
+                image_path = os.path.join(image_save_path, f'calibration_image_{images_captured}.jpg')
                 self.save_image(frame, image_path)
                 images_captured += 1
                 print(f"Captured image {images_captured}/{num_images}")
@@ -119,7 +116,12 @@ class Camera(BasePlug):
         Returns:
             dict: Calibration results, or None if calibration failed.
         """
-        return calibrate_camera(checkerboard_dims, square_size, image_save_path)
+        if self.simulated_mode:
+            # Use sample images for calibration
+            sample_images_path = os.path.join(os.path.dirname(__file__), '../../sample_calibration_images')
+            return calibrate_camera(checkerboard_dims, square_size, sample_images_path)
+        else:
+            return calibrate_camera(checkerboard_dims, square_size, image_save_path)
 
     def validate(self, calibration_results):
         """
@@ -128,4 +130,9 @@ class Camera(BasePlug):
         Args:
             calibration_results (dict): Calibration results containing camera matrix and distortion coefficients.
         """
-        validate_calibration(calibration_results, self.camera_id, self.simulated_mode)
+        if self.simulated_mode:
+            # Use a sample image for validation
+            sample_images_path = os.path.join(os.path.dirname(__file__), '../../sample_calibration_images')
+            validate_calibration(calibration_results, None, simulated_mode=True, sample_image_path=sample_images_path)
+        else:
+            validate_calibration(calibration_results, self.camera_id)
