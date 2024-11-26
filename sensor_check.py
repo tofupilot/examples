@@ -1,17 +1,12 @@
-import time
-from typing import Optional
-
 import openhtf as htf
 from openhtf import measures
 from openhtf.plugs import plug, user_input
 from openhtf.util import units
 from openhtf.util.configuration import CONF
-
 from tofupilot.openhtf import TofuPilot
 
 from plug.com.mock_drone_com import MockDroneCom  # Assuming this plug can read all sensors
 from plug.power.mock_psu_control import MockPsuControl
-from plug.usb_switch.acroname2x4 import Acroname2x4
 
 # Test station specific configuration
 CONF.declare('known_distance_mm', default_value=1000, description='Known distance in millimeters for the laser distance sensor calibration.')
