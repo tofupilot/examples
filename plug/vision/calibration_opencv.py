@@ -1,9 +1,11 @@
 # plug/vision/calibration_opencv.py
-
-import cv2
-import numpy as np
 import glob
 import os
+from typing import Optional
+
+import cv2
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 def calibrate_camera(checkerboard_dims, square_size, image_path):
@@ -28,7 +30,8 @@ def calibrate_camera(checkerboard_dims, square_size, image_path):
     imgpoints = []  # 2D points in image plane
 
     # Get list of images
-    images = glob.glob(os.path.join(image_path, 'calibration_image_*.jpg'))
+    images = glob.glob(os.path.join(image_path, '*.jpg'))\
+             + glob.glob(os.path.join(image_path, '*.png'))
 
     if not images:
         print('No calibration images found.')
@@ -82,57 +85,51 @@ def calibrate_camera(checkerboard_dims, square_size, image_path):
     return {
         'reprojection_error': ret,
         'camera_matrix': camera_matrix,
-        'distortion_coefficients': distortion_coefficients
+        'distortion_coefficients': distortion_coefficients,
+        'calibration_file_path': os.path.abspath(calibration_file)
     }
 
 
-def validate_calibration(calibration_results, camera_id=None, simulated_mode=False, sample_image_path=None):
+def validate_calibration(calibration_results: dict, image_path: str = None) -> Optional[np.ndarray]:
     """
-    Validate the calibration results by undistorting an image.
+    Validate the calibration results by displaying the original and undistorted images side by side.
 
     Args:
         calibration_results (dict): Calibration results containing camera matrix and distortion coefficients.
-        camera_id (int, optional): ID of the camera to use for validation.
-        simulated_mode (bool): If True, uses sample image for validation.
-        sample_image_path (str, optional): Path to sample images directory.
+        image_path (str, optional): Path to the image to validate.
     """
+
     camera_matrix = calibration_results['camera_matrix']
     distortion_coefficients = calibration_results['distortion_coefficients']
 
-    if simulated_mode:
-        # Use a sample image for validation
-        if sample_image_path is None:
-            print('Sample image path not provided for validation in simulated mode.')
-            return
-        validation_image_path = os.path.join(sample_image_path, 'validation_image.jpg')
-        img = cv2.imread(validation_image_path)
-        if img is None:
-            print('Failed to load sample validation image.')
-            return
-    else:
-        # Capture image from camera
-        cap = cv2.VideoCapture(camera_id)
-        if not cap.isOpened():
-            print('Cannot open camera for validation.')
-            return
+    if image_path is None:
+        print('Image path not provided for validation.')
+        return
 
-        ret, img = cap.read()
-        cap.release()
+    img = cv2.imread(image_path, cv2.IMREAD_COLOR)
+    if img is None:
+        print('Failed to load image for validation.')
+        return
 
-        if not ret:
-            print('Failed to capture frame for validation.')
-            return
-
+    # Undistort the image
     h, w = img.shape[:2]
-    new_camera_matrix, roi = cv2.getOptimalNewCameraMatrix(
+    new_camera_matrix, _ = cv2.getOptimalNewCameraMatrix(
         camera_matrix, distortion_coefficients, (w, h), 1, (w, h)
     )
-
-    # Undistort
     undistorted_img = cv2.undistort(img, camera_matrix, distortion_coefficients, None, new_camera_matrix)
 
-    # Display images side by side
+    # Combine images side by side
     combined = np.hstack((img, undistorted_img))
-    cv2.imshow('Validation - Original (Left) vs Undistorted (Right)', combined)
-    cv2.waitKey(5000)  # Display for 5 seconds
-    cv2.destroyAllWindows()
+
+    # Convert BGR to RGB for Matplotlib
+    combined_rgb = cv2.cvtColor(combined, cv2.COLOR_BGR2RGB)
+
+    # Display the image using Matplotlib
+    plt.figure(figsize=(10, 6))  # Adjust the figsize as needed
+    plt.imshow(combined_rgb)
+    plt.title('Validation - Original (Left) vs Undistorted (Right)', fontsize=16)
+    plt.axis('off')  # Hide the axes
+    plt.tight_layout()
+    plt.show()
+
+    return undistorted_img

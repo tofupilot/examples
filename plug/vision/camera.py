@@ -1,11 +1,13 @@
 # plug/vision/camera.py
+import glob
+import os
+import time
+from typing import Optional
 
 import cv2
-import time
-import os
-
 from openhtf.plugs import BasePlug
 from openhtf.util.configuration import CONF
+
 from plug.vision.calibration_opencv import calibrate_camera, validate_calibration
 
 
@@ -20,6 +22,8 @@ class Camera(BasePlug):
         self.simulated_mode: bool = getattr(CONF, 'simulated', False)
         self.camera_id: int = getattr(CONF, 'camera_id', 0)
         self.cap = None
+        self.sample_images_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'sample_data', 'calibration_images')
+        self.real_image_path = getattr(CONF, 'image_save_path')
 
     def connect(self) -> bool:
         """
@@ -60,24 +64,24 @@ class Camera(BasePlug):
             return None
         return frame
 
-    def save_image(self, frame, image_path: str):
+    @staticmethod
+    def save_image(frame, image_path: str):
         """
         Save the captured image to the specified path.
 
         Args:
             frame: The image frame to save.
-            image_path (str): The path to save the image.
+            image_path: Path to save it to
         """
         cv2.imwrite(image_path, frame)
         print(f"Image saved to {image_path}")
 
-    def capture_calibration_images(self, num_images: int, image_save_path: str):
+    def capture_calibration_images(self, num_images: int):
         """
         Capture a specified number of calibration images.
 
         Args:
             num_images (int): Number of images to capture.
-            image_save_path (str): Directory to save captured images.
         """
         if self.simulated_mode:
             print("Simulated mode: Using sample calibration images.")
@@ -93,7 +97,7 @@ class Camera(BasePlug):
             cv2.imshow('Calibration - Press SPACE to capture', frame)
             key = cv2.waitKey(1)
             if key % 256 == 32:  # SPACE pressed
-                image_path = os.path.join(image_save_path, f'calibration_image_{images_captured}.jpg')
+                image_path = os.path.join(self.real_image_path, f'calibration_image_{images_captured}.jpg')
                 self.save_image(frame, image_path)
                 images_captured += 1
                 print(f"Captured image {images_captured}/{num_images}")
@@ -104,26 +108,24 @@ class Camera(BasePlug):
 
         cv2.destroyAllWindows()
 
-    def calibrate(self, checkerboard_dims, square_size, image_save_path):
+    def calibrate(self, checkerboard_dims: tuple, square_size: float) -> Optional[dict]:
         """
         Perform camera calibration using captured images.
 
         Args:
             checkerboard_dims (tuple): Dimensions of the checkerboard pattern (columns, rows).
             square_size (float): Size of a square in the checkerboard pattern.
-            image_save_path (str): Directory containing captured images.
 
         Returns:
             dict: Calibration results, or None if calibration failed.
         """
         if self.simulated_mode:
             # Use sample images for calibration
-            sample_images_path = os.path.join(os.path.dirname(__file__), '../../sample_calibration_images')
-            return calibrate_camera(checkerboard_dims, square_size, sample_images_path)
+            return calibrate_camera(checkerboard_dims, square_size, self.sample_images_path)
         else:
-            return calibrate_camera(checkerboard_dims, square_size, image_save_path)
+            return calibrate_camera(checkerboard_dims, square_size, self.real_image_path)
 
-    def validate(self, calibration_results):
+    def validate(self, calibration_results: dict) -> str:
         """
         Validate the calibration results by undistorting an image.
 
@@ -131,8 +133,15 @@ class Camera(BasePlug):
             calibration_results (dict): Calibration results containing camera matrix and distortion coefficients.
         """
         if self.simulated_mode:
-            # Use a sample image for validation
-            sample_images_path = os.path.join(os.path.dirname(__file__), '../../sample_calibration_images')
-            validate_calibration(calibration_results, None, simulated_mode=True, sample_image_path=sample_images_path)
+            undistorted_img_path = os.path.join(self.sample_images_path, f'undistorted_image.jpg')
+            undistorted_frame = validate_calibration(calibration_results,
+                                                     image_path=( glob.glob(os.path.join(self.sample_images_path, '*.jpg'))
+                                                                  + glob.glob(os.path.join(self.sample_images_path, '*.png')) )[0])
         else:
-            validate_calibration(calibration_results, self.camera_id)
+            undistorted_img_path = os.path.join(self.real_image_path, f'undistorted_image.jpg')
+            undistorted_frame = validate_calibration(calibration_results,
+                                                     image_path=( glob.glob(os.path.join(self.real_image_path, '*.jpg'))
+                                                                  + glob.glob(os.path.join(self.real_image_path, '*.png')) )[0])
+        self.save_image(undistorted_frame, undistorted_img_path)
+
+        return os.path.abspath(undistorted_img_path)
