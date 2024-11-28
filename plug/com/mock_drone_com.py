@@ -1,3 +1,4 @@
+# plug/com/mock_drone_com.py
 import time
 from openhtf.plugs import BasePlug
 
@@ -9,6 +10,7 @@ class MockDroneCom(BasePlug):
     Provides methods to get and set the drone ID, and to get pressure, temperature, and distance readings.
     This class always operates in simulated mode.
     """
+
     def get_drone_id(self) -> str:
         self.logger.info("Simulated: Drone ID received: default-id-123")
         return "default-id-123"
@@ -37,3 +39,95 @@ class MockDroneCom(BasePlug):
     def get_distance(self) -> float:
         self.logger.info("Simulated: Distance measurement: 1002.0 mm")
         return 1002.0
+
+    def switch_on(self, component: str) -> None:
+        self.logger.info(f"Simulated: Switching on {component}.")
+        time.sleep(0.5)
+
+    def switch_off(self) -> None:
+        self.logger.info("Simulated: Switching off drone.")
+        time.sleep(0.5)
+
+    def connect(self) -> bool:
+        self.logger.info("Simulated: Connecting to drone.")
+        time.sleep(1)
+        return True
+
+    def connect_modem(self) -> bool:
+        self.logger.info("Simulated: Connecting to drone modem.")
+        time.sleep(1)
+        return True
+
+    def configure_ground_modem(self) -> None:
+        self.logger.info("Simulated: Configuring ground modem.")
+        time.sleep(1)
+
+    def set_rtk_antenna_type(self, antenna_type: str) -> None:
+        self.logger.info(f"Simulated: Setting RTK antenna type to {antenna_type}.")
+        time.sleep(0.5)
+
+    def send_sensors_telemetry(self) -> None:
+        self.logger.info("Simulated: Sending telemetry sensors.")
+        time.sleep(0.5)
+
+    def measure_downlink_quality(self) -> float:
+        self.logger.info("Simulated: Measuring downlink quality.")
+        time.sleep(1)
+        return 99.0  # Simulated quality percentage
+
+    def get_rssi(self) -> float:
+        self.logger.info("Simulated: Getting RSSI values.")
+        time.sleep(0.5)
+        return 90.0
+
+    def wait_for_gnss_configuration(self, timeout: int) -> bool:
+        self.logger.info("Simulated: Waiting for GNSS configuration.")
+        time.sleep(1)
+        return True  # Simulate success
+
+    def wait_for_gnss_fix(self, timeout: int) -> bool:
+        self.logger.info("Simulated: Waiting for GNSS fix.")
+        time.sleep(1)
+        return True  # Simulate success
+
+    def send_telemetry_gnss_bands(self) -> None:
+        self.logger.info("Simulated: Sending telemetry GNSS bands.")
+        time.sleep(0.5)
+
+    def receive_gnss_status(self) -> dict:
+        self.logger.info("Simulated: Receiving GNSS status.")
+        time.sleep(1)
+        # Simulated GNSS status data
+        return {'sat_count': 10, 'strength_L1': 40, 'strength_L2': 41}
+
+    def check_gnss_status(self, gnss_status: dict) -> bool:
+        self.logger.info("Simulated: Checking GNSS status.")
+        # Implement logic to check GNSS status against limits
+        # For simulation, return True
+        return True
+
+    def update_gnss_license(self, license_file: str) -> bool:
+        self.logger.info(f"Simulated: Updating GNSS license using file {license_file}.")
+        time.sleep(1)
+        return True  # Simulate success
+
+    def is_remote_id_applicable(self) -> bool:
+        self.logger.info("Simulated: Checking if WiFi Remote ID is applicable.")
+        return True  # Simulate that it is applicable
+
+    def enable_wifi_remote_id(self) -> None:
+        self.logger.info("Simulated: Enabling WiFi Remote ID.")
+        time.sleep(0.5)
+
+    def check_wifi_remote_id(self) -> bool:
+        self.logger.info("Simulated: Checking WiFi Remote ID.")
+        time.sleep(1)
+        return True  # Simulate success
+
+    def disable_wifi_remote_id(self) -> None:
+        self.logger.info("Simulated: Disabling WiFi Remote ID.")
+        time.sleep(0.5)
+
+    def reset_logs_counter(self) -> None:
+        self.logger.info("Simulated: Resetting logs counter.")
+        time.sleep(0.5)

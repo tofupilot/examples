@@ -29,7 +29,7 @@ class Acroname2x4(BasePlug):
         if not self.simulated_mode:
             self.stem: USBHub2x4 = USBHub2x4()
 
-    def open(self) -> None:
+    def connect(self) -> None:
         if not self.simulated_mode:
             if self.stem.discoverAndConnect(Spec.USB) != Result.NO_ERROR:
                 raise ConnectionError("Failed to connect to the USBHub2x4 device.")
