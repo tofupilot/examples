@@ -131,3 +131,33 @@ class MockDroneCom(BasePlug):
     def reset_logs_counter(self) -> None:
         self.logger.info("Simulated: Resetting logs counter.")
         time.sleep(0.5)
+
+    def set_imu_mode(self, mode: str) -> None:
+        self.logger.info(f"Simulated: Setting IMU mode to {mode}.")
+        time.sleep(0.5)
+
+    def log_imu_data(self, duration: int) -> None:
+        self.logger.info(f"Simulated: Collecting static IMU data")
+        time.sleep(1)
+
+    def fit_static_calibration_data(self, data_path: str) -> dict:
+        self.logger.info("Simulated: Fitting static calibration data.")
+        time.sleep(1)
+        return {'bias': 0.3}  # Simulated bias value
+
+    def send_calibration_results(self, calibration_results: dict) -> None:
+        self.logger.info("Simulated: Sending static calibration to drone.")
+        time.sleep(0.5)
+
+    def collect_dynamic_imu_data(self, duration: int, temperature: float, axis: str, save_path: str) -> None:
+        self.logger.info(f"Simulated: Collecting dynamic IMU data on axis {axis} at {temperature}°C for {duration} seconds.")
+        time.sleep(1)
+
+    def fit_dynamic_calibration_data(self, data_path: str) -> dict:
+        self.logger.info("Simulated: Fitting dynamic calibration data.")
+        time.sleep(1)
+        return {'scale_factor_error': 800.0}  # Simulated scale factor error
+
+    def send_dynamic_calibration(self, calibration_results: dict) -> None:
+        self.logger.info("Simulated: Sending dynamic calibration to drone.")
+        time.sleep(0.5)
