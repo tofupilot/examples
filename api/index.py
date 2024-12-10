@@ -47,14 +47,14 @@ class handler(BaseHTTPRequestHandler):
                 {}
             )  # Default to an empty dictionary if the body is not valid JSON
 
-        # Extract base_url, defaulting to None if not provided
-        base_url = body_data.get("base_url", None)
+        # Extract url, defaulting to None if not provided
+        url = body_data.get("url", None)
         framework = body_data.get("framework", "openhtf")
 
         if framework == "client":
-            client.simple(api_key, base_url)
+            client.simple(api_key, url)
         elif framework == "openhtf":
-            openhtf.simple(api_key, base_url)
+            openhtf.simple(api_key, url)
 
         self.send_response(200)
         self.send_header("Content-type", "text/plain")
