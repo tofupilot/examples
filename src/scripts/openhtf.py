@@ -19,5 +19,5 @@ def step_one():
 def simple(api_key: Optional[str], url: Optional[str]):
     # Set up test run for unit "00102" adding a single line before test execution
     test = htf.Test(step_one, procedure_id="FVT1", part_number="PCB01")
-    with TofuPilot(test, api_key=api_key, url=url):
+    with TofuPilot(test, api_key=api_key, url=url, stream=False):
         test.execute(lambda: "00102")
