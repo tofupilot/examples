@@ -2,7 +2,7 @@ from http.server import BaseHTTPRequestHandler
 import json
 import src.scripts.client as client
 import src.scripts.openhtf as openhtf
-import time
+from importlib.metadata import version
 
 
 class handler(BaseHTTPRequestHandler):
@@ -53,13 +53,16 @@ class handler(BaseHTTPRequestHandler):
         url = body_data.get("url", None)
         framework = body_data.get("framework", "openhtf")
 
+        print(version("openhtf"))
+        print(version("six"))
+
         # Calling the appropriate function based on the framework
         if framework == "client":
             client.simple(api_key, url)
         elif framework == "openhtf":
+            print("BEFORE")
             openhtf.simple(api_key, url)
-
-        time.sleep(3)
+            print("AFTER")
 
         # Sending a successful response
         self.send_response(200)
