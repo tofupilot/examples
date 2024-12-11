@@ -2,6 +2,7 @@ from http.server import BaseHTTPRequestHandler
 import json
 import src.scripts.client as client
 import src.scripts.openhtf as openhtf
+import time
 
 
 class handler(BaseHTTPRequestHandler):
@@ -57,6 +58,8 @@ class handler(BaseHTTPRequestHandler):
             client.simple(api_key, url)
         elif framework == "openhtf":
             openhtf.simple(api_key, url)
+
+        time.sleep(3)
 
         # Sending a successful response
         self.send_response(200)
