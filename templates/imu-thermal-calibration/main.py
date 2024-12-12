@@ -21,7 +21,7 @@ CONF.declare(
 # TODO: implement read_csv_data as a mock-up method from MockDutPlug
 def get_calibration_data(test: Test):
     data = read_csv_data(CONF.dataset_file)
-    test.state["imu_data"] = data # TODO: store result in test for next phase
+    test.state["imu_data"] = data  # TODO: store result in test for next phase
     return PhaseResult.CONTINUE
 
 
@@ -29,7 +29,7 @@ def get_calibration_data(test: Test):
 # TODO: do not use local files
 @measures(
     htf.Measurement("acc_max_bias")
-    .in_range(0.0, 0.5) # TODO: why this parameter?
+    .in_range(0.0, 0.5)  # TODO: why this parameter?
     .with_units(htf.units.METRE_PER_SECOND_SQUARED)
     .with_precision(5)
 )
@@ -38,7 +38,7 @@ def compute_accelerometer_calibration(test):
     acc_results = calibrate_accelerometer(test.state["imu_data"])
     test.state["acc_calibration_results"] = acc_results
 
-    test.measurements.acc_max_bias = compute_viais;
+    test.measurements.acc_max_bias = compute_viais
     test.measurements.acc_residuals = compute_residuals
     test.measurements.accelerometer_max_bias
     test.measurements.accelerometer_max_bias
