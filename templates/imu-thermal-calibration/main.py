@@ -79,6 +79,7 @@ def save_calibration_to_dut(test, drone) -> PhaseResult:
 
     return PhaseResult.CONTINUE
 
+
 def main():
     test = htf.Test(
         get_calibration_data,
