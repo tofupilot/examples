@@ -91,7 +91,7 @@ def main():
     )
 
     with TofuPilot(test):
-        test.execute(lambda: '00001') # mock operator input
+        test.execute(lambda: '00001') # mock operator S/N input
 
 if __name__ == "__main__":
     main()
