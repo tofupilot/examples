@@ -1,5 +1,3 @@
-# imu_thermal_calibration.py
-
 import openhtf as htf
 import os
 from openhtf import measures, PhaseResult
@@ -8,23 +6,12 @@ from openhtf.util.configuration import CONF
 from tofupilot.openhtf import TofuPilot
 
 # Import necessary plugs
-from plug.com.mock_drone_com import MockDroneCom
-from plug.thermal_calibration.mock_environmental_chamber import MockEnvironmentalChamber
-from plug.thermal_calibration.regression_fitter import IMUThermalCalibration
+from plugs.mock_drone_com import MockDroneCom
+from plugs.mock_environmental_chamber import MockEnvironmentalChamber
+from plugs.regression_fitter import IMUThermalCalibration
 
 # Calibration configuration
-CONF.declare('calibration_csv_file', default_value='sample_data/sample_imu_thermal.csv', description='Path to IMU data CSV file.')
-CONF.declare('data_save_path', default_value='imu_calibration_results', description='Directory to save calibration results and plots.')
-
-CONF.declare('polynomial_order', default_value=3, description='Order of the polynomial to fit.')
-CONF.declare('max_bias_threshold', default_value=0.5, description='Maximum acceptable bias for sensors.')
-CONF.declare('min_temp', default_value=-10.0, description='Minimum temperature for calibration (°C).')
-CONF.declare('max_temp', default_value=40.0, description='Maximum temperature for calibration (°C).')
-CONF.declare('temp_step', default_value=10.0, description='Temperature step size (°C).')
-CONF.declare('data_collection_duration', default_value=60, description='Duration to collect data at each temperature (seconds).')
-
-# Dry-run?
-CONF.declare('simulated', default_value=True, description='Simulated mode toggle.')
+CONF.declare('calibration_csv_file', default_value='data/sample_imu_thermal.csv', description='Path to IMU data CSV file.')
 
 ## Phase 1: Perform Calibration
 @plug(drone=MockDroneCom, chamber=MockEnvironmentalChamber)
@@ -36,10 +23,7 @@ def perform_calibration(test, drone, chamber) -> PhaseResult:
     os.makedirs(data_save_path, exist_ok=True)
 
     # Generate temperature points
-    min_temp = CONF.min_temp
-    max_temp = CONF.max_temp
-    temp_step = CONF.temp_step
-    temperatures = list(range(int(min_temp), int(max_temp) + 1, int(temp_step)))
+    temperatures = list(range(-10, 41, 10))
 
     # Set drone to data logging mode
     drone.set_imu_mode('data_logging')
@@ -50,7 +34,7 @@ def perform_calibration(test, drone, chamber) -> PhaseResult:
         chamber.wait_for_stabilization()
 
         # Command drone to log IMU data at this temperature
-        drone.log_imu_data(duration=CONF.data_collection_duration)
+        drone.log_imu_data(duration=60)
 
     # Reset drone IMU to flight mode
     drone.set_imu_mode('flight')
@@ -75,7 +59,7 @@ def read_csv_data(test) -> PhaseResult:
 @plug(calibration=IMUThermalCalibration)
 @measures(
     htf.Measurement('accelerometer_max_bias')
-    .in_range(0.0, CONF.max_bias_threshold)
+    .in_range(0.0, 0.5)
     .with_units('m/s²')
     .with_precision(5)
 )
@@ -108,7 +92,7 @@ def calibrate_accelerometer(test, calibration) -> PhaseResult:
 @plug(calibration=IMUThermalCalibration)
 @measures(
     htf.Measurement('gyroscope_max_bias')
-    .in_range(0.0, CONF.max_bias_threshold)
+    .in_range(0.0, 0.5)
     .with_units(htf.units.DEGREE_PER_SECOND)
     .with_precision(5)
 )
@@ -155,9 +139,6 @@ def send_gains_to_drone(test, drone) -> PhaseResult:
 
     return PhaseResult.CONTINUE
 
-
-
-
 # Main test procedure with TofuPilot integration
 def main():
     test = htf.Test(
@@ -170,8 +151,8 @@ def main():
         procedure_id="IMUTC-1"
     )
 
-    with TofuPilot(test):
-        test.execute(test_start=user_input.prompt_for_test_start())
+    #with TofuPilot(test):
+    test.execute(test_start=user_input.prompt_for_test_start())
 
 if __name__ == "__main__":
     main()
