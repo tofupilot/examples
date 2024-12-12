@@ -5,23 +5,48 @@ from .imu_plotting import plot_sensor_data
 # TODO: remove save path
 # TODO: remove check on max bias
 
-def calibrate_accelerometer(data, save_path="results", polynomial_order=3, max_bias_threshold=0.5):
-    data['imu.acc.z'] = data['imu.acc.z'] + 9.81
-    axes = ['imu.acc.x', 'imu.acc.y', 'imu.acc.z']
-    y_label = 'Acceleration (m/s^2)'
-    sensor_type = 'acc'
-    return calibrate_sensor(data, axes, y_label, sensor_type, save_path, polynomial_order, max_bias_threshold)
 
-def calibrate_gyroscope(data, save_path="results", polynomial_order=3, max_bias_threshold=0.5):
-    axes = ['imu.gyro.x', 'imu.gyro.y', 'imu.gyro.z']
-    y_label = 'Angular Rate (deg/s)'
-    sensor_type = 'gyro'
-    return calibrate_sensor(data, axes, y_label, sensor_type, save_path, polynomial_order, max_bias_threshold)
+def calibrate_accelerometer(
+    data, save_path="results", polynomial_order=3, max_bias_threshold=0.5
+):
+    data["imu.acc.z"] = data["imu.acc.z"] + 9.81
+    axes = ["imu.acc.x", "imu.acc.y", "imu.acc.z"]
+    y_label = "Acceleration (m/s^2)"
+    sensor_type = "acc"
+    return calibrate_sensor(
+        data,
+        axes,
+        y_label,
+        sensor_type,
+        save_path,
+        polynomial_order,
+        max_bias_threshold,
+    )
 
-# TODO: why do we have 
-def calibrate_sensor(data, axes, y_label, sensor_type, save_path, polynomial_order, max_bias_threshold):
+
+def calibrate_gyroscope(
+    data, save_path="results", polynomial_order=3, max_bias_threshold=0.5
+):
+    axes = ["imu.gyro.x", "imu.gyro.y", "imu.gyro.z"]
+    y_label = "Angular Rate (deg/s)"
+    sensor_type = "gyro"
+    return calibrate_sensor(
+        data,
+        axes,
+        y_label,
+        sensor_type,
+        save_path,
+        polynomial_order,
+        max_bias_threshold,
+    )
+
+
+# TODO: why do we have
+def calibrate_sensor(
+    data, axes, y_label, sensor_type, save_path, polynomial_order, max_bias_threshold
+):
     os.makedirs(save_path, exist_ok=True)
-    temp = data['imu.temperature'].values
+    temp = data["imu.temperature"].values
     poly_coeffs = {}
     residuals = {}
     biases = {}
@@ -45,19 +70,21 @@ def calibrate_sensor(data, axes, y_label, sensor_type, save_path, polynomial_ord
 
         max_bias = max(max_bias, abs(bias_at_ref_temp))
         if abs(bias_at_ref_temp) > max_bias_threshold:
-            raise ValueError(f'Bias exceeds maximum threshold for {axis}.')
+            raise ValueError(f"Bias exceeds maximum threshold for {axis}.")
 
         # Plot data
-        fig_file = plot_sensor_data(temp, sensor_data, fitted, res, axis, y_label, sensor_type, save_path)
+        fig_file = plot_sensor_data(
+            temp, sensor_data, fitted, res, axis, y_label, sensor_type, save_path
+        )
         figures.append(fig_file)
 
     correction_gains = {axis: -coeffs for axis, coeffs in poly_coeffs.items()}
 
     return {
-        'correction_gains': correction_gains,
-        'polynomial_coefficients': poly_coeffs,
-        'residuals': residuals,
-        'biases': biases,
-        'max_bias': max_bias,
-        'figures': figures
+        "correction_gains": correction_gains,
+        "polynomial_coefficients": poly_coeffs,
+        "residuals": residuals,
+        "biases": biases,
+        "max_bias": max_bias,
+        "figures": figures,
     }

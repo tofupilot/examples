@@ -1,6 +1,7 @@
 import time
 from openhtf.plugs import BasePlug
 
+
 class MockDutPlug(BasePlug):
     """
     A mock plug for simulating communication with a DUT.
