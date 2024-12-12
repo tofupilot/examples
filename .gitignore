@@ -1,14 +1,18 @@
-.vercel
-*.log
+# Python-specific files
+__pycache__/
 *.pyc
-__pycache__
+*.pyo
+*.pyd
 
-# Environments 
-.env 
-.venv 
-env/ 
-venv/ 
-ENV/ 
-env.bak/ 
-venv.bak/ 
-.env*.local
+# Virtual environments
+venv/
+.env/
+
+# IDE-specific files
+.vscode/
+.idea/
+
+# Miscellaneous
+*.log
+.DS_Store
+*.env
