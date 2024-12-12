@@ -1,5 +1,5 @@
 import openhtf as htf
-from openhtf import measures, PhaseResult
+from openhtf import Test, PhaseResult, measures
 from openhtf.plugs import plug
 from openhtf.util.configuration import CONF
 from tofupilot.openhtf import TofuPilot
@@ -15,33 +15,33 @@ CONF.declare(
 )
 
 
-# TODO: why -> PhaseResult
+# TODO: tout typer
 # TODO: try catch with STOP?
-def get_calibration_data(test) -> PhaseResult:
-    try:
-        data = read_csv_data(CONF.dataset_file)
-        test.state["imu_data"] = data
-        return PhaseResult.CONTINUE
-
-    except Exception:
-        return PhaseResult.STOP
+# TODO: add connect to unit DUT mock-up
+# TODO: implement read_csv_data as a mock-up method from MockDutPlug
+def get_calibration_data(test: Test):
+    data = read_csv_data(CONF.dataset_file)
+    test.state["imu_data"] = data # TODO: store result in test for next phase
+    return PhaseResult.CONTINUE
 
 
 # TODO: missings tests on calibration parameters?
 # TODO: do not use local files
 @measures(
-    htf.Measurement("accelerometer_max_bias")
-    .in_range(0, 0.5)
+    htf.Measurement("acc_max_bias")
+    .in_range(0.0, 0.5) # TODO: why this parameter?
     .with_units(htf.units.METRE_PER_SECOND_SQUARED)
     .with_precision(5)
 )
-def compute_accelerometer_calibration(test) -> PhaseResult:
+def compute_accelerometer_calibration(test):
     # Perform accelerometer calibration
     acc_results = calibrate_accelerometer(test.state["imu_data"])
     test.state["acc_calibration_results"] = acc_results
 
-    # Validate maximum bias
-    test.measurements.accelerometer_max_bias = acc_results["max_bias"]
+    test.measurements.acc_max_bias = compute_viais;
+    test.measurements.acc_residuals = compute_residuals
+    test.measurements.accelerometer_max_bias
+    test.measurements.accelerometer_max_bias
 
     # Attach generated calibration figures
     for fig_file in acc_results["figures"]:
@@ -58,7 +58,7 @@ def compute_accelerometer_calibration(test) -> PhaseResult:
     .with_units(htf.units.DEGREE_PER_SECOND)
     .with_precision(5)
 )
-def compute_gyroscope_calibration(test) -> PhaseResult:
+def compute_gyroscope_calibration(test):
     # Perform gyroscope calibration
     gyro_results = calibrate_gyroscope(test.state["imu_data"])
     test.state["gyro_calibration_results"] = gyro_results
@@ -75,9 +75,12 @@ def compute_gyroscope_calibration(test) -> PhaseResult:
 
 # TODO: gains?
 @plug(drone=MockDutPlug)
-def save_calibration_to(test, drone) -> PhaseResult:
+def save_calibration_to(test, drone):
     acc_calibration_results = test.state.get("acc_calibration_results")
     gyro_calibration_results = test.state.get("gyro_calibration_results")
+
+    dut.send_accelero_thermal_biais(test.measurements.acc_thermal_bias)
+    dut.send_accelero_thermal_biais(test.measurements.acc_thermal_bias)
 
     # Send gains to DUT
     drone.save_imu_thermal_calibration(

@@ -22,9 +22,9 @@ class MockDutPlug(BasePlug):
         self.logger.info("Simulated: Saving IMU thermal calibration to DUT.")
         time.sleep(0.5)
 
-    def teardown(self) -> None:
+    def tearDown(self) -> None:
         """
-        OpenHTF automatically calls the teardown method after the test phase ends.
+        OpenHTF automatically calls the tearDown method after the test phase ends.
         This ensures that any required cleanup (like disconnecting from the DUT) is performed.
         """
         self.logger.info("Simulated: Performing teardown.")
