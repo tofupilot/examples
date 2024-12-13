@@ -1,5 +1,8 @@
 import time
+from pathlib import Path
+
 from openhtf.plugs import BasePlug
+from pandas import read_csv, DataFrame
 
 
 class MockDutPlug(BasePlug):
@@ -9,18 +12,25 @@ class MockDutPlug(BasePlug):
     Provides methods to connect, disconnect, and save calibration data for the DUT.
     """
 
-    def connect(self) -> bool:
+    def connect(self) -> None:
         self.logger.info("Simulated: Connecting to DUT.")
         time.sleep(1)
-        return True
 
     def disconnect(self) -> None:
         self.logger.info("Simulated: Disconnecting from DUT.")
         time.sleep(1)
 
-    def save_imu_thermal_calibration(self, calibration_results: dict) -> None:
+    @staticmethod
+    def send_csv_data(csv_path: Path) -> DataFrame:
+        return read_csv(csv_path, delimiter="\t")
+    def save_accelerometer_calibration(self, polynomial_coefficients: dict) -> None:
         self.logger.info("Simulated: Saving IMU thermal calibration to DUT.")
         time.sleep(0.5)
+
+    def save_gyroscope_calibration(self, polynomial_coefficients: dict) -> None:
+        self.logger.info("Simulated: Saving IMU thermal calibration to DUT.")
+        time.sleep(0.5)
+
 
     def tearDown(self) -> None:
         """
