@@ -3,21 +3,25 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 from typing import Dict, Tuple, List
 
-def calibrate_sensor(data: Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray], polynomial_order: int = 3) -> Dict[str, Dict[str, np.ndarray]]:
+
+def calibrate_sensor(
+    data: Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray],
+    polynomial_order: int = 3,
+) -> Dict[str, Dict[str, np.ndarray]]:
     """
-Fit a polynomial model to the sensor data against temperature.
+    Fit a polynomial model to the sensor data against temperature.
 
-Args:
-data (tuple): A tuple containing:
-- temperature data (numpy array)
-- sensor data for each axis (numpy arrays for x, y, z)
-polynomial_order (int): The degree of the polynomial to fit.
+    Args:
+    data (tuple): A tuple containing:
+    - temperature data (numpy array)
+    - sensor data for each axis (numpy arrays for x, y, z)
+    polynomial_order (int): The degree of the polynomial to fit.
 
-Returns:
-dict: A dictionary containing:
-- polynomial_coefficients: Coefficients of the fitted polynomial for each axis.
-- fitted_values: Fitted values for each axis at the given temperature points.
-- figures: Matplotlib figure objects as in-memory images for each axis.
+    Returns:
+    dict: A dictionary containing:
+    - polynomial_coefficients: Coefficients of the fitted polynomial for each axis.
+    - fitted_values: Fitted values for each axis at the given temperature points.
+    - figures: Matplotlib figure objects as in-memory images for each axis.
     """
     temp, *sensor_axes = data
 
@@ -38,8 +42,8 @@ dict: A dictionary containing:
 
         # Generate plot and store figure
         fig, ax = plt.subplots()
-        ax.plot(temp, axis_data, 'o', label='Sensor Data')
-        ax.plot(temp, fitted, '-', label='Fitted Curve')
+        ax.plot(temp, axis_data, "o", label="Sensor Data")
+        ax.plot(temp, fitted, "-", label="Fitted Curve")
         ax.set_title(f"{axis_name} Calibration")
         ax.set_xlabel("Temperature (°C)")
         ax.set_ylabel("Sensor Value")

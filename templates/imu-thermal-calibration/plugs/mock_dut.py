@@ -23,6 +23,7 @@ class MockDutPlug(BasePlug):
     @staticmethod
     def send_csv_data(csv_path: Path) -> DataFrame:
         return read_csv(csv_path, delimiter="\t")
+
     def save_accelerometer_calibration(self, polynomial_coefficients: dict) -> None:
         self.logger.info("Simulated: Saving IMU thermal calibration to DUT.")
         time.sleep(0.5)
@@ -30,7 +31,6 @@ class MockDutPlug(BasePlug):
     def save_gyroscope_calibration(self, polynomial_coefficients: dict) -> None:
         self.logger.info("Simulated: Saving IMU thermal calibration to DUT.")
         time.sleep(0.5)
-
 
     def tearDown(self) -> None:
         """
