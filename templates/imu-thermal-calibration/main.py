@@ -12,12 +12,6 @@ from utils.compute_r2 import compute_r2
 from utils.compute_noise_density import compute_noise_density
 from utils.compute_temp_sensitivity import compute_temp_sensitivity
 
-CONF.declare(
-    "dataset_file",
-    default_value="data/imu_raw_data.csv",
-    description="Path to IMU raw acquisitions .csv file.",
-)
-
 
 ACC_MAX_BIAS_LIMIT = 0.5  # m/s^2
 ACC_RESIDUAL_MEAN_LIMIT = 0.01  # m/s^2
@@ -49,7 +43,11 @@ def connect_dut(test: Test, dut: MockDutPlug) -> None:
 @plug(dut=MockDutPlug)
 def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
     """Retrieve calibration data from the DUT."""
-    calibration_data = dut.send_csv_data(CONF.dataset_file)
+    
+    calibration_data = dut.send_raw_data()
+
+    # Attach the raw data directly to the test
+    test.attach("raw_calibration_data", calibration_data.to_csv(), "text/csv")
 
     test.state["lin_acc_temp"] = {
         "temperature": calibration_data["imu.temperature"],

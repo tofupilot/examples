@@ -21,8 +21,8 @@ class MockDutPlug(BasePlug):
         time.sleep(1)
 
     @staticmethod
-    def send_csv_data(csv_path: Path) -> DataFrame:
-        return read_csv(csv_path, delimiter="\t")
+    def send_raw_data() -> DataFrame:
+        return read_csv("data/imu_raw_data.csv", delimiter="\t")
 
     def save_accelerometer_calibration(self, polynomial_coefficients: dict) -> None:
         self.logger.info("Simulated: Saving IMU thermal calibration to DUT.")
