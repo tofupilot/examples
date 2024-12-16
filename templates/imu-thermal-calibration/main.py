@@ -43,168 +43,224 @@ def connect_dut(test: Test, drone: MockDutPlug) -> None:
 
 
 @plug(drone=MockDutPlug)
-@measures(
-    htf.Measurement("lin_acc_temp")
-    .doc("Linear acceleration over temperature")
-    .with_dimensions(
-        units.DEGREE_CELSIUS,
-        units.METRE_PER_SECOND_SQUARED,
-        units.METRE_PER_SECOND_SQUARED,
-        units.METRE_PER_SECOND_SQUARED,
-    ),
-    htf.Measurement("ang_acc_temp")
-    .doc("Angular acceleration over temperature")
-    .with_dimensions(
-        units.DEGREE_CELSIUS,
-        units.DEGREE_PER_SECOND,
-        units.DEGREE_PER_SECOND,
-        units.DEGREE_PER_SECOND,
-    ),
-)
 def get_calibration_data(test: Test, drone: MockDutPlug) -> None:
     """Retrieve calibration data from the DUT."""
     calibration_data = drone.send_csv_data(CONF.dataset_file)
 
-    test.measurements.lin_acc_temp = (
-        calibration_data["imu.temperature"],
-        calibration_data["imu.acc.x"],
-        calibration_data["imu.acc.y"],
-        calibration_data["imu.acc.z"] + 9.81,
-    )
+    test.state["lin_acc_temp"] = {
+        "temperature": calibration_data["imu.temperature"],
+        "acc_x": calibration_data["imu.acc.x"],
+        "acc_y": calibration_data["imu.acc.y"],
+        "acc_z": calibration_data["imu.acc.z"] + 9.81,
+    }
 
-    test.measurements.ang_acc_temp = (
-        calibration_data["imu.temperature"],
-        calibration_data["imu.gyro.x"],
-        calibration_data["imu.gyro.y"],
-        calibration_data["imu.gyro.z"],
-    )
+    test.state["gyro_data"] = {
+        "temperature": calibration_data["imu.temperature"],
+        "gyro_x": calibration_data["imu.gyro.x"],
+        "gyro_y": calibration_data["imu.gyro.y"],
+        "gyro_z": calibration_data["imu.gyro.z"],
+    }
 
 
 @measures(
-    htf.Measurement("acc_max_bias")
+    htf.Measurement("acc_max_bias_x")
     .in_range(0.0, ACC_MAX_BIAS_LIMIT)
     .with_units(units.METRE_PER_SECOND_SQUARED),
-    htf.Measurement("acc_residuals"),
-    htf.Measurement("acc_r2"),
-    htf.Measurement("acc_noise_density")
+    htf.Measurement("acc_max_bias_y")
+    .in_range(0.0, ACC_MAX_BIAS_LIMIT)
+    .with_units(units.METRE_PER_SECOND_SQUARED),
+    htf.Measurement("acc_max_bias_z")
+    .in_range(0.0, ACC_MAX_BIAS_LIMIT)
+    .with_units(units.METRE_PER_SECOND_SQUARED),
+    htf.Measurement("acc_residuals_x")
+    .with_units(units.METRE_PER_SECOND_SQUARED),
+    htf.Measurement("acc_residuals_y")
+    .with_units(units.METRE_PER_SECOND_SQUARED),
+    htf.Measurement("acc_residuals_z")
+    .with_units(units.METRE_PER_SECOND_SQUARED),
+    htf.Measurement("acc_r2_x"),
+    htf.Measurement("acc_r2_y"),
+    htf.Measurement("acc_r2_z"),
+    htf.Measurement("acc_noise_density_x")
     .in_range(0.0, ACC_NOISE_DENSITY_LIMIT)
     .with_units(units.METRE_PER_SECOND_SQUARED),
-    htf.Measurement("acc_temp_sensitivity"),
-    htf.Measurement("acc_polynomial_coefficients").doc(
+    htf.Measurement("acc_noise_density_y")
+    .in_range(0.0, ACC_NOISE_DENSITY_LIMIT)
+    .with_units(units.METRE_PER_SECOND_SQUARED),
+    htf.Measurement("acc_noise_density_z")
+    .in_range(0.0, ACC_NOISE_DENSITY_LIMIT)
+    .with_units(units.METRE_PER_SECOND_SQUARED),
+    htf.Measurement("acc_temp_sensitivity_x"),
+    htf.Measurement("acc_temp_sensitivity_y"),
+    htf.Measurement("acc_temp_sensitivity_z"),
+    htf.Measurement("acc_polynomial_coefficients_x").doc(
+        "Coefficients of the polynomial that models the accelerometer temperature response."
+    ),
+    htf.Measurement("acc_polynomial_coefficients_y").doc(
+        "Coefficients of the polynomial that models the accelerometer temperature response."
+    ),
+    htf.Measurement("acc_polynomial_coefficients_z").doc(
         "Coefficients of the polynomial that models the accelerometer temperature response."
     ),
 )
 def compute_accelerometer_calibration(test: Test) -> None:
     """Perform calibration and metrics computation for the accelerometer."""
-    temp, acc_x, acc_y, acc_z = test.measurements.lin_acc_temp
-    data = (temp, acc_x, acc_y, acc_z)
+    # Extract data from test.state
+    lin_acc_temp = test.state["lin_acc_temp"]
+    data = (
+        lin_acc_temp["temperature"].to_numpy(),
+        lin_acc_temp["acc_x"].to_numpy(),
+        lin_acc_temp["acc_y"].to_numpy(),
+        lin_acc_temp["acc_z"].to_numpy(),
+    )
 
     # Perform calibration
     calibration_results = calibrate_sensor(data)
 
-    # Compute metrics
-    residuals = {
-        axis: compute_residuals(
-            data[i + 1], calibration_results["fitted_values"][f"axis_{i}"]
-        )
-        for i, axis in enumerate(["x", "y", "z"])
-    }
-    r2 = {
-        axis: compute_r2(data[i + 1], calibration_results["fitted_values"][f"axis_{i}"])
-        for i, axis in enumerate(["x", "y", "z"])
-    }
-    noise_density = {
-        axis: compute_noise_density(data[i + 1])
-        for i, axis in enumerate(["x", "y", "z"])
-    }
-    temp_sensitivity = {
-        axis: compute_temp_sensitivity(data[i + 1], temp)
-        for i, axis in enumerate(["x", "y", "z"])
-    }
+    # Compute metrics for each axis
+    metrics = {}
+    for axis, axis_name in enumerate(["x", "y", "z"]):
+        axis_data = data[axis + 1]  # Skip temperature
+        fitted_values = calibration_results["fitted_values"][f"axis_{axis}"]
+
+        residuals = compute_residuals(axis_data, fitted_values)
+        r2 = compute_r2(axis_data, fitted_values)
+        noise_density = compute_noise_density(axis_data)
+        temp_sensitivity = compute_temp_sensitivity(axis_data, data[0])
+
+        metrics[axis_name] = {
+            "residuals": residuals,
+            "r2": r2,
+            "noise_density": noise_density,
+            "temp_sensitivity": temp_sensitivity,
+            "max_bias": abs(residuals["mean_residual"]),  # Max bias directly from residuals
+        }
 
     # Update measurements
-    test.measurements.acc_max_bias = max(
-        abs(residuals[axis]["mean_residual"]) for axis in residuals
-    )
-    test.measurements.acc_residuals = residuals
-    test.measurements.acc_r2 = r2
-    test.measurements.acc_noise_density = noise_density
-    test.measurements.acc_temp_sensitivity = temp_sensitivity
-    test.measurements.acc_polynomial_coefficients = calibration_results[
-        "polynomial_coefficients"
-    ]
-    test.measurements.acc_calibration_figures = calibration_results["figures"]
+    for axis_name, axis_metrics in metrics.items():
+        test.measurements[f"acc_max_bias_{axis_name}"] = axis_metrics["max_bias"]
+        test.measurements[f"acc_residuals_{axis_name}"] = axis_metrics["residuals"]
+        test.measurements[f"acc_r2_{axis_name}"] = axis_metrics["r2"]
+        test.measurements[f"acc_noise_density_{axis_name}"] = axis_metrics[
+            "noise_density"
+        ]
+        test.measurements[f"acc_temp_sensitivity_{axis_name}"] = axis_metrics[
+            "temp_sensitivity"
+        ]
+        test.measurements[f"acc_polynomial_coefficients_{axis_name}"] = calibration_results[
+            "polynomial_coefficients"
+        ][f"axis_{list(metrics.keys()).index(axis_name)}"]
 
-    # Attach figures
+    # Attach calibration figures
     for axis, fig in zip(["x", "y", "z"], calibration_results["figures"]):
         test.attach(f"acc_calibration_figure_{axis}", fig.getvalue(), "image/png")
 
 
+
+
+
 @measures(
-    htf.Measurement("gyro_max_bias")
+    htf.Measurement("gyro_max_bias_x")
     .in_range(0.0, GYRO_MAX_BIAS_LIMIT)
     .with_units(units.DEGREE_PER_SECOND),
-    htf.Measurement("gyro_residuals"),
-    htf.Measurement("gyro_r2"),
-    htf.Measurement("gyro_noise_density")
+    htf.Measurement("gyro_max_bias_y")
+    .in_range(0.0, GYRO_MAX_BIAS_LIMIT)
+    .with_units(units.DEGREE_PER_SECOND),
+    htf.Measurement("gyro_max_bias_z")
+    .in_range(0.0, GYRO_MAX_BIAS_LIMIT)
+    .with_units(units.DEGREE_PER_SECOND),
+    htf.Measurement("gyro_residuals_x")
+    .with_units(units.DEGREE_PER_SECOND),
+    htf.Measurement("gyro_residuals_y")
+    .with_units(units.DEGREE_PER_SECOND),
+    htf.Measurement("gyro_residuals_z")
+    .with_units(units.DEGREE_PER_SECOND),
+    htf.Measurement("gyro_r2_x"),
+    htf.Measurement("gyro_r2_y"),
+    htf.Measurement("gyro_r2_z"),
+    htf.Measurement("gyro_noise_density_x")
     .in_range(0.0, GYRO_NOISE_DENSITY_LIMIT)
     .with_units(units.DEGREE_PER_SECOND),
-    htf.Measurement("gyro_temp_sensitivity"),
-    htf.Measurement("gyro_polynomial_coefficients").doc(
+    htf.Measurement("gyro_noise_density_y")
+    .in_range(0.0, GYRO_NOISE_DENSITY_LIMIT)
+    .with_units(units.DEGREE_PER_SECOND),
+    htf.Measurement("gyro_noise_density_z")
+    .in_range(0.0, GYRO_NOISE_DENSITY_LIMIT)
+    .with_units(units.DEGREE_PER_SECOND),
+    htf.Measurement("gyro_temp_sensitivity_x"),
+    htf.Measurement("gyro_temp_sensitivity_y"),
+    htf.Measurement("gyro_temp_sensitivity_z"),
+    htf.Measurement("gyro_polynomial_coefficients_x").doc(
+        "Coefficients of the polynomial that models the gyroscope temperature response."
+    ),
+    htf.Measurement("gyro_polynomial_coefficients_y").doc(
+        "Coefficients of the polynomial that models the gyroscope temperature response."
+    ),
+    htf.Measurement("gyro_polynomial_coefficients_z").doc(
         "Coefficients of the polynomial that models the gyroscope temperature response."
     ),
 )
 def compute_gyroscope_calibration(test: Test) -> None:
     """Perform calibration and metrics computation for the gyroscope."""
-    temp, gyro_x, gyro_y, gyro_z = test.measurements.ang_acc_temp
-    data = (temp, gyro_x, gyro_y, gyro_z)
+    # Extract data from test.state
+    gyro_data = test.state["gyro_data"]
+    data = (
+        gyro_data["temperature"].to_numpy(),
+        gyro_data["gyro_x"].to_numpy(),
+        gyro_data["gyro_y"].to_numpy(),
+        gyro_data["gyro_z"].to_numpy(),
+    )
 
     # Perform calibration
     calibration_results = calibrate_sensor(data)
 
-    # Compute metrics
-    residuals = {
-        axis: compute_residuals(
-            data[i + 1], calibration_results["fitted_values"][f"axis_{i}"]
-        )
-        for i, axis in enumerate(["x", "y", "z"])
-    }
-    r2 = {
-        axis: compute_r2(data[i + 1], calibration_results["fitted_values"][f"axis_{i}"])
-        for i, axis in enumerate(["x", "y", "z"])
-    }
-    noise_density = {
-        axis: compute_noise_density(data[i + 1])
-        for i, axis in enumerate(["x", "y", "z"])
-    }
-    temp_sensitivity = {
-        axis: compute_temp_sensitivity(data[i + 1], temp)
-        for i, axis in enumerate(["x", "y", "z"])
-    }
+    # Compute metrics for each axis
+    metrics = {}
+    for axis, axis_name in enumerate(["x", "y", "z"]):
+        axis_data = data[axis + 1]  # Skip temperature
+        fitted_values = calibration_results["fitted_values"][f"axis_{axis}"]
+
+        residuals = compute_residuals(axis_data, fitted_values)
+        r2 = compute_r2(axis_data, fitted_values)
+        noise_density = compute_noise_density(axis_data)
+        temp_sensitivity = compute_temp_sensitivity(axis_data, data[0])
+
+        metrics[axis_name] = {
+            "residuals": residuals,
+            "r2": r2,
+            "noise_density": noise_density,
+            "temp_sensitivity": temp_sensitivity,
+            "max_bias": abs(residuals["mean_residual"]),  # Max bias directly from residuals
+        }
 
     # Update measurements
-    test.measurements.gyro_max_bias = max(
-        abs(residuals[axis]["mean_residual"]) for axis in residuals
-    )
-    test.measurements.gyro_residuals = residuals
-    test.measurements.gyro_r2 = r2
-    test.measurements.gyro_noise_density = noise_density
-    test.measurements.gyro_temp_sensitivity = temp_sensitivity
-    test.measurements.gyro_polynomial_coefficients = calibration_results[
-        "polynomial_coefficients"
-    ]
-    test.measurements.gyro_calibration_figures = calibration_results["figures"]
+    for axis_name, axis_metrics in metrics.items():
+        test.measurements[f"gyro_max_bias_{axis_name}"] = axis_metrics["max_bias"]
+        test.measurements[f"gyro_residuals_{axis_name}"] = axis_metrics["residuals"]
+        test.measurements[f"gyro_r2_{axis_name}"] = axis_metrics["r2"]
+        test.measurements[f"gyro_noise_density_{axis_name}"] = axis_metrics[
+            "noise_density"
+        ]
+        test.measurements[f"gyro_temp_sensitivity_{axis_name}"] = axis_metrics[
+            "temp_sensitivity"
+        ]
+        test.measurements[f"gyro_polynomial_coefficients_{axis_name}"] = calibration_results[
+            "polynomial_coefficients"
+        ][f"axis_{list(metrics.keys()).index(axis_name)}"]
 
-    # Attach figures
+    # Attach calibration figures
     for axis, fig in zip(["x", "y", "z"], calibration_results["figures"]):
         test.attach(f"gyro_calibration_figure_{axis}", fig.getvalue(), "image/png")
 
 
-@plug(drone=MockDutPlug)
-def save_calibration_to(test: Test, drone: MockDutPlug) -> None:
-    """Save calibration data to the DUT."""
-    drone.save_accelerometer_calibration(test.measurements.acc_polynomial_coefficients)
-    drone.save_gyroscope_calibration(test.measurements.gyro_polynomial_coefficients)
+
+# @plug(drone=MockDutPlug)
+# def save_calibration(test: Test, drone: MockDutPlug) -> None:
+#     """Save calibration data to the DUT."""
+#     for axis in ['x', 'y', 'z']:
+#         drone.save_accelerometer_calibration(getattr(test.measurements, f"acc_polynomial_coefficients_{axis}"))
+#         drone.save_gyroscope_calibration(getattr(test.measurements, f"gyro_polynomial_coefficients_{axis}"))
+
 
 
 def main():
@@ -213,7 +269,7 @@ def main():
         get_calibration_data,
         compute_accelerometer_calibration,
         compute_gyroscope_calibration,
-        save_calibration_to,
+        # save_calibration,
         procedure_id="IMUTC-1",
         procedure_name="IMU Thermal Calibration",
         part_name="PCB01",
