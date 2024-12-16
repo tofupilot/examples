@@ -108,7 +108,7 @@ def handle_test():
     serial_number = f"SI0364A{random_digits}"
 
     # Exécuter tous les tests
-    steps = run_all_tests()
+    phases = run_all_tests()
 
     # Créer un rapport de test
     client.create_run(
@@ -121,15 +121,8 @@ def handle_test():
             "batch_number": "11-24",
             "serial_number": serial_number,
         },
-        run_passed=True,  # <---- FIND BETTER LOGIC
-        # started_at=datetime.now(),
-        phases=steps,  # <----- CHANGE TO PHASE
-        attachments=["data/oscilloscope.jpeg"],
-        report_variables={
-            "var1": serial_number,
-            "var2": "hahahah",
-        },
-        # sub_units=[{"serial_number": "00102"}],
+        run_passed=True,
+        phases=phases,
     )
 
 

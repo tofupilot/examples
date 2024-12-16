@@ -14,13 +14,13 @@ def power_on_test(test):
 
 # Function to execute the test and save results to a JSON file
 def execute_test(file_path):
-    test = Test(power_on_test)
+    test = Test(power_on_test, serial_number="PCB01")
 
     # Set output callback to save the test results as a JSON file
     test.add_output_callbacks(json_factory.OutputToJSON(file_path))
 
     # Execute the test with a specific device identifier
-    test.execute(lambda: "DeviceUnderTest123")
+    test.execute(lambda: "0001")
 
 
 # Specify the file path for saving test results
