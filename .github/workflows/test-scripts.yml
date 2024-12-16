@@ -14,9 +14,6 @@ on:
         options:
           - preview
           - production
-  push:
-    branches:
-      - automatic-testing
 
 jobs:
   execute-python-scripts:
