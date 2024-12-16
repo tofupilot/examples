@@ -54,7 +54,7 @@ jobs:
       - name: Running all Python scripts
         run: |
           echo "Testing branch ${{ env.TOFUPILOT_URL }}..."
-          find scripts -type f -name 'main.py' -print0 | while IFS= read -r -d '' file; do
+          find . -type f -name 'main.py' -print0 | while IFS= read -r -d '' file; do
             echo "Running $file with TOFUPILOT_API_KEY and environment=${{ github.event.inputs.environment }}"
             python "$file"
           done
