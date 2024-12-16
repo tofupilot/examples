@@ -7,7 +7,7 @@ from typing import Dict, Tuple, List
 
 
 def calibrate_sensor(
-    data: Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray],
+        data: Tuple[List[float], List[float], List[float], List[float]],
     polynomial_order: int = 3,
 ) -> Dict[str, Dict[str, np.ndarray]]:
     """
@@ -25,7 +25,9 @@ def calibrate_sensor(
     - fitted_values: Fitted values for each axis at the given temperature points.
     - figures: Matplotlib figure objects as in-memory images for each axis.
     """
-    temp, *sensor_axes = data
+
+    # Convert the tuple elements to NumPy arrays
+    temp, *sensor_axes = (np.array(arr) for arr in data)
 
     poly_coeffs: Dict[str, np.ndarray] = {}
     fitted_values: Dict[str, np.ndarray] = {}

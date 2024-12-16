@@ -35,10 +35,14 @@ GYRO_RESIDUAL_P2P_LIMIT = 2.0  # °/s
 GYRO_NOISE_DENSITY_LIMIT = 0.04  # °/s/sqrt(Hz)
 GYRO_TEMP_SENSITIVITY_LIMIT = 0.05  # °/s/°C
 
+ACCELERATION_OF_FREEFALL = -9.80600  # m/s^2, standard gravity in Switzerland zone 2
+
 
 @plug(dut=MockDutPlug)
 def connect_dut(test: Test, dut: MockDutPlug) -> None:
-    """Connect to the Device Under Test (DUT)."""
+    """
+    Connect to the Device Under Test (DUT).
+    """
     dut.connect()
 
 
@@ -51,7 +55,7 @@ def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
         "temperature": calibration_data["imu.temperature"],
         "acc_x": calibration_data["imu.acc.x"],
         "acc_y": calibration_data["imu.acc.y"],
-        "acc_z": calibration_data["imu.acc.z"] + 9.81,
+        "acc_z": calibration_data["imu.acc.z"] - ACCELERATION_OF_FREEFALL,
     }
 
     test.state["gyro_data"] = {
@@ -109,10 +113,10 @@ def compute_sensors_calibration(test: Test) -> None:
         # Extract data from test.state
         sensor_temp_data = test.state[data_key]
         data = (
-            sensor_temp_data["temperature"].to_numpy(),
-            sensor_temp_data[f"{sensor}_x"].to_numpy(),
-            sensor_temp_data[f"{sensor}_y"].to_numpy(),
-            sensor_temp_data[f"{sensor}_z"].to_numpy(),
+            sensor_temp_data["temperature"],
+            sensor_temp_data[f"{sensor}_x"],
+            sensor_temp_data[f"{sensor}_y"],
+            sensor_temp_data[f"{sensor}_z"],
         )
 
         # Perform calibration
