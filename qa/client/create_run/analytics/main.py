@@ -182,4 +182,4 @@ def execute_procedures(start, end):
         )
 
 
-execute_procedures(0, 100)
+execute_procedures(0, 10)

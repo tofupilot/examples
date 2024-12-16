@@ -102,7 +102,7 @@ def handle_test():
     # Créer un rapport de test
     client.create_run(
         procedure_id="FVT5",
-        procedure_name="Python Client"
+        procedure_name="Python Client",
         unit_under_test={
             "part_number": "SI0364A",
             "revision": "1.8",
@@ -115,6 +115,4 @@ def handle_test():
     )
 
 
-if __name__ == "__main__":
-    for _ in range(1):
-        handle_test()
+handle_test()
