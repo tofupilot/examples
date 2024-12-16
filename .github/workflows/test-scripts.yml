@@ -1,0 +1,60 @@
+name: Run Python Scripts
+
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "Url to be used during script execution"
+        required: true
+        type: string
+      environment:
+        description: "Which API Key to use"
+        required: true
+        type: choice
+        options:
+          - preview
+          - production
+
+jobs:
+  execute-python-scripts:
+    runs-on: ubuntu-latest
+
+    env:
+      # Storing the user-supplied URL
+      TOFUPILOT_URL: ${{ github.event.inputs.url }}
+
+    steps:
+      # Checking out the repository
+      - name: Checking out the repository
+        uses: actions/checkout@v3
+
+      # Setting the appropriate API key based on environment choice
+      - name: Setting API key
+        run: |
+          if [ "${{ github.event.inputs.environment }}" = "production" ]; then
+            echo "TOFUPILOT_API_KEY=${{ secrets.PRODUCTION_API_KEY }}" >> $GITHUB_ENV
+          else
+            echo "TOFUPILOT_API_KEY=${{ secrets.PREVIEW_API_KEY }}" >> $GITHUB_ENV
+          fi
+
+      # Setting up Python
+      - name: Setting up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+
+      # Installing dependencies and the tofupilot client for the given version
+      - name: Installing dependencies
+        run: |
+          pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ tofupilot==1.9.0.dev2
+
+      # Finding and running all Python scripts in the scripts folder and subfolders
+      - name: Running all Python scripts
+        run: |
+          echo "Testing branch ${{ env.TOFUPILOT_URL }}..."
+          find scripts -type f -name 'main.py' -print0 | while IFS= read -r -d '' file; do
+            echo "Running $file with TOFUPILOT_API_KEY and environment=${{ github.event.inputs.environment }}"
+            python "$file"
+          done
