@@ -10,8 +10,6 @@ def simulate_test_result(yield_percentage):
     return random.random() < (yield_percentage / 100.0)
 
 
-# --- Définition des tests pour chaque procédure ---
-# CELL Tests
 def esr_test():
     passed = simulate_test_result(99)
     value_measured = (
@@ -68,9 +66,6 @@ def check_soh():
 def take_picture():
     passed = simulate_test_result(100)
     return passed, None, None, None, None
-
-
-# --- Fonctions de gestion des procédures ---
 
 
 def run_test(test, duration):
@@ -153,9 +148,6 @@ def handle_procedure(
     return run_passed, failed_step
 
 
-# --- Exécution des procédures ---
-
-
 def execute_procedures(start, end):
     for i in range(start, end + 1):
         serial_number_cell = f"A0B8-{i:04d}"
@@ -190,5 +182,4 @@ def execute_procedures(start, end):
         )
 
 
-# Exécuter les procédures pour les numéros de série
 execute_procedures(0, 100)

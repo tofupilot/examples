@@ -124,7 +124,7 @@ def handle_test():
         run_passed=True,  # <---- FIND BETTER LOGIC
         # started_at=datetime.now(),
         phases=steps,  # <----- CHANGE TO PHASE
-        attachments=["1_QA/oscilloscope.jpeg"],
+        attachments=["data/oscilloscope.jpeg"],
         report_variables={
             "var1": serial_number,
             "var2": "hahahah",

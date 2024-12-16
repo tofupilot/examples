@@ -97,7 +97,7 @@ def test_power_saving_mode(test):
 
 def visual_control_pcb_coating(test):
     if simulate_test_result(1):
-        test.attach_from_file("1_QA/oscilloscope.jpeg")
+        test.attach_from_file("data/oscilloscope.jpeg")
         return htf.PhaseResult.CONTINUE
     else:
         return htf.PhaseResult.STOP

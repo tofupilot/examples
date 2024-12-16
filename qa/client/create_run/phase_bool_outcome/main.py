@@ -38,7 +38,7 @@ def main():
         run_passed=True,
         started_at=datetime.now(),
         phases=phases,
-        attachments=["1_QA/oscilloscope.jpeg"],
+        attachments=["data/oscilloscope.jpeg"],
         report_variables={
             "var1": "serial_number",
             "var2": "hahahah",

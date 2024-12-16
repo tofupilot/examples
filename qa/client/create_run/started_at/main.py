@@ -113,7 +113,7 @@ def handle_test():
         run_passed=all(step["step_passed"] for step in steps),
         started_at=datetime.now() - timedelta(days=1),
         steps=steps,
-        attachments=["1_QA/oscilloscope.jpeg"],
+        attachments=["data/oscilloscope.jpeg"],
         report_variables={
             "var1": serial_number,
             "var2": "hahahah",
