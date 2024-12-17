@@ -46,7 +46,6 @@ def test_voltage_output(test):
         if passed
         else round(random.uniform(0.1, 0.3), 2)
     )
-    # time.sleep(5)
 
 
 @htf.measures(
@@ -61,7 +60,6 @@ def test_overcurrent_protection(test):
         if passed
         else round(random.uniform(1.7, 1.8), 3)
     )
-    time.sleep(0)
 
 
 def test_battery_switch():
@@ -81,13 +79,11 @@ def test_converter_efficiency(test):
         round(random.uniform(450, 480)) if passed else round(random.uniform(400, 425))
     )
     test.measurements.efficiency = round(((output_power / input_power) * 100), 1)
-    # time.sleep(5)
 
 
 @htf.measures(htf.Measurement("power_mode_functional").equals("on"))
 def test_power_saving_mode(test):
     test.measurements.power_mode_functional = "on" if simulate_test_result(1) else "off"
-    time.sleep(1)
 
 
 def visual_control_pcb_coating(test):
