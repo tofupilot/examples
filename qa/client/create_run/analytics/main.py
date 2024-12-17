@@ -149,7 +149,7 @@ def handle_procedure(
 
 
 def main():
-    serial_number_cell = f"A0B8-{i:04d}"
+    serial_number_cell = "A0B8-0:04d"
     # serial_number_pcb = f"A0X4-{i:04d}"
 
     # Gérer les tests CELL
