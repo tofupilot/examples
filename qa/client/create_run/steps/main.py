@@ -34,7 +34,6 @@ def run_all_tests():
 
     for test in tests:
         start_time = datetime.now()
-        # time.sleep(1)
         passed, value_measured, unit, limit_low, limit_high = test()
         end_time = datetime.now()
 

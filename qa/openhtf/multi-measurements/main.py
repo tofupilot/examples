@@ -2,7 +2,6 @@ import openhtf as htf
 from openhtf.util import units
 import random
 from tofupilot.openhtf import TofuPilot
-import time
 
 
 # Utility function to simulate the test result with a given pass probability
@@ -15,19 +14,16 @@ def pcba_firmware_version(test):
     test.measurements.firmware_version = (
         "1.4.3" if simulate_test_result(0.99) else "1.4.2"
     )
-    # time.sleep(1)
 
 
 @htf.measures(htf.Measurement("button_status").equals(True))
 def check_button(test):
     test.measurements.button_status = simulate_test_result(1)
-    # time.sleep(3)
 
 
 @htf.measures(htf.Measurement("led_status").equals(True))
 def check_led_switch_on(test):
     test.measurements.led_status = simulate_test_result(1)
-    # time.sleep(1)
 
 
 @htf.measures(htf.Measurement("input_voltage").in_range(4.5, 5).with_units(units.VOLT))
@@ -38,7 +34,6 @@ def test_voltage_input(test):
         if passed
         else round(random.uniform(3.0, 3.8), 2)
     )
-    time.sleep(3)
 
 
 @htf.measures(
