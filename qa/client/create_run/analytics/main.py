@@ -148,38 +148,37 @@ def handle_procedure(
     return run_passed, failed_step
 
 
-def execute_procedures(start, end):
-    for i in range(start, end + 1):
-        serial_number_cell = f"A0B8-{i:04d}"
-        # serial_number_pcb = f"A0X4-{i:04d}"
+def main():
+    serial_number_cell = f"A0B8-{i:04d}"
+    # serial_number_pcb = f"A0X4-{i:04d}"
 
-        # Gérer les tests CELL
-        tests_cell = [
-            (esr_test, timedelta(seconds=4)),
-            (cell_voltage_test, timedelta(seconds=0.1)),
-        ]
-        passed_cell, failed_step_cell = handle_procedure(
-            "FVT2", tests_cell, serial_number_cell, "CELL0B8", "A", None
-        )
-        if not passed_cell:
-            continue
+    # Gérer les tests CELL
+    tests_cell = [
+        (esr_test, timedelta(seconds=4)),
+        (cell_voltage_test, timedelta(seconds=0.1)),
+    ]
+    passed_cell, _ = handle_procedure(
+        "FVT2", tests_cell, serial_number_cell, "CELL0B8", "A", None
+    )
 
-        # Gérer les tests
-        tests_final = [
-            (battery_connection, timedelta(seconds=0.1)),
-            (check_voltage, timedelta(seconds=3)),
-            (check_soc, timedelta(seconds=1)),
-            (check_soh, timedelta(seconds=1)),
-            (take_picture, timedelta(seconds=12)),
-        ]
-        handle_procedure(
-            "FVT3",
-            tests_final,
-            f"B1F3-{i:04d}",
-            "BAT123",
-            "C",
-            [{"serial_number": serial_number_cell}],
-        )
+    if not passed_cell:
+        return
+
+    tests_final = [
+        (battery_connection, timedelta(seconds=0.1)),
+        (check_voltage, timedelta(seconds=3)),
+        (check_soc, timedelta(seconds=1)),
+        (check_soh, timedelta(seconds=1)),
+        (take_picture, timedelta(seconds=12)),
+    ]
+    handle_procedure(
+        "FVT3",
+        tests_final,
+        "B1F3-04d",
+        "BAT123",
+        "C",
+        [{"serial_number": serial_number_cell}],
+    )
 
 
-execute_procedures(0, 10)
+main()
