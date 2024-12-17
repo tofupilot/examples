@@ -21,7 +21,7 @@ class MockDutPlug(BasePlug):
         time.sleep(1)
 
     @staticmethod
-    def send_raw_data() -> DataFrame:
+    def get_imu_data() -> DataFrame:
         return read_csv("data/imu_raw_data.csv", delimiter="\t")
 
     def save_accelerometer_calibration(self, polynomial_coefficients: dict) -> None:

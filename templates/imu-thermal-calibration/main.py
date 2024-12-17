@@ -42,7 +42,7 @@ def connect_dut(test: Test, dut: MockDutPlug) -> None:
 def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
     """Retrieve calibration data from the DUT."""
     
-    calibration_data = dut.send_raw_data()
+    calibration_data = dut.get_imu_data()
 
     # Attach the raw data directly to the test
     test.attach("raw_calibration_data", calibration_data.to_csv(), "text/csv")
@@ -177,8 +177,8 @@ def main():
         part_name="PCB01",
     )
 
-    with TofuPilot(test):
-        test.execute(lambda: "00001")  # mock operator S/N input
+    #with TofuPilot(test):
+    test.execute(lambda: "00001")  # mock operator S/N input
 
 
 if __name__ == "__main__":
