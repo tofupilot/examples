@@ -167,7 +167,7 @@ def main():
     )
     test.add_output_callbacks(console_summary.ConsoleSummary())
 
-    with TofuPilot(test, url="http://localhost:3000"):
+    with TofuPilot(test):
         test.execute(lambda: "00220D4K")
 
 
