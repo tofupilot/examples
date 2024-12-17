@@ -34,9 +34,7 @@ ACCELERATION_OF_FREEFALL = -9.80600  # m/s^2, standard gravity in Switzerland zo
 
 @plug(dut=MockDutPlug)
 def connect_dut(test: Test, dut: MockDutPlug) -> None:
-    """
-    Connect to the Device Under Test (DUT).
-    """
+    """Connect to the Device Under Test (DUT)."""
     dut.connect()
 
 
