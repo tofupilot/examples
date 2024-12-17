@@ -70,8 +70,24 @@ def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
-    # Residuals
-    *(htf.Measurement("{sensor}_residuals_{axis}")
+    # Residual mean
+    *(htf.Measurement("{sensor}_residual_mean_{axis}")
+      .in_range(0.0, ACC_RESIDUAL_MEAN_LIMIT if sensor == "acc" else GYRO_RESIDUAL_MEAN_LIMIT)
+      .with_units(units.METRE_PER_SECOND_SQUARED if sensor == "acc" else units.DEGREE_PER_SECOND)
+      .with_args(sensor=sensor, axis=axis)
+      for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
+
+    # Residual standard deviation
+    *(htf.Measurement("{sensor}_residual_std_{axis}")
+      .in_range(0.0, ACC_RESIDUAL_STD_LIMIT if sensor == "acc" else GYRO_RESIDUAL_STD_LIMIT)
+      .with_units(units.METRE_PER_SECOND_SQUARED if sensor == "acc" else units.DEGREE_PER_SECOND)
+      .with_args(sensor=sensor, axis=axis)
+      for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
+
+    # Residual peak-to-peak
+    *(htf.Measurement("{sensor}_residual_p2p_{axis}")
+      .in_range(0.0, ACC_RESIDUAL_P2P_LIMIT_XY if sensor == "acc" and axis in ("x", "y") else
+                ACC_RESIDUAL_P2P_LIMIT_Z if sensor == "acc" else GYRO_RESIDUAL_P2P_LIMIT)
       .with_units(units.METRE_PER_SECOND_SQUARED if sensor == "acc" else units.DEGREE_PER_SECOND)
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
@@ -140,7 +156,9 @@ def compute_sensors_calibration(test: Test) -> None:
         # Update measurements for the current sensor
         for axis_name, axis_metrics in metrics.items():
             test.measurements[f"{sensor}_max_bias_{axis_name}"] = axis_metrics["max_bias"]
-            test.measurements[f"{sensor}_residuals_{axis_name}"] = axis_metrics["residuals"]
+            test.measurements[f"{sensor}_residual_mean_{axis_name}"] = abs(axis_metrics["residuals"]["mean_residual"])
+            test.measurements[f"{sensor}_residual_std_{axis_name}"] = axis_metrics["residuals"]["std_residual"]
+            test.measurements[f"{sensor}_residual_p2p_{axis_name}"] = axis_metrics["residuals"]["p2p_residual"]
             test.measurements[f"{sensor}_r2_{axis_name}"] = axis_metrics["r2"]
             test.measurements[f"{sensor}_noise_density_{axis_name}"] = axis_metrics[
                 "noise_density"
@@ -177,8 +195,8 @@ def main():
         part_name="PCB01",
     )
 
-    #with TofuPilot(test):
-    test.execute(lambda: "00001")  # mock operator S/N input
+    with TofuPilot(test):
+        test.execute(lambda: "00001")  # mock operator S/N input
 
 
 if __name__ == "__main__":
