@@ -116,11 +116,10 @@ def handle_test():
         attachments=["data/oscilloscope.jpeg"],
         report_variables={
             "var1": serial_number,
-            "var2": "hahahah",
-            "var3": "bbbbb",
-            "var4": "olé",
+            "var2": "first_var",
+            "var3": "second_var",
+            "var4": "third_var",
         },
-        # sub_units=[{"serial_number": "00102"}],
     )
 
 

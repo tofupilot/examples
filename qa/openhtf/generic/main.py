@@ -127,10 +127,10 @@ def main():
         batch_number="1024-0001",
         sub_units=[{"serial_number": "00102"}],
         report_variables={
-            "var1": "aaa",
-            "var2": "hahahah",
-            "var3": "bbbbb",
-            "var4": "olé",
+            "var1": "first_var",
+            "var2": "var2",
+            "var3": "123",
+            "var4": "456",
         },
     )
 
