@@ -1,6 +1,8 @@
 import time
 from pathlib import Path
+from typing import Dict
 
+from openhtf import Test
 from openhtf.plugs import BasePlug
 from pandas import read_csv, DataFrame
 
@@ -21,8 +23,24 @@ class MockDutPlug(BasePlug):
         time.sleep(1)
 
     @staticmethod
-    def get_imu_data() -> DataFrame:
-        return read_csv("data/imu_raw_data.csv", delimiter="\t")
+    def get_imu_data(test: Test) -> Dict:
+        data = read_csv("data/imu_raw_data.csv", delimiter="\t")
+        test.attach("raw_calibration_data", data.to_csv(), "text/csv")
+        return {"acc_data":
+                   {
+                        "temperature": data["imu.temperature"],
+                        "acc_x": data["imu.acc.x"],
+                        "acc_y": data["imu.acc.y"],
+                        "acc_z": data["imu.acc.z"] - 9.80600,  # Acceleration of freefall in Switzerland zone 2
+                    },
+                "gyro_data":
+                   {
+                       "temperature": data["imu.temperature"],
+                       "gyro_x": data["imu.gyro.x"],
+                       "gyro_y": data["imu.gyro.y"],
+                       "gyro_z": data["imu.gyro.z"],
+                   }
+        }
 
     def save_accelerometer_calibration(self, polynomial_coefficients: dict) -> None:
         self.logger.info("Simulated: Saving IMU thermal calibration to DUT.")

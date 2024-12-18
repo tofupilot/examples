@@ -29,8 +29,6 @@ GYRO_RESIDUAL_P2P_LIMIT = 2.0  # °/s
 GYRO_NOISE_DENSITY_LIMIT = 0.04  # °/s/sqrt(Hz)
 GYRO_TEMP_SENSITIVITY_LIMIT = 0.05  # °/s/°C
 
-ACCELERATION_OF_FREEFALL = -9.80600  # m/s^2, standard gravity in Switzerland zone 2
-
 
 @plug(dut=MockDutPlug)
 def connect_dut(test: Test, dut: MockDutPlug) -> None:
@@ -41,28 +39,28 @@ def connect_dut(test: Test, dut: MockDutPlug) -> None:
 @plug(dut=MockDutPlug)
 def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
     """Retrieve calibration data from the DUT."""
-    
-    calibration_data = dut.get_imu_data()
-
-    # Attach the raw data directly to the test
-    test.attach("raw_calibration_data", calibration_data.to_csv(), "text/csv")
-
-    test.state["lin_acc_temp"] = {
-        "temperature": calibration_data["imu.temperature"],
-        "acc_x": calibration_data["imu.acc.x"],
-        "acc_y": calibration_data["imu.acc.y"],
-        "acc_z": calibration_data["imu.acc.z"] - ACCELERATION_OF_FREEFALL,
-    }
-
-    test.state["gyro_data"] = {
-        "temperature": calibration_data["imu.temperature"],
-        "gyro_x": calibration_data["imu.gyro.x"],
-        "gyro_y": calibration_data["imu.gyro.y"],
-        "gyro_z": calibration_data["imu.gyro.z"],
-    }
+    test.state.update(dut.get_imu_data(test))
 
 
 @measures(
+    # Polynomial Coefficients
+    *(htf.Measurement("{sensor}_polynomial_coefficients_{axis}")
+      .doc("Coefficients of the polynomial that models the {sensor} temperature response.")
+      .with_args(sensor=sensor, axis=axis)
+      for sensor in ("acc", "gyro") for axis in ("x", "y", "z"))
+
+    # Noise Density (uses raw data only)
+    *(htf.Measurement("{sensor}_noise_density_{axis}")
+      .in_range(0.0, ACC_NOISE_DENSITY_LIMIT if sensor == "acc" else GYRO_NOISE_DENSITY_LIMIT)
+      .with_units(units.METRE_PER_SECOND_SQUARED if sensor == "acc" else units.DEGREE_PER_SECOND)
+      .with_args(sensor=sensor, axis=axis)
+      for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
+
+    # Temperature Sensitivity (uses raw data only)
+    *(htf.Measurement("{sensor}_temp_sensitivity_{axis}")
+      .with_args(sensor=sensor, axis=axis)
+      for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
+
     # Max Bias
     *(htf.Measurement("{sensor}_max_bias_{axis}")
       .in_range(0.0, ACC_MAX_BIAS_LIMIT if sensor == "acc" else GYRO_MAX_BIAS_LIMIT)
@@ -96,30 +94,12 @@ def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
     *(htf.Measurement("{sensor}_r2_{axis}")
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
-
-    # Noise Density
-    *(htf.Measurement("{sensor}_noise_density_{axis}")
-      .in_range(0.0, ACC_NOISE_DENSITY_LIMIT if sensor == "acc" else GYRO_NOISE_DENSITY_LIMIT)
-      .with_units(units.METRE_PER_SECOND_SQUARED if sensor == "acc" else units.DEGREE_PER_SECOND)
-      .with_args(sensor=sensor, axis=axis)
-      for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
-
-    # Temperature Sensitivity
-    *(htf.Measurement("{sensor}_temp_sensitivity_{axis}")
-      .with_args(sensor=sensor, axis=axis)
-      for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
-
-    # Polynomial Coefficients
-    *(htf.Measurement("{sensor}_polynomial_coefficients_{axis}")
-      .doc("Coefficients of the polynomial that models the {sensor} temperature response.")
-      .with_args(sensor=sensor, axis=axis)
-      for sensor in ("acc", "gyro") for axis in ("x", "y", "z"))
 )
 def compute_sensors_calibration(test: Test) -> None:
     """Perform calibration and metrics computation for both accelerometer and gyroscope."""
     # Iterate over both sensors (accelerometer and gyroscope)
     for sensor, data_key, calibration_key in [
-        ("acc", "lin_acc_temp", "acc_calibration_results"),
+        ("acc", "acc_data", "acc_calibration_results"),
         ("gyro", "gyro_data", "gyro_calibration_results"),
     ]:
         # Extract data from test.state
@@ -155,20 +135,21 @@ def compute_sensors_calibration(test: Test) -> None:
 
         # Update measurements for the current sensor
         for axis_name, axis_metrics in metrics.items():
+            # Polynomial coefficients
+            test.measurements[f"{sensor}_polynomial_coefficients_{axis_name}"] = \
+                test.state[calibration_key]["polynomial_coefficients"][f"axis_{list(metrics.keys()).index(axis_name)}"]
+
+            # Measurements on raw data
+            test.measurements[f"{sensor}_noise_density_{axis_name}"] = axis_metrics["noise_density"]
+            test.measurements[f"{sensor}_temp_sensitivity_{axis_name}"] = axis_metrics["temp_sensitivity"]
+
+            # Measurements using raw data and fitted data
             test.measurements[f"{sensor}_max_bias_{axis_name}"] = axis_metrics["max_bias"]
             test.measurements[f"{sensor}_residual_mean_{axis_name}"] = abs(axis_metrics["residuals"]["mean_residual"])
             test.measurements[f"{sensor}_residual_std_{axis_name}"] = axis_metrics["residuals"]["std_residual"]
             test.measurements[f"{sensor}_residual_p2p_{axis_name}"] = axis_metrics["residuals"]["p2p_residual"]
             test.measurements[f"{sensor}_r2_{axis_name}"] = axis_metrics["r2"]
-            test.measurements[f"{sensor}_noise_density_{axis_name}"] = axis_metrics[
-                "noise_density"
-            ]
-            test.measurements[f"{sensor}_temp_sensitivity_{axis_name}"] = axis_metrics[
-                "temp_sensitivity"
-            ]
-            test.measurements[f"{sensor}_polynomial_coefficients_{axis_name}"] = test.state[calibration_key][
-                "polynomial_coefficients"
-            ][f"axis_{list(metrics.keys()).index(axis_name)}"]
+
 
         # Attach calibration figures for the current sensor
         for axis, fig in zip(["x", "y", "z"], test.state[calibration_key]["figures"]):
