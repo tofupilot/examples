@@ -32,5 +32,5 @@ def compute_temp_sensitivity(
 
     return {
         "max_sensitivity": np.max(np.abs(sensitivities)),
-        "sensitivity_at_ref": sensitivity_ref,
+        "sensitivity_at_ref": abs(sensitivity_ref),
     }

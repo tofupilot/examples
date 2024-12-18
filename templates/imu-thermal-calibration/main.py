@@ -13,7 +13,6 @@ from utils.compute_noise_density import compute_noise_density
 from utils.compute_temp_sensitivity import compute_temp_sensitivity
 
 
-ACC_MAX_BIAS_LIMIT = 0.5  # m/s^2
 ACC_RESIDUAL_MEAN_LIMIT = 0.01  # m/s^2
 ACC_RESIDUAL_STD_LIMIT = 5.0  # m/s^2
 ACC_RESIDUAL_P2P_LIMIT_XY = 15.0  # m/s^2
@@ -22,7 +21,6 @@ ACC_NOISE_DENSITY_LIMIT = 1.0  # m/s^2/sqrt(Hz)
 ACC_TEMP_SENSITIVITY_LIMIT_XY = 0.5  # m/s^2/°C
 ACC_TEMP_SENSITIVITY_LIMIT_Z = 1.0  # m/s^2/°C
 
-GYRO_MAX_BIAS_LIMIT = 0.5  # °/s
 GYRO_RESIDUAL_MEAN_LIMIT = 0.01  # °/s
 GYRO_RESIDUAL_STD_LIMIT = 0.3  # °/s
 GYRO_RESIDUAL_P2P_LIMIT = 2.0  # °/s
@@ -47,7 +45,7 @@ def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
     *(htf.Measurement("{sensor}_polynomial_coefficients_{axis}")
       .doc("Coefficients of the polynomial that models the {sensor} temperature response.")
       .with_args(sensor=sensor, axis=axis)
-      for sensor in ("acc", "gyro") for axis in ("x", "y", "z"))
+      for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
     # Noise Density (uses raw data only)
     *(htf.Measurement("{sensor}_noise_density_{axis}")
@@ -56,15 +54,19 @@ def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
-    # Temperature Sensitivity (uses raw data only)
-    *(htf.Measurement("{sensor}_temp_sensitivity_{axis}")
+    # Temperature Sensitivity - Max
+    *(htf.Measurement("{sensor}_temp_sensitivity_max_{axis}")
+      .in_range(0.0, ACC_TEMP_SENSITIVITY_LIMIT_XY if sensor == "acc" and axis in ("x", "y") else
+                ACC_TEMP_SENSITIVITY_LIMIT_Z if sensor == "acc" else GYRO_TEMP_SENSITIVITY_LIMIT)
+      .with_units(units.METRE_PER_SECOND_SQUARED if sensor == "acc" else units.DEGREE_PER_SECOND)  # Note: units are per degree Celsius
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
-    # Max Bias
-    *(htf.Measurement("{sensor}_max_bias_{axis}")
-      .in_range(0.0, ACC_MAX_BIAS_LIMIT if sensor == "acc" else GYRO_MAX_BIAS_LIMIT)
-      .with_units(units.METRE_PER_SECOND_SQUARED if sensor == "acc" else units.DEGREE_PER_SECOND)
+    # Temperature Sensitivity - Reference
+    *(htf.Measurement("{sensor}_temp_sensitivity_ref_{axis}")
+      .in_range(0.0, ACC_TEMP_SENSITIVITY_LIMIT_XY if sensor == "acc" and axis in ("x", "y") else
+                ACC_TEMP_SENSITIVITY_LIMIT_Z if sensor == "acc" else GYRO_TEMP_SENSITIVITY_LIMIT)
+      .with_units(units.METRE_PER_SECOND_SQUARED if sensor == "acc" else units.DEGREE_PER_SECOND)  # Note: units are per degree Celsius
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
@@ -125,12 +127,12 @@ def compute_sensors_calibration(test: Test) -> None:
             noise_density = compute_noise_density(axis_data)
             temp_sensitivity = compute_temp_sensitivity(axis_data, data[0])
 
+
             metrics[axis_name] = {
-                "residuals": residuals,
-                "r2": r2,
                 "noise_density": noise_density,
                 "temp_sensitivity": temp_sensitivity,
-                "max_bias": abs(residuals["mean_residual"]),  # Max bias directly from residuals
+                "residuals": residuals,
+                "r2": r2,
             }
 
         # Update measurements for the current sensor
@@ -141,10 +143,10 @@ def compute_sensors_calibration(test: Test) -> None:
 
             # Measurements on raw data
             test.measurements[f"{sensor}_noise_density_{axis_name}"] = axis_metrics["noise_density"]
-            test.measurements[f"{sensor}_temp_sensitivity_{axis_name}"] = axis_metrics["temp_sensitivity"]
+            test.measurements[f"{sensor}_temp_sensitivity_max_{axis_name}"] = axis_metrics["temp_sensitivity"]["max_sensitivity"]
+            test.measurements[f"{sensor}_temp_sensitivity_ref_{axis_name}"] = axis_metrics["temp_sensitivity"]["sensitivity_at_ref"]
 
             # Measurements using raw data and fitted data
-            test.measurements[f"{sensor}_max_bias_{axis_name}"] = axis_metrics["max_bias"]
             test.measurements[f"{sensor}_residual_mean_{axis_name}"] = abs(axis_metrics["residuals"]["mean_residual"])
             test.measurements[f"{sensor}_residual_std_{axis_name}"] = axis_metrics["residuals"]["std_residual"]
             test.measurements[f"{sensor}_residual_p2p_{axis_name}"] = axis_metrics["residuals"]["p2p_residual"]
