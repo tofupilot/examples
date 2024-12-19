@@ -16,13 +16,6 @@ def connect_dut(test: Test, dut: MockDutPlug) -> None:
     """Connect to the Device Under Test (DUT)."""
     dut.connect()
 
-
-@plug(dut=MockDutPlug)
-def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
-    """Retrieve calibration data from the DUT."""
-    test.state.update(dut.get_imu_data(test))
-
-
 @measures(
     # Noise Density (uses raw data only)
     *(htf.Measurement("{sensor}_noise_density_{axis}")
@@ -44,7 +37,44 @@ def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
       .with_units({"acc": units.METRE_PER_SECOND_SQUARED, "gyro": units.DEGREE_PER_SECOND}.get(sensor))
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
+)
+@plug(dut=MockDutPlug)
+def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
+    """Retrieve calibration data from the DUT."""
+    test.state.update(dut.get_imu_data(test))
 
+    for sensor, data_key, calibration_key in [
+        ("acc", "acc_data", "acc_calibration_results"),
+        ("gyro", "gyro_data", "gyro_calibration_results"),
+    ]:
+        # Data preparation: extract data from test.state
+        sensor_temp_data = test.state[data_key]
+        data = (
+            sensor_temp_data["temperature"],
+            sensor_temp_data[f"{sensor}_x"],
+            sensor_temp_data[f"{sensor}_y"],
+            sensor_temp_data[f"{sensor}_z"],
+        )
+
+        # Validate raw data for each axis
+        metrics = {}
+        for axis, axis_name in enumerate(["x", "y", "z"]):
+            axis_data = data[axis + 1]  # Skip temperature
+            noise_density = compute_noise_density(axis_data)
+            temp_sensitivity = compute_temp_sensitivity(axis_data, data[0])
+
+            metrics[axis_name] = {"noise_density": noise_density, "temp_sensitivity": temp_sensitivity}
+
+        for axis_name, axis_metrics in metrics.items():
+            # Fill measurements on raw data
+            test.measurements[f"{sensor}_noise_density_{axis_name}"] = axis_metrics["noise_density"]
+            test.measurements[f"{sensor}_temp_sensitivity_max_{axis_name}"] = axis_metrics["temp_sensitivity"][
+                "max_sensitivity"]
+            test.measurements[f"{sensor}_temp_sensitivity_ref_{axis_name}"] = axis_metrics["temp_sensitivity"][
+                "sensitivity_at_ref"]
+
+
+@measures(
     # Polynomial Coefficients
     *(htf.Measurement("{sensor}_polynomial_coefficients_{axis}")
       .with_args(sensor=sensor, axis=axis)
@@ -92,15 +122,9 @@ def compute_sensors_calibration(test: Test) -> None:
             sensor_temp_data[f"{sensor}_z"],
         )
 
-        # Validate raw data for each axis
         metrics = {}
         for axis, axis_name in enumerate(["x", "y", "z"]):
             axis_data = data[axis + 1]  # Skip temperature
-            noise_density = compute_noise_density(axis_data)
-            temp_sensitivity = compute_temp_sensitivity(axis_data, data[0])
-
-            metrics[axis_name] = {"noise_density": noise_density, "temp_sensitivity": temp_sensitivity}
-
         # Fit polynomial to raw data and calculate fitted temperature response
         test.state[calibration_key] = calibrate_sensor(data)
 
@@ -113,17 +137,10 @@ def compute_sensors_calibration(test: Test) -> None:
             residuals = compute_residuals(axis_data, fitted_values)
             r2 = compute_r2(axis_data, fitted_values)
 
-            metrics[axis_name].update({"residuals": residuals, "r2": r2})
+            metrics[axis_name] = {"residuals": residuals, "r2": r2}
 
         # Update all measurements for the current sensor
         for axis_name, axis_metrics in metrics.items():
-            # Measurements on raw data
-            test.measurements[f"{sensor}_noise_density_{axis_name}"] = axis_metrics["noise_density"]
-            test.measurements[f"{sensor}_temp_sensitivity_max_{axis_name}"] = axis_metrics["temp_sensitivity"][
-                "max_sensitivity"]
-            test.measurements[f"{sensor}_temp_sensitivity_ref_{axis_name}"] = axis_metrics["temp_sensitivity"][
-                "sensitivity_at_ref"]
-
             # Polynomial coefficients
             test.measurements[
                 f"{sensor}_polynomial_coefficients_{axis_name}"
