@@ -18,7 +18,7 @@ client = TofuPilotClient()
 client.create_run(
     procedure_id="FVT1",
     unit_under_test={
-        "serial_number": "SNNEWNNEstss",
+        "serial_number": "SN17",
         "part_number": "PNrstsrtsr",
         "part_name": "Never seen before",
         "batch_number": "B",
