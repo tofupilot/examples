@@ -10,6 +10,7 @@ on:
       environment:
         description: "Which API Key to use"
         required: true
+        default: production
         type: choice
         options:
           - preview
@@ -24,7 +25,7 @@ jobs:
 
     env:
       # Storing the user-supplied URL
-      TOFUPILOT_URL: ${{ secrets.TOFUPILOT_URL }}
+      TOFUPILOT_URL: https://www.tofupilot.app
 
     steps:
       # Checking out the repository
@@ -51,7 +52,7 @@ jobs:
         run: |
           pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ tofupilot==1.9.0.dev3
+          pip install tofupilot
 
       # Finding and running all Python scripts in the scripts folder and subfolders
       - name: Running all Python scripts
