@@ -42,7 +42,7 @@ def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
     # Noise Density (uses raw data only)
     *(htf.Measurement("{sensor}_noise_density_{axis}")
       .in_range(0.0, {"acc": 1.0, "gyro": 0.04}.get(sensor))
-      .with_units(units.METRE_PER_SECOND_SQUARED if sensor == "acc" else units.DEGREE_PER_SECOND)
+      .with_units({"acc": units.METRE_PER_SECOND_SQUARED, "gyro": units.DEGREE_PER_SECOND}.get(sensor))
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
@@ -66,7 +66,6 @@ def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
 
     # Polynomial Coefficients
     *(htf.Measurement("{sensor}_polynomial_coefficients_{axis}")
-      .doc("Coefficients of the polynomial that models the {sensor} temperature response.")
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
