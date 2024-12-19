@@ -1,0 +1,40 @@
+name: Auto-Format Python Code
+
+on:
+  push:
+    branches:
+      - main  # Trigger when code is pushed or merged into `main`
+
+jobs:
+  auto-format:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the code
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      # Step 3: Install dependencies
+      - name: Install Black
+        run: pip install black
+
+      # Step 4: Run the formatter
+      - name: Format Python Code
+        run: black .
+
+      # Step 5: Push formatted code back to `main`
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+          git add .
+          git commit -m "Auto-format Python code"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
