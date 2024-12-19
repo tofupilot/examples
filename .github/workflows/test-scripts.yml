@@ -9,7 +9,7 @@ on:
         type: string
       environment:
         description: "Which API Key to use"
-        required: true
+        required: false
         default: production
         type: choice
         options:
@@ -52,7 +52,7 @@ jobs:
         run: |
           pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          pip install tofupilot
+          pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ tofupilot==1.9.0.dev3
 
       # Finding and running all Python scripts in the scripts folder and subfolders
       - name: Running all Python scripts
