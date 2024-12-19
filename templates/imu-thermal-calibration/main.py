@@ -176,7 +176,6 @@ def main():
         get_calibration_data,
         compute_sensors_calibration,
         save_calibration,
-        procedure_id="IMUTC-1",
         procedure_name="IMU Thermal Calibration",
         part_name="PCB01",
     )
