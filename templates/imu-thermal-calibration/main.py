@@ -146,8 +146,11 @@ def compute_sensors_calibration(test: Test) -> None:
                 "sensitivity_at_ref"]
 
             # Polynomial coefficients
-            test.measurements[f"{sensor}_polynomial_coefficients_{axis_name}"] = \
-                test.state[calibration_key]["polynomial_coefficients"][f"axis_{list(metrics.keys()).index(axis_name)}"]
+            test.measurements[
+                f"{sensor}_polynomial_coefficients_{axis_name}"
+            ] = test.state[calibration_key]["polynomial_coefficients"][
+                f"axis_{list(metrics.keys()).index(axis_name)}"
+            ].tolist()
 
             # Measurements using raw data and fitted data
             test.measurements[f"{sensor}_residual_mean_{axis_name}"] = abs(axis_metrics["residuals"]["mean_residual"])
