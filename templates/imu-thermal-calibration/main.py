@@ -41,7 +41,7 @@ def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
 @measures(
     # Noise Density (uses raw data only)
     *(htf.Measurement("{sensor}_noise_density_{axis}")
-      .in_range(0.0, ACC_NOISE_DENSITY_LIMIT if sensor == "acc" else GYRO_NOISE_DENSITY_LIMIT)
+      .in_range(0.0, {"acc": 1.0, "gyro": 0.04}.get(sensor))
       .with_units(units.METRE_PER_SECOND_SQUARED if sensor == "acc" else units.DEGREE_PER_SECOND)
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
