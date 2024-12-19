@@ -9,60 +9,23 @@ def simulate_test_result(passed_prob):
     return random.random() < passed_prob
 
 
-@htf.measures(htf.Measurement("firmware_version").equals("1.4.3"))
-def pcba_firmware_version(test):
+@htf.measures(
+    htf.Measurement("firmware_version").equals("1.4.3"),
+    htf.Measurement("power_mode_functional").equals("on"),
+)
+def string_test(test):
     test.measurements.firmware_version = (
         "1.4.3" if simulate_test_result(0.99) else "1.4.2"
     )
+    test.measurements.power_mode_functional = "on" if simulate_test_result(1) else "off"
 
 
 @htf.measures(htf.Measurement("button_status").equals(True))
-def check_button(test):
+def boolean_test(test):
     test.measurements.button_status = simulate_test_result(1)
 
 
-@htf.measures(htf.Measurement("led_status").equals(True))
-def check_led_switch_on(test):
-    test.measurements.led_status = simulate_test_result(1)
-
-
-@htf.measures(htf.Measurement("input_voltage").in_range(4.5, 5).with_units(units.VOLT))
-def test_voltage_input(test):
-    passed = simulate_test_result(0.99)
-    test.measurements.input_voltage = (
-        round(random.uniform(4.7, 4.9), 2)
-        if passed
-        else round(random.uniform(3.0, 3.8), 2)
-    )
-
-
-@htf.measures(
-    htf.Measurement("output_voltage").in_range(3.2, 3.4).with_units(units.VOLT)
-)
-def test_voltage_output(test):
-    passed = simulate_test_result(1)
-    test.measurements.output_voltage = (
-        round(random.uniform(3.25, 3.35), 2)
-        if passed
-        else round(random.uniform(0.1, 0.3), 2)
-    )
-
-
-@htf.measures(
-    htf.Measurement("current_protection_triggered")
-    .in_range(maximum=1.5)
-    .with_units(units.AMPERE)
-)
-def test_overcurrent_protection(test):
-    passed = simulate_test_result(0.80)
-    test.measurements.current_protection_triggered = (
-        round(random.uniform(1.0, 1.4), 3)
-        if passed
-        else round(random.uniform(1.7, 1.8), 3)
-    )
-
-
-def test_battery_switch():
+def phaseresult_test():
     if simulate_test_result(0.98):
         return htf.PhaseResult.CONTINUE
     else:
@@ -70,23 +33,30 @@ def test_battery_switch():
 
 
 @htf.measures(
-    htf.Measurement("efficiency").in_range(85, 98).with_units(units.Unit("%"))
+    htf.Measurement("two_limits").in_range(4.5, 5).with_units(units.VOLT),
+    htf.Measurement("one_limit").in_range(maximum=1.5).with_units(units.AMPERE),
+    htf.Measurement("percentage").in_range(85, 98).with_units(units.Unit("%")),
 )
-def test_converter_efficiency(test):
+def measure_test_with_limits(test):
     passed = simulate_test_result(0.99)
+    test.measurements.two_limits = (
+        round(random.uniform(4.7, 4.9), 2)
+        if passed
+        else round(random.uniform(3.0, 3.8), 2)
+    )
+    test.measurements.one_limit = (
+        round(random.uniform(1.0, 1.4), 3)
+        if passed
+        else round(random.uniform(1.7, 1.8), 3)
+    )
     input_power = 500
     output_power = (
         round(random.uniform(450, 480)) if passed else round(random.uniform(400, 425))
     )
-    test.measurements.efficiency = round(((output_power / input_power) * 100), 1)
+    test.measurements.percentage = round(((output_power / input_power) * 100), 1)
 
 
-@htf.measures(htf.Measurement("power_mode_functional").equals("on"))
-def test_power_saving_mode(test):
-    test.measurements.power_mode_functional = "on" if simulate_test_result(1) else "off"
-
-
-def visual_control_pcb_coating(test):
+def phase_with_attachment(test):
     if simulate_test_result(1):
         test.attach_from_file("data/oscilloscope.jpeg")
         return htf.PhaseResult.CONTINUE
@@ -107,20 +77,46 @@ def phase_multi_measurements(test):
     test.measurements.temperature = round(random.uniform(22.5, 23), 2)
 
 
+@htf.measures(
+    htf.Measurement("dimensions").with_dimensions(units.HERTZ),
+    htf.Measurement("lots_of_dims").with_dimensions(
+        units.HERTZ,
+        units.SECOND,
+        htf.Dimension(description="my_angle", unit=units.RADIAN),
+    ),
+)
+def dimensions(test):
+    """Phase with dimensioned measurements."""
+    for dim in range(5):
+        test.measurements.dimensions[dim] = 1 << dim
+    for x, y, z in zip(list(range(1, 5)), list(range(21, 25)), list(range(101, 105))):
+        test.measurements.lots_of_dims[x, y, z] = x + y + z
+
+
+@htf.measures(
+    htf.Measurement("binary_measure").equals(True),
+    htf.Measurement("string_measure").equals("1.2.7"),
+    htf.Measurement("numerical_measure")
+    .in_range(20, 25)
+    .with_units(units.DEGREE_CELSIUS),
+)
+def not_working_multi_measurements(test):
+    test.measurements.binary_measure = 42
+    test.measurements.string_measure = 123
+    test.measurements.numerical_measure = "N/A"
+
+
 def main():
     # Define the test plan with all steps
     test = htf.Test(
         phase_multi_measurements,
-        pcba_firmware_version,
-        check_button,
-        check_led_switch_on,
-        test_voltage_input,
-        test_voltage_output,
-        test_overcurrent_protection,
-        test_battery_switch,
-        test_converter_efficiency,
-        test_power_saving_mode,
-        visual_control_pcb_coating,
+        dimensions,
+        string_test,
+        boolean_test,
+        phaseresult_test,
+        measure_test_with_limits,
+        phase_with_attachment,
+        not_working_multi_measurements,
         procedure_id="FVT9",
         procedure_name="Test QA",
         part_number="00220D",
@@ -129,7 +125,7 @@ def main():
         batch_number="1124-0001",
         sub_units=[{"serial_number": "00102"}],
         report_variables={
-            "var1": "other automatic text from the script !!!!!???1234567890'±“#Ç[]|{}≠¿≠}{|][‘§æ¢]}",
+            "var1": "other automatic text from the script !!!!!???1234567890'±“#Ç[]|{}≠¿≠}{|][‘§æ¢]}≤–…«¶æ¢¬‘§πø¡°†®€∑œ¬∆ºª@ƒ∂ßå«µ~∫√©≈¥",
             "var2": "I'm an automatic text from the script",
         },
     )
