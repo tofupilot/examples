@@ -11,21 +11,6 @@ from utils.compute_r2 import compute_r2
 from utils.compute_residuals import compute_residuals
 from utils.compute_temp_sensitivity import compute_temp_sensitivity
 
-ACC_RESIDUAL_MEAN_LIMIT = 0.01  # m/s^2
-ACC_RESIDUAL_STD_LIMIT = 5.0  # m/s^2
-ACC_RESIDUAL_P2P_LIMIT_XY = 15.0  # m/s^2
-ACC_RESIDUAL_P2P_LIMIT_Z = 35.0  # m/s^2
-ACC_NOISE_DENSITY_LIMIT = 1.0  # m/s^2/sqrt(Hz)
-ACC_TEMP_SENSITIVITY_LIMIT_XY = 0.5  # m/s^2/°C
-ACC_TEMP_SENSITIVITY_LIMIT_Z = 1.0  # m/s^2/°C
-
-GYRO_RESIDUAL_MEAN_LIMIT = 0.01  # °/s
-GYRO_RESIDUAL_STD_LIMIT = 0.3  # °/s
-GYRO_RESIDUAL_P2P_LIMIT = 2.0  # °/s
-GYRO_NOISE_DENSITY_LIMIT = 0.04  # °/s/sqrt(Hz)
-GYRO_TEMP_SENSITIVITY_LIMIT = 0.05  # °/s/°C
-
-
 @plug(dut=MockDutPlug)
 def connect_dut(test: Test, dut: MockDutPlug) -> None:
     """Connect to the Device Under Test (DUT)."""
@@ -48,19 +33,15 @@ def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
 
     # Temperature Sensitivity - Max (uses raw data only)
     *(htf.Measurement("{sensor}_temp_sensitivity_max_{axis}")
-      .in_range(0.0, ACC_TEMP_SENSITIVITY_LIMIT_XY if sensor == "acc" and axis in ("x", "y") else
-    ACC_TEMP_SENSITIVITY_LIMIT_Z if sensor == "acc" else GYRO_TEMP_SENSITIVITY_LIMIT)
-      .with_units(
-        units.METRE_PER_SECOND_SQUARED if sensor == "acc" else units.DEGREE_PER_SECOND)  # Note: units are per degree Celsius
+      .in_range(0.0, {"acc": {"x": 0.5, "y": 0.5, "z": 1.0}, "gyro": {"x": 0.05, "y": 0.05, "z": 0.05}}[sensor][axis])
+      .with_units({"acc": units.METRE_PER_SECOND_SQUARED, "gyro": units.DEGREE_PER_SECOND}.get(sensor))
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
     # Temperature Sensitivity - Reference (uses raw data only)
     *(htf.Measurement("{sensor}_temp_sensitivity_ref_{axis}")
-      .in_range(0.0, ACC_TEMP_SENSITIVITY_LIMIT_XY if sensor == "acc" and axis in ("x", "y") else
-    ACC_TEMP_SENSITIVITY_LIMIT_Z if sensor == "acc" else GYRO_TEMP_SENSITIVITY_LIMIT)
-      .with_units(
-        units.METRE_PER_SECOND_SQUARED if sensor == "acc" else units.DEGREE_PER_SECOND)  # Note: units are per degree Celsius
+      .in_range(0.0, {"acc": {"x": 0.5, "y": 0.5, "z": 1.0}, "gyro": {"x": 0.05, "y": 0.05, "z": 0.05}}[sensor][axis])
+      .with_units({"acc": units.METRE_PER_SECOND_SQUARED, "gyro": units.DEGREE_PER_SECOND}.get(sensor))
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
@@ -71,23 +52,22 @@ def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
 
     # Residual mean
     *(htf.Measurement("{sensor}_residual_mean_{axis}")
-      .in_range(0.0, ACC_RESIDUAL_MEAN_LIMIT if sensor == "acc" else GYRO_RESIDUAL_MEAN_LIMIT)
-      .with_units(units.METRE_PER_SECOND_SQUARED if sensor == "acc" else units.DEGREE_PER_SECOND)
+      .in_range(0.0, {"acc": 0.01, "gyro": 0.01}.get(sensor))
+      .with_units({"acc": units.METRE_PER_SECOND_SQUARED, "gyro": units.DEGREE_PER_SECOND}.get(sensor))
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
     # Residual standard deviation
     *(htf.Measurement("{sensor}_residual_std_{axis}")
-      .in_range(0.0, ACC_RESIDUAL_STD_LIMIT if sensor == "acc" else GYRO_RESIDUAL_STD_LIMIT)
-      .with_units(units.METRE_PER_SECOND_SQUARED if sensor == "acc" else units.DEGREE_PER_SECOND)
+      .in_range(0.0, {"acc": 5.0, "gyro": 0.3}.get(sensor))
+      .with_units({"acc": units.METRE_PER_SECOND_SQUARED, "gyro": units.DEGREE_PER_SECOND}.get(sensor))
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
     # Residual peak-to-peak
     *(htf.Measurement("{sensor}_residual_p2p_{axis}")
-      .in_range(0.0, ACC_RESIDUAL_P2P_LIMIT_XY if sensor == "acc" and axis in ("x", "y") else
-    ACC_RESIDUAL_P2P_LIMIT_Z if sensor == "acc" else GYRO_RESIDUAL_P2P_LIMIT)
-      .with_units(units.METRE_PER_SECOND_SQUARED if sensor == "acc" else units.DEGREE_PER_SECOND)
+      .in_range(0.0, {"acc": {"x": 15.0, "y": 15.0, "z": 35.0}, "gyro": {"x": 2.0, "y": 2.0, "z": 2.0}}[sensor][axis])
+      .with_units({"acc": units.METRE_PER_SECOND_SQUARED, "gyro": units.DEGREE_PER_SECOND}.get(sensor))
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
