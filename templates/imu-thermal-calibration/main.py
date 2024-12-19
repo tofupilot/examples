@@ -46,7 +46,7 @@ def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
-    # Temperature Sensitivity - Max
+    # Temperature Sensitivity - Max (uses raw data only)
     *(htf.Measurement("{sensor}_temp_sensitivity_max_{axis}")
       .in_range(0.0, ACC_TEMP_SENSITIVITY_LIMIT_XY if sensor == "acc" and axis in ("x", "y") else
     ACC_TEMP_SENSITIVITY_LIMIT_Z if sensor == "acc" else GYRO_TEMP_SENSITIVITY_LIMIT)
@@ -55,7 +55,7 @@ def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
-    # Temperature Sensitivity - Reference
+    # Temperature Sensitivity - Reference (uses raw data only)
     *(htf.Measurement("{sensor}_temp_sensitivity_ref_{axis}")
       .in_range(0.0, ACC_TEMP_SENSITIVITY_LIMIT_XY if sensor == "acc" and axis in ("x", "y") else
     ACC_TEMP_SENSITIVITY_LIMIT_Z if sensor == "acc" else GYRO_TEMP_SENSITIVITY_LIMIT)
