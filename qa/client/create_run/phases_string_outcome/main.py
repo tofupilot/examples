@@ -1,6 +1,6 @@
 from tofupilot import TofuPilotClient
-from datetime import datetime, timedelta
 import random
+import time
 
 client = TofuPilotClient()
 
@@ -16,30 +16,30 @@ def battery_connection():
 
 def check_voltage():
     passed = simulate_test_result(100)
-    value_measured = (
+    measured_value = (
         round(random.uniform(10.1, 12.0), 0)
         if passed
         else round(random.uniform(14.4, 15.0), 1)
     )
-    return passed, value_measured, "V", None, 13
+    return passed, measured_value, "V", None, 13
 
 
 def check_soc():
     passed = simulate_test_result(95)
-    value_measured = (
+    measured_value = (
         round(random.uniform(50, 55), 0) if passed else round(random.uniform(20, 39), 2)
     )
-    return passed, value_measured, "%", 40, 60
+    return passed, measured_value, "%", 40, 60
 
 
 def check_soh():
     passed = simulate_test_result(100)
-    value_measured = (
+    measured_value = (
         round(random.uniform(96, 100), 0)
         if passed
         else round(random.uniform(70, 95), 2)
     )
-    return passed, value_measured, "%", 95, None
+    return passed, measured_value, "%", 95, None
 
 
 def take_picture():
@@ -49,32 +49,33 @@ def take_picture():
 
 def flash_firmware():
     passed = simulate_test_result(90)
-    value_measured = "1.2.4" if passed else "1.2.0"
-    return passed, value_measured, None, None, None
+    measured_value = "1.2.4" if passed else "1.2.0"
+    return passed, measured_value, None, None, None
 
 
 # Running Tests
-def run_test(test, duration):
-    # start_time = datetime.now() - timedelta(days=1)
-    start_time = datetime.now()
-    passed, value_measured, unit, limit_low, limit_high = test()
+def run_test(test):
+    start_time_millis = int(time.time() * 1000)
+
+    passed, measured_value, unit, limit_low, limit_high = test()
+
+    end_time_millis = int(time.time() * 1000)
 
     if passed == True:
         outcome = "PASS"
     elif passed == False:
         outcome = "FAIL"
 
-    # ---- UPDATE PARAMETER NAMES
-    step = {
+    phase = {
         "name": test.__name__,  # Third phase
-        "outcome": outcome,  # Outcome of the step
-        "duration": duration,  # Duration of the step
-        "started_at": start_time,
+        "outcome": outcome,  # Outcome of the phase
+        "start_time_millis": start_time_millis,
+        "end_time_millis": end_time_millis,
         "measurements": [
             {
                 "name": test.__name__,
                 "outcome": outcome,
-                "value": value_measured,
+                "measured_value": measured_value,
                 "units": unit,
                 "lower_limit": limit_low,
                 "upper_limit": limit_high,
@@ -82,35 +83,34 @@ def run_test(test, duration):
         ],
     }
 
-    return step
+    return phase
 
 
 def run_all_tests():
     tests = [
-        (flash_firmware, timedelta(minutes=3, seconds=32)),
-        (battery_connection, timedelta(seconds=8)),
-        (check_voltage, timedelta(seconds=3)),
-        (check_soc, timedelta(seconds=1)),
-        (check_soh, timedelta(seconds=5)),
-        (take_picture, timedelta(seconds=12)),
+        flash_firmware,
+        battery_connection,
+        check_voltage,
+        check_soc,
+        check_soh,
+        take_picture,
     ]
 
-    steps = []
-    for test, duration in tests:
-        step = run_test(test, duration)
-        steps.append(step)
+    phases = []
+    for test in tests:
+        phase = run_test(test)
+        phases.append(phase)
 
-    return steps
+    return phases
 
 
 def handle_test():
     random_digits = "".join([str(random.randint(0, 9)) for _ in range(5)])
     serial_number = f"SI0364A{random_digits}"
 
-    # Exécuter tous les tests
+    # Execute all tests
     phases = run_all_tests()
 
-    # Créer un rapport de test
     client.create_run(
         procedure_id="FVT9",
         procedure_name="Test_QA",
