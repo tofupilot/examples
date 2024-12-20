@@ -44,35 +44,18 @@ def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
     """Retrieve calibration data from the DUT."""
     test.state.update(dut.get_imu_data(test))
 
-    for sensor, data_key, _ in [
-        ("acc", "acc_data", "acc_calibration_results"),
-        ("gyro", "gyro_data", "gyro_calibration_results"),
-    ]:
-        # Data preparation: extract data from test.state
-        sensor_temp_data = test.state[data_key]
-        data = (
-            sensor_temp_data["temperature"],
-            sensor_temp_data[f"{sensor}_x"],
-            sensor_temp_data[f"{sensor}_y"],
-            sensor_temp_data[f"{sensor}_z"],
-        )
+    for sensor, data_key in [("acc", "acc_data"), ("gyro", "gyro_data")]:
+        sensor_data = test.state[data_key]
+        temperature = sensor_data["temperature"]
+        axes_data = {axis: sensor_data[f"{sensor}_{axis}"] for axis in ["x", "y", "z"]}
 
-        # Validate raw data for each axis
-        metrics = {}
-        for axis, axis_name in enumerate(["x", "y", "z"]):
-            axis_data = data[axis + 1]  # Skip temperature
+        for axis, axis_data in axes_data.items():
             noise_density = compute_noise_density(axis_data)
-            temp_sensitivity = compute_temp_sensitivity(axis_data, data[0])
+            temp_sensitivity = compute_temp_sensitivity(axis_data, temperature)
 
-            metrics[axis_name] = {"noise_density": noise_density, "temp_sensitivity": temp_sensitivity}
-
-        for axis_name, axis_metrics in metrics.items():
-            # Fill measurements on raw data
-            test.measurements[f"{sensor}_noise_density_{axis_name}"] = axis_metrics["noise_density"]
-            test.measurements[f"{sensor}_temp_sensitivity_max_{axis_name}"] = axis_metrics["temp_sensitivity"][
-                "max_sensitivity"]
-            test.measurements[f"{sensor}_temp_sensitivity_ref_{axis_name}"] = axis_metrics["temp_sensitivity"][
-                "sensitivity_at_ref"]
+            test.measurements[f"{sensor}_noise_density_{axis}"] = noise_density
+            test.measurements[f"{sensor}_temp_sensitivity_max_{axis}"] = temp_sensitivity["max_sensitivity"]
+            test.measurements[f"{sensor}_temp_sensitivity_ref_{axis}"] = temp_sensitivity["sensitivity_at_ref"]
 
 
 @measures(
@@ -110,50 +93,32 @@ def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
 )
 def compute_sensors_calibration(test: Test) -> None:
     """Perform calibration and metrics computation for both accelerometer and gyroscope."""
-    # Iterate over both sensors (accelerometer and gyroscope)
     for sensor, data_key, calibration_key in [
         ("acc", "acc_data", "acc_calibration_results"),
         ("gyro", "gyro_data", "gyro_calibration_results"),
     ]:
-        # Data preparation: extract data from test.state
-        sensor_temp_data = test.state[data_key]
-        data = (
-            sensor_temp_data["temperature"],
-            sensor_temp_data[f"{sensor}_x"],
-            sensor_temp_data[f"{sensor}_y"],
-            sensor_temp_data[f"{sensor}_z"],
+        sensor_data = test.state[data_key]
+        temperature = sensor_data["temperature"]
+        axes_data = {axis: sensor_data[f"{sensor}_{axis}"] for axis in ["x", "y", "z"]}
+
+        test.state[calibration_key] = calibrate_sensor(
+            (temperature, *axes_data.values()), sensor
         )
-        # Fit polynomial to raw data and calculate fitted temperature response
-        test.state[calibration_key] = calibrate_sensor(data, sensor)
 
-        metrics = {}
-        # Compute fit metrics for each axis
-        for axis, axis_name in enumerate(["x", "y", "z"]):
-            axis_data = data[axis + 1]  # Skip temperature
-
-            # Validate fit
-            fitted_values = test.state[calibration_key]["fitted_values"][f"{axis_name}_axis"]
+        for axis, axis_data in axes_data.items():
+            fitted_values = test.state[calibration_key]["fitted_values"][f"{axis}_axis"]
             residuals = compute_residuals(axis_data, fitted_values)
             r2 = compute_r2(axis_data, fitted_values)
 
-            metrics[axis_name] = {"residuals": residuals, "r2": r2}
+            # Update measurements
+            test.measurements[f"{sensor}_polynomial_coefficients_{axis}"] = (
+                test.state[calibration_key]["polynomial_coefficients"][f"{axis}_axis"].tolist()
+            )
+            test.measurements[f"{sensor}_residual_mean_{axis}"] = abs(residuals["mean_residual"])
+            test.measurements[f"{sensor}_residual_std_{axis}"] = residuals["std_residual"]
+            test.measurements[f"{sensor}_residual_p2p_{axis}"] = residuals["p2p_residual"]
+            test.measurements[f"{sensor}_r2_{axis}"] = r2
 
-        # Update all measurements for the current sensor
-        for axis_name, axis_metrics in metrics.items():
-            # Polynomial coefficients
-            test.measurements[
-                f"{sensor}_polynomial_coefficients_{axis_name}"
-            ] = test.state[calibration_key]["polynomial_coefficients"][
-                f"{axis_name}_axis"
-            ].tolist()
-
-            # Measurements using raw data and fitted data
-            test.measurements[f"{sensor}_residual_mean_{axis_name}"] = abs(axis_metrics["residuals"]["mean_residual"])
-            test.measurements[f"{sensor}_residual_std_{axis_name}"] = axis_metrics["residuals"]["std_residual"]
-            test.measurements[f"{sensor}_residual_p2p_{axis_name}"] = axis_metrics["residuals"]["p2p_residual"]
-            test.measurements[f"{sensor}_r2_{axis_name}"] = axis_metrics["r2"]
-
-        # Attach calibration figures for the current sensor
         for axis, fig in zip(["x", "y", "z"], test.state[calibration_key]["figures"]):
             test.attach(f"{sensor}_calibration_figure_{axis}", fig.getvalue(), "image/png")
 
@@ -171,6 +136,7 @@ def main():
         get_calibration_data,
         compute_sensors_calibration,
         save_calibration,
+        procedure_id="FVT1",
         procedure_name="IMU Thermal Calibration",
         part_number="PCB01",
         part_name="Motherboard PCBA",
