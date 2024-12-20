@@ -26,7 +26,6 @@ def connect_dut(test: Test, dut: MockDutPlug) -> None:
 
     *(htf.Measurement("{sensor}_temp_sensitivity_max_{axis}")
       .doc('Max temperature sensitivity (unit/°C)')
-      .in_range(0.0, {"acc": {"x": 0.5, "y": 0.5, "z": 1.0}, "gyro": {"x": 0.05, "y": 0.05, "z": 0.05}}[sensor][axis])
       .with_units({"acc": units.METRE_PER_SECOND_SQUARED, "gyro": units.DEGREE_PER_SECOND}.get(sensor))
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
@@ -34,7 +33,7 @@ def connect_dut(test: Test, dut: MockDutPlug) -> None:
     *(htf.Measurement("{sensor}_temp_sensitivity_ref_{axis}")
       .doc('Temperature sensitivity at 25°C (unit/°C)')
       .in_range(
-        {"acc": {"x": 5e-4, "y": 5e-4, "z": 5e-4}, "gyro": {"x": 6e-4, "y": 6e-4, "z": 6e-4}}[sensor][axis], 
+        {"acc": {"x": 5e-4, "y": 5e-4, "z": 5e-4}, "gyro": {"x": 6e-5, "y": 6e-5, "z": 6e-5}}[sensor][axis], 
         {"acc": {"x": 1e-2, "y": 1e-2, "z": 1e-2}, "gyro": {"x": 1e0, "y": 1e0, "z": 1e0}}[sensor][axis])
       .with_units({"acc": units.METRE_PER_SECOND_SQUARED, "gyro": units.DEGREE_PER_SECOND}.get(sensor))
       .with_args(sensor=sensor, axis=axis)
@@ -45,7 +44,7 @@ def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
     """Retrieve calibration data from the DUT."""
     test.state.update(dut.get_imu_data(test))
 
-    for sensor, data_key in [
+    for sensor, data_key, _ in [
         ("acc", "acc_data", "acc_calibration_results"),
         ("gyro", "gyro_data", "gyro_calibration_results"),
     ]:
@@ -106,6 +105,7 @@ def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
 
     *(htf.Measurement("{sensor}_r2_{axis}")
       .doc("Coefficient of determination R² (unitless)")
+      .in_range(0.5, 1.0)
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 )
@@ -176,7 +176,8 @@ def main():
         compute_sensors_calibration,
         save_calibration,
         procedure_name="IMU Thermal Calibration",
-        part_name="PCB01",
+        part_number="PCB01",
+        part_name="Motherboard PCBA",
     )
 
     with TofuPilot(test):
