@@ -5,11 +5,10 @@ import matplotlib.pyplot as plt
 from io import BytesIO
 from typing import Dict, Tuple, List
 
-
 def calibrate_sensor(
         data: Tuple[List[float], List[float], List[float], List[float]],
-    polynomial_order: int = 3,
-) -> Dict[str, Dict[str, np.ndarray]]:
+        sensor: str, polynomial_order: int = 3
+        ) -> Dict[str, Dict[str, np.ndarray]]:
     """
     Fit a polynomial model to the sensor data against temperature.
 
@@ -26,15 +25,31 @@ def calibrate_sensor(
     - figures: Matplotlib figure objects as in-memory images for each axis.
     """
 
+    # Define color names
+    colors = {
+        "dark_gray": "#09090B",
+        "lime": "#bef264",
+        "pink": "#f9a8d4",
+        "white": "#ffffff",
+        "purple": "#a78bfa"
+    }
+
     # Convert the tuple elements to NumPy arrays
-    temp, *sensor_axes = (np.array(arr) for arr in data)
+    temp, *sensor_data = (np.array(arr) for arr in data)
 
     poly_coeffs: Dict[str, np.ndarray] = {}
     fitted_values: Dict[str, np.ndarray] = {}
     figures: List[BytesIO] = []
+    axis_list = ('x', 'y', 'z')
 
-    for i, axis_data in enumerate(sensor_axes):
-        axis_name = f"axis_{i}"
+    for i, axis_data in enumerate(sensor_data):
+        if sensor == "acc":
+            sensor = "Accelerometer"
+            unit = "m/s²"
+        else:
+            sensor = "Gyroscope"
+            unit = "°/s"
+        axis_name = f"{axis_list[i]}_axis"
 
         # Fit polynomial to the data
         coeffs = np.polyfit(temp, axis_data, polynomial_order)
@@ -46,12 +61,20 @@ def calibrate_sensor(
 
         # Generate plot and store figure
         fig, ax = plt.subplots()
-        ax.plot(temp, axis_data, "o", label="Sensor Data")
-        ax.plot(temp, fitted, "-", label="Fitted Curve")
-        ax.set_title(f"{axis_name} Calibration")
-        ax.set_xlabel("Temperature (°C)")
-        ax.set_ylabel("Sensor Value")
-        ax.legend()
+        fig.patch.set_facecolor(colors["dark_gray"])
+        ax.set_facecolor(colors["dark_gray"])
+
+        ax.plot(temp, axis_data, "o", color=colors["lime"], label=f"{sensor} data")
+        ax.plot(temp, fitted, "-", color=colors["pink"], label="Fitted Curve")
+        ax.set_title(f"{sensor} {axis_name[0].capitalize()} axis calibration", color=colors["white"])
+        ax.set_xlabel("Temperature (°C)", color=colors["white"])
+        ax.set_ylabel(f"{sensor} value ({unit})", color=colors["white"])
+        ax.tick_params(colors=colors["white"])
+        ax.spines['bottom'].set_color(colors["white"])
+        ax.spines['left'].set_color(colors["white"])
+        ax.spines['top'].set_color(colors["white"])
+        ax.spines['right'].set_color(colors["white"])
+        ax.legend(facecolor=colors["dark_gray"], edgecolor=colors["white"], labelcolor=colors["white"])
 
         # Convert the figure to an in-memory image
         buffer = BytesIO()
