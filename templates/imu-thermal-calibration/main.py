@@ -81,7 +81,6 @@ def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
-    # Residual mean
     *(htf.Measurement("{sensor}_residual_mean_{axis}")
       .doc("Residual mean")
       .in_range(0.0, {"acc": 0.01, "gyro": 0.01}.get(sensor))
