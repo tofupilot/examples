@@ -17,23 +17,25 @@ def connect_dut(test: Test, dut: MockDutPlug) -> None:
     dut.connect()
 
 @measures(
-    # Noise Density (uses raw data only)
     *(htf.Measurement("{sensor}_noise_density_{axis}")
-      .in_range(0.0, {"acc": 1.0, "gyro": 0.04}.get(sensor))
+      .doc('Noise density, normalized to √Hz')
+      .in_range(0.0, {"acc": 0.003, "gyro": 0.005}.get(sensor))
       .with_units({"acc": units.METRE_PER_SECOND_SQUARED, "gyro": units.DEGREE_PER_SECOND}.get(sensor))
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
-    # Temperature Sensitivity - Max (uses raw data only)
     *(htf.Measurement("{sensor}_temp_sensitivity_max_{axis}")
+      .doc('Max temperature sensitivity (m/s²/°C)')
       .in_range(0.0, {"acc": {"x": 0.5, "y": 0.5, "z": 1.0}, "gyro": {"x": 0.05, "y": 0.05, "z": 0.05}}[sensor][axis])
       .with_units({"acc": units.METRE_PER_SECOND_SQUARED, "gyro": units.DEGREE_PER_SECOND}.get(sensor))
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
-    # Temperature Sensitivity - Reference (uses raw data only)
     *(htf.Measurement("{sensor}_temp_sensitivity_ref_{axis}")
-      .in_range(0.0, {"acc": {"x": 0.5, "y": 0.5, "z": 1.0}, "gyro": {"x": 0.05, "y": 0.05, "z": 0.05}}[sensor][axis])
+      .doc('Temperature sensitivity at 25°C (m/s²/°C)')
+      .in_range(
+        {"acc": {"x": 5e-4, "y": 5e-4, "z": 5e-4}, "gyro": {"x": 6e-4, "y": 6e-4, "z": 6e-4}}[sensor][axis], 
+        {"acc": {"x": 1e-2, "y": 1e-2, "z": 1e-2}, "gyro": {"x": 1e0, "y": 1e0, "z": 1e0}}[sensor][axis])
       .with_units({"acc": units.METRE_PER_SECOND_SQUARED, "gyro": units.DEGREE_PER_SECOND}.get(sensor))
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
