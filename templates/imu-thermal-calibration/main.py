@@ -124,19 +124,16 @@ def compute_sensors_calibration(test: Test) -> None:
             sensor_temp_data[f"{sensor}_y"],
             sensor_temp_data[f"{sensor}_z"],
         )
+        # Fit polynomial to raw data and calculate fitted temperature response
+        test.state[calibration_key] = calibrate_sensor(data, sensor)
 
         metrics = {}
-        for axis, axis_name in enumerate(["x", "y", "z"]):
-            axis_data = data[axis + 1]  # Skip temperature
-        # Fit polynomial to raw data and calculate fitted temperature response
-        test.state[calibration_key] = calibrate_sensor(data)
-
         # Compute fit metrics for each axis
         for axis, axis_name in enumerate(["x", "y", "z"]):
             axis_data = data[axis + 1]  # Skip temperature
 
             # Validate fit
-            fitted_values = test.state[calibration_key]["fitted_values"][f"axis_{axis}"]
+            fitted_values = test.state[calibration_key]["fitted_values"][f"{axis_name}_axis"]
             residuals = compute_residuals(axis_data, fitted_values)
             r2 = compute_r2(axis_data, fitted_values)
 
@@ -148,7 +145,7 @@ def compute_sensors_calibration(test: Test) -> None:
             test.measurements[
                 f"{sensor}_polynomial_coefficients_{axis_name}"
             ] = test.state[calibration_key]["polynomial_coefficients"][
-                f"axis_{list(metrics.keys()).index(axis_name)}"
+                f"{axis_name}_axis"
             ].tolist()
 
             # Measurements using raw data and fitted data
