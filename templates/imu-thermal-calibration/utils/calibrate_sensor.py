@@ -27,11 +27,10 @@ def calibrate_sensor(
 
     # Define color names
     colors = {
-        "dark_gray": "#09090B",
+        "zinc": "#09090B",
         "white": "#ffffff",
         "lime": "#bef264",
         "pink": "#f9a8d4",
-        "purple": "#a78bfa"
     }
 
     # Convert the tuple elements to NumPy arrays
@@ -64,9 +63,9 @@ def calibrate_sensor(
 
         # Generate plot and store figure
         fig, axs = plt.subplots(2, 1, figsize=(8, 10), gridspec_kw={'height_ratios': [3, 1]})
-        fig.patch.set_facecolor(colors["dark_gray"])
-        axs[0].set_facecolor(colors["dark_gray"])
-        axs[1].set_facecolor(colors["dark_gray"])
+        fig.patch.set_facecolor(colors["zinc"])
+        axs[0].set_facecolor(colors["zinc"])
+        axs[1].set_facecolor(colors["zinc"])
 
         # Plot sensor data with the fitted curve
         axs[0].plot(temp, axis_data, ".", color=colors["lime"], label=f"{sensor_name} data")
@@ -79,7 +78,7 @@ def calibrate_sensor(
         axs[0].spines['left'].set_color(colors["white"])
         axs[0].spines['top'].set_color(colors["white"])
         axs[0].spines['right'].set_color(colors["white"])
-        axs[0].legend(facecolor=colors["dark_gray"], edgecolor=colors["white"], labelcolor=colors["white"])
+        axs[0].legend(facecolor=colors["zinc"], edgecolor=colors["white"], labelcolor=colors["white"])
 
         # Plot histogram of residuals
         axs[1].hist(residuals, bins=30, color=colors["lime"], edgecolor=colors["white"], alpha=0.8)
