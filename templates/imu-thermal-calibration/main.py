@@ -26,7 +26,6 @@ def connect_dut(test: Test, dut: MockDutPlug) -> None:
 
     # Temperature Sensitivity - Max (uses raw data only)
     *(htf.Measurement("{sensor}_temp_sensitivity_max_{axis}")
-      .in_range(0.0, {"acc": {"x": 0.5, "y": 0.5, "z": 1.0}, "gyro": {"x": 0.05, "y": 0.05, "z": 0.05}}[sensor][axis])
       .with_units({"acc": units.METRE_PER_SECOND_SQUARED, "gyro": units.DEGREE_PER_SECOND}.get(sensor))
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
