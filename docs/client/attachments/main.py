@@ -2,7 +2,7 @@ from tofupilot import TofuPilotClient
 
 
 def step_file_attachment():
-    file_path = ["/path/to/your/file.png"]
+    file_path = ["data/temperature-map.png"]  # Replace with your actual files paths
     return file_path
 
 

@@ -3,7 +3,9 @@ from tofupilot.openhtf import TofuPilot
 
 
 def step_file_attachment(test):
-    test.attach_from_file("/path/to/your/logfile.png")
+    test.attach_from_file(
+        "data/temperature-map.png"
+    )  # Replace with your actual file path
     return htf.PhaseResult.CONTINUE
 
 
