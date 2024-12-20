@@ -25,14 +25,14 @@ def connect_dut(test: Test, dut: MockDutPlug) -> None:
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
     *(htf.Measurement("{sensor}_temp_sensitivity_max_{axis}")
-      .doc('Max temperature sensitivity (m/s²/°C)')
+      .doc('Max temperature sensitivity (unit/°C)')
       .in_range(0.0, {"acc": {"x": 0.5, "y": 0.5, "z": 1.0}, "gyro": {"x": 0.05, "y": 0.05, "z": 0.05}}[sensor][axis])
       .with_units({"acc": units.METRE_PER_SECOND_SQUARED, "gyro": units.DEGREE_PER_SECOND}.get(sensor))
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
     *(htf.Measurement("{sensor}_temp_sensitivity_ref_{axis}")
-      .doc('Temperature sensitivity at 25°C (m/s²/°C)')
+      .doc('Temperature sensitivity at 25°C (unit/°C)')
       .in_range(
         {"acc": {"x": 5e-4, "y": 5e-4, "z": 5e-4}, "gyro": {"x": 6e-4, "y": 6e-4, "z": 6e-4}}[sensor][axis], 
         {"acc": {"x": 1e-2, "y": 1e-2, "z": 1e-2}, "gyro": {"x": 1e0, "y": 1e0, "z": 1e0}}[sensor][axis])
@@ -45,7 +45,7 @@ def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
     """Retrieve calibration data from the DUT."""
     test.state.update(dut.get_imu_data(test))
 
-    for sensor, data_key, calibration_key in [
+    for sensor, data_key in [
         ("acc", "acc_data", "acc_calibration_results"),
         ("gyro", "gyro_data", "gyro_calibration_results"),
     ]:
@@ -77,34 +77,35 @@ def get_calibration_data(test: Test, dut: MockDutPlug) -> None:
 
 
 @measures(
-    # Polynomial Coefficients
     *(htf.Measurement("{sensor}_polynomial_coefficients_{axis}")
+      .doc("Calibration polynomial coefficient matrix")
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
     # Residual mean
     *(htf.Measurement("{sensor}_residual_mean_{axis}")
+      .doc("Residual mean")
       .in_range(0.0, {"acc": 0.01, "gyro": 0.01}.get(sensor))
       .with_units({"acc": units.METRE_PER_SECOND_SQUARED, "gyro": units.DEGREE_PER_SECOND}.get(sensor))
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
-    # Residual standard deviation
     *(htf.Measurement("{sensor}_residual_std_{axis}")
+      .doc("Residual standard deviation")
       .in_range(0.0, {"acc": 5.0, "gyro": 0.3}.get(sensor))
       .with_units({"acc": units.METRE_PER_SECOND_SQUARED, "gyro": units.DEGREE_PER_SECOND}.get(sensor))
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
-    # Residual peak-to-peak
     *(htf.Measurement("{sensor}_residual_p2p_{axis}")
+      .doc("Residual peak-to-peak")
       .in_range(0.0, {"acc": {"x": 15.0, "y": 15.0, "z": 35.0}, "gyro": {"x": 2.0, "y": 2.0, "z": 2.0}}[sensor][axis])
       .with_units({"acc": units.METRE_PER_SECOND_SQUARED, "gyro": units.DEGREE_PER_SECOND}.get(sensor))
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 
-    # R²
     *(htf.Measurement("{sensor}_r2_{axis}")
+      .doc("Coefficient of determination R² (unitless)")
       .with_args(sensor=sensor, axis=axis)
       for sensor in ("acc", "gyro") for axis in ("x", "y", "z")),
 )
