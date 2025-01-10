@@ -103,7 +103,7 @@ def dimensions(test):
 def not_working_multi_measurements(test):
     test.measurements.binary_measure = 42
     test.measurements.string_measure = 123
-    test.measurements.numerical_measure = "N/A"
+    test.measurements.numerical_measure = 35
 
 
 def main():
