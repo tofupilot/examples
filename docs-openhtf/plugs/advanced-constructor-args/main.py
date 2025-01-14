@@ -12,21 +12,17 @@ MultimeterPlug2 = bind_init_args(MultimeterPlug, COM_PORT_2)
 
 
 @plug(multimeter=MultimeterPlug1)
-@htf.measures(htf.Measurement("voltage").in_range(3.0, 3.5).with_units("V"))
-def test_voltage(test, multimeter):
-    voltage = multimeter.measure_voltage()
-    test.measurements.voltage = voltage
+def test_voltage_1(test, multimeter):
+    multimeter.measure_voltage()
 
 
 @plug(multimeter=MultimeterPlug2)
-@htf.measures(htf.Measurement("voltage").in_range(3.0, 3.5).with_units("V"))
-def test_voltage(test, multimeter):
-    voltage = multimeter.measure_voltage()
-    test.measurements.voltage = voltage
+def test_voltage_2(test, multimeter):
+    multimeter.measure_voltage()
 
 
 def main():
-    test = htf.Test(test_voltage)
+    test = htf.Test(test_voltage_1, test_voltage_2)
     test.execute(lambda: "PCB0001")  # UUT S/N
 
 
