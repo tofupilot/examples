@@ -24,7 +24,8 @@ jobs:
 
     env:
       # Storing the user-supplied URL
-      TOFUPILOT_URL: https://www.tofupilot.app
+      # TOFUPILOT_URL: https://www.tofupilot.app
+      TOFUPILOT_URL: ${{ secrets.TOFUPILOT_URL }}
 
     steps:
       # Checking out the repository
@@ -33,12 +34,18 @@ jobs:
 
       # Setting the appropriate API key based on environment choice
       - name: Setting TOFUPILOT_API_KEY
+        # run: |
+        #   if [ "${{ github.event.inputs.environment }}" = "production" ] || [ -z "${{ github.event.inputs.environment }}" ]; then
+        #     # Using the production key if environment is production or not defined
+        #     echo "TOFUPILOT_API_KEY=${{ secrets.PRODUCTION_API_KEY }}" >> $GITHUB_ENV
+        #   else
+        #     # Using the preview key otherwise
+        #     echo "TOFUPILOT_API_KEY=${{ secrets.PREVIEW_API_KEY }}" >> $GITHUB_ENV
+        #   fi
         run: |
-          if [ "${{ github.event.inputs.environment }}" = "production" ] || [ -z "${{ github.event.inputs.environment }}" ]; then
-            # Using the production key if environment is production or not defined
+          if [ "${{ github.event.inputs.environment }}" = "production" ]; then
             echo "TOFUPILOT_API_KEY=${{ secrets.PRODUCTION_API_KEY }}" >> $GITHUB_ENV
           else
-            # Using the preview key otherwise
             echo "TOFUPILOT_API_KEY=${{ secrets.PREVIEW_API_KEY }}" >> $GITHUB_ENV
           fi
 
