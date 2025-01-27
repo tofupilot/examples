@@ -6,8 +6,8 @@ def main():
     client = TofuPilotClient()
 
     client.create_run(
-        procedure_id="FVT2",
-        procedure_name="PCB Temperature Calibration",
+        procedure_id="FVT1",
+        procedure_name="PCB Testing",
         unit_under_test={
             "serial_number": "PCB1A002",
             "part_number": "PCB1",
