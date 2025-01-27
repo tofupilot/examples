@@ -8,6 +8,7 @@ def phase_one(test):
 
 def main():
     test = htf.Test(phase_one)
+
     with TofuPilot(test):  # One-line integration
         test.execute(lambda: "PCB1A001")
 

@@ -16,8 +16,8 @@ def phase_voltage_measure():
         + 30 * 1000,  # Indicating phase took 30 seconds to complete
         "measurements": [
             {
-                "name": "voltage_measure",
-                "units": "Volt",
+                "name": "voltage",
+                "units": "V",
                 "lower_limit": 3.1,
                 "upper_limit": 3.5,
                 "measured_value": 3.3,

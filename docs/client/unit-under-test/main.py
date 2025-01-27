@@ -7,7 +7,7 @@ def main():
     client.create_run(
         procedure_id="FVT1",
         unit_under_test={
-            "serial_number": "PCB1A001",
+            "serial_number": "PCB1A002",
             "part_number": "PCB1",
             "revision": "A",  # optional
             "batch_number": "12-24",  # optional

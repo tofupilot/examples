@@ -29,8 +29,8 @@ def main():
         phase_connect,
         phase_firmware_version_check,
         phase_voltage_measurements,
-        procedure_id="FVT2",
-        procedure_name="Functional PCBA Testing",
+        procedure_id="FVT1",
+        procedure_name="PCB Testing",
         part_number="PCB1",
     )
 
