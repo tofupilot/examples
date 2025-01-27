@@ -1,3 +1,4 @@
 tofupilot
+pandas
 openhtf
 six
