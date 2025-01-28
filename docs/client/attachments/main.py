@@ -2,7 +2,7 @@ from tofupilot import TofuPilotClient
 
 
 def phase_file_attachment():
-    file_path = ["data/temperature-map.png"]  # Replace with your actual files paths
+    file_path = ["data/temperature-map.png"]  # Replace with your files paths
     return file_path
 
 
