@@ -226,16 +226,6 @@ def handle_procedure(
     if procedure_id == "FVT3" and run_passed:  # Assembly Procedure
         internal_resistance = steps[2]["measurement_value"]
         voltage_value = steps[1]["measurement_value"]
-        report_variables = {
-            "report_date": str(datetime.now().strftime("%d.%m.%Y")),
-            "serial_number": serial_number,
-            "batch_number": batch_number,
-            "voltage_test_result": str(voltage_value),
-            "safety_test_result": "Passed all safety tests",
-            "internal_resistance": str(internal_resistance),
-        }
-    else:
-        report_variables = None
 
     client.create_run(
         procedure_id=procedure_id,
@@ -249,7 +239,6 @@ def handle_procedure(
         steps=steps,
         sub_units=sub_units,
         attachments=attachments,
-        report_variables=report_variables,
     )
     return run_passed, failed_step
 

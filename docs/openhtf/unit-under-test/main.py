@@ -3,13 +3,13 @@ from tofupilot.openhtf import TofuPilot
 
 
 def main():
-    phases = []  # Your test phases here
+    phases = []                 # Your test phases here
     test = Test(
         phases,
         procedure_id="FVT1",
         part_number="PCB1",
-        revision="A",  # optional
-        batch_number="12-24",  # optional
+        revision="A",           # optional
+        batch_number="12-24",   # optional
     )
     with TofuPilot(test):
         test.execute(lambda: "PCB1A002")  # UUT S/N
