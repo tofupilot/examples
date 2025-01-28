@@ -141,3 +141,4 @@ dmypy.json
 cython_debug/
 # Mac OS hidden files
 .DS_Store
+.vercel
