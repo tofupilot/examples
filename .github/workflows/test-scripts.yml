@@ -9,14 +9,16 @@ on:
         type: string
       environment:
         description: "Which API Key to use"
+        default: preview
         required: true
         type: choice
         options:
           - preview
           - production
+
   push:
-    branches:
-      - automatic-testing
+
+  pull_request:
 
 jobs:
   execute-python-scripts:
@@ -43,10 +45,10 @@ jobs:
         #     echo "TOFUPILOT_API_KEY=${{ secrets.PREVIEW_API_KEY }}" >> $GITHUB_ENV
         #   fi
         run: |
-          if [ "${{ github.event.inputs.environment }}" = "production" ]; then
-            echo "TOFUPILOT_API_KEY=${{ secrets.PRODUCTION_API_KEY }}" >> $GITHUB_ENV
-          else
+          if [ "${{ github.event.inputs.environment }}" = "preview" ]; then
             echo "TOFUPILOT_API_KEY=${{ secrets.PREVIEW_API_KEY }}" >> $GITHUB_ENV
+          else
+            echo "TOFUPILOT_API_KEY=${{ secrets.PRODUCTION_API_KEY }}" >> $GITHUB_ENV
           fi
 
       # Setting up Python
@@ -66,7 +68,11 @@ jobs:
       - name: Running all Python scripts
         run: |
           echo "Testing branch ${{ env.TOFUPILOT_URL }}..."
-          find . -type f -name 'main.py' -not -path '*/venv/*' -print0 | while IFS= read -r -d '' file; do
+          # Executing every `main.py` files, excluding virtual environment and hidden directories
+          find . -type f -name 'main.py' \
+            -not -path '*/venv/*' \
+            -not -path '*/.*/*' \
+            -print0 | while IFS= read -r -d '' file; do
             echo "Running $file with TOFUPILOT_API_KEY and environment=${{ github.event.inputs.environment }}"
             python "$file"
           done

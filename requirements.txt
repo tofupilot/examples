@@ -1,3 +1,6 @@
-tofupilot
 openhtf
 six
+tofupilot
+numpy
+pandas
+matplotlib

@@ -1,4 +1,0 @@
-tofupilot
-pandas
-openhtf
-six
