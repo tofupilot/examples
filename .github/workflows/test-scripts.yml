@@ -9,14 +9,16 @@ on:
         type: string
       environment:
         description: "Which API Key to use"
+        default: preview
         required: true
         type: choice
         options:
           - preview
           - production
+
   push:
-    branches:
-      - automatic-testing
+
+  pull_request:
 
 jobs:
   execute-python-scripts:
@@ -43,10 +45,10 @@ jobs:
         #     echo "TOFUPILOT_API_KEY=${{ secrets.PREVIEW_API_KEY }}" >> $GITHUB_ENV
         #   fi
         run: |
-          if [ "${{ github.event.inputs.environment }}" = "production" ]; then
-            echo "TOFUPILOT_API_KEY=${{ secrets.PRODUCTION_API_KEY }}" >> $GITHUB_ENV
-          else
+          if [ "${{ github.event.inputs.environment }}" = "preview" ]; then
             echo "TOFUPILOT_API_KEY=${{ secrets.PREVIEW_API_KEY }}" >> $GITHUB_ENV
+          else
+            echo "TOFUPILOT_API_KEY=${{ secrets.PRODUCTION_API_KEY }}" >> $GITHUB_ENV
           fi
 
       # Setting up Python
