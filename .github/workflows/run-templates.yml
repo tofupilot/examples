@@ -31,7 +31,7 @@ jobs:
         - name: Run Battery Testing Script
           env: 
             TOFUPILOT_API_KEY: ${{ secrets.GET_STARTED_BATTERY_API_KEY }}
-          run: for file in get-started/battery-testing/*.py; do
+          run: for file in get_started/battery-testing/*.py; do
               python "$file"
             done
         
