@@ -66,7 +66,11 @@ jobs:
       - name: Running all Python scripts
         run: |
           echo "Testing branch ${{ env.TOFUPILOT_URL }}..."
-          find . -type d -name '.*' -prune -o -type f -name 'main.py' -not -path '*/venv/*' -print0 | while IFS= read -r -d '' file; do
+          # Executing every `main.py` files, excluding virtual environment and hidden directories
+          find . -type f -name 'main.py' \
+            -not -path '*/venv/*' \
+            -not -path '*/.*/*' \
+            -print0 | while IFS= read -r -d '' file; do
             echo "Running $file with TOFUPILOT_API_KEY and environment=${{ github.event.inputs.environment }}"
             python "$file"
           done
