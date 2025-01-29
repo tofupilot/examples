@@ -1,4 +1,4 @@
-name: Run Python Templates
+name: Run Python Get-Started Mock-up Script
 
 on:
   schedule:
