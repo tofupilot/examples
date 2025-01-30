@@ -32,36 +32,32 @@ def flash_production_firmware():
 
 
 def configuration_battery_gauge():
-    gauge_syspress = True
-    calibration_voltage = 12133
-    calibration_current = 3.631
-    calibration_temperature = "on"
 
     return True, [
         {
             "name": "gauge_syspress",
-            "value": gauge_syspress,
+            "value": True,
             "units": None,
             "lower_limit": None,
             "upper_limit": None,
         },
         {
-            "name": "calibration_voltage",
-            "value": calibration_voltage,
+            "name": "calibration_voltage_cellGain",
+            "value": 12133,
             "units": "mV",
-            "lower_limit": 12000,
-            "upper_limit": 12500,
+            "lower_limit": None,
+            "upper_limit": None,
         },
         {
-            "name": "calibration_current",
-            "value": calibration_current,
+            "name": "calibration_current_CCGain",
+            "value": 3.6310,
             "units": "A",
-            "lower_limit": 3.5,
-            "upper_limit": 4.0,
+            "lower_limit": None,
+            "upper_limit": None,
         },
         {
-            "name": "calibration_temperature",
-            "value": calibration_temperature,
+            "name": "calibration_Temperature_InternalTempOffset",
+            "value": "on",
             "units": None,
             "lower_limit": None,
             "upper_limit": None,
@@ -71,44 +67,40 @@ def configuration_battery_gauge():
 
 def phase_voltage_measurements():
     passed = simulate_test_result(0.85)
-    input_voltage = (
-        round(random.uniform(3.1, 3.5), 1)
-        if passed
-        else round(random.uniform(0, 0.010), 3)
-    )
-    output_voltage = round(random.uniform(1.2, 1.3), 1) if passed else 0
-    output_current = (
-        round(random.uniform(0.5, 0.655), 3)
-        if passed
-        else round(random.uniform(0, 0.010), 3)
-    )
-    state_of_health = round(random.uniform(0.95, 0.98), 2)
 
     return passed, [
         {
             "name": "input_voltage",
-            "value": input_voltage,
+            "value": (
+                round(random.uniform(3.1, 3.5), 1)
+                if passed
+                else round(random.uniform(0, 0.010), 3)
+            ),
             "units": "V",
             "lower_limit": 3.1,
             "upper_limit": 3.5,
         },
         {
             "name": "output_voltage",
-            "value": output_voltage,
+            "value": round(random.uniform(1.2, 1.3), 1) if passed else 0,
             "units": "V",
             "lower_limit": 1.1,
             "upper_limit": 1.3,
         },
         {
             "name": "output_current",
-            "value": output_current,
+            "value": (
+                round(random.uniform(0.5, 0.655), 3)
+                if passed
+                else round(random.uniform(0, 0.010), 3)
+            ),
             "units": "A",
             "lower_limit": 0.5,
             "upper_limit": 0.655,
         },
         {
             "name": "state_of_health",
-            "value": state_of_health,
+            "value": round(random.uniform(0.95, 0.98), 2),
             "units": None,
             "lower_limit": 0.95,
             "upper_limit": 0.98,
@@ -117,11 +109,10 @@ def phase_voltage_measurements():
 
 
 def ir_test():
-    internal_resistance_value = round(random.uniform(0.007, 0.012), 3)
     return True, [
         {
             "name": "internal_resistance",
-            "value": internal_resistance_value,
+            "value": round(random.uniform(0.007, 0.012), 3),
             "units": "Ω",
             "lower_limit": 0.005,
             "upper_limit": 0.015,
