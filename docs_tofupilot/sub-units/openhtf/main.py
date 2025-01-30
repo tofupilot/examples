@@ -1,8 +1,8 @@
 from openhtf import Test, PhaseResult
 from tofupilot.openhtf import TofuPilot
 
-# Create both units PCB1A001 and LEN1A001 before executing this script
-# You can use example as docs/openhtf/procedures/main.py
+# Please ensure both units PCB1A001 and LEN1A001 exist before running this script
+# Refer to https://tofupilot.com/docs/procedures for an example on how to create them
 
 
 def main():
