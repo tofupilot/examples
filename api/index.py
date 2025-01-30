@@ -1,8 +1,7 @@
 from http.server import BaseHTTPRequestHandler
 import json
-import get_started.scripts.client as client
-import get_started.scripts.openhtf as openhtf
-
+import welcome_aboard.scripts.client as client
+import welcome_aboard.scripts.openhtf as openhtf
 
 class Handler(BaseHTTPRequestHandler):
     # Setting common CORS headers
