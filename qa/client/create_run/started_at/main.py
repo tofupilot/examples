@@ -113,10 +113,8 @@ def handle_test():
         run_passed=all(step["step_passed"] for step in steps),
         started_at=datetime.now() - timedelta(days=1),
         steps=steps,
-        attachments=["data/oscilloscope.jpeg"],
     )
 
 
 if __name__ == "__main__":
-    for _ in range(1):
-        handle_test()
+    handle_test()

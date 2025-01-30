@@ -111,7 +111,6 @@ def handle_test():
             },
             run_passed=True if testnumber == 0 else False,
             steps=steps,
-            attachments=["data/oscilloscope.jpeg"],
         )
 
 

@@ -53,18 +53,20 @@ def run_all_tests():
         if not passed:
             all_tests_passed = False
 
-        attachments = ["data/oscilloscope.jpeg"]
-
-    return all_tests_passed, steps, attachments
+    return all_tests_passed, steps
 
 
-# Run the tests and create the run
-run_passed, steps, attachments = run_all_tests()
+def main():
+    # Run the tests and create the run
+    run_passed, steps = run_all_tests()
 
-client.create_run(
-    procedure_id="FVT1",
-    unit_under_test={"part_number": "PCB01", "serial_number": "00121"},
-    run_passed=run_passed,
-    steps=steps,
-    attachments=attachments,
-)
+    client.create_run(
+        procedure_id="FVT1",
+        unit_under_test={"part_number": "PCB01", "serial_number": "00121"},
+        run_passed=run_passed,
+        steps=steps,
+    )
+
+
+if __name__ == "__main__":
+    main()
