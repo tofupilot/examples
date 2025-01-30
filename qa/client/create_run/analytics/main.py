@@ -1,7 +1,7 @@
-from tofupilot import TofuPilotClient
-from datetime import datetime, timedelta
 import random
+from datetime import datetime, timedelta
 
+from tofupilot import TofuPilotClient
 
 client = TofuPilotClient()
 
@@ -13,8 +13,15 @@ def simulate_test_result(yield_percentage):
 def esr_test():
     passed = simulate_test_result(99)
     value_measured = (
-        round(random.uniform(5, 9), 2) if passed else round(random.uniform(10, 15), 2)
-    )
+        round(
+            random.uniform(
+                5,
+                9),
+            2) if passed else round(
+            random.uniform(
+                10,
+                15),
+            2))
     return passed, value_measured, "mOhm", None, 10
 
 
@@ -47,8 +54,15 @@ def check_voltage():
 def check_soc():
     passed = simulate_test_result(95)
     value_measured = (
-        round(random.uniform(40, 60), 0) if passed else round(random.uniform(20, 39), 2)
-    )
+        round(
+            random.uniform(
+                40,
+                60),
+            0) if passed else round(
+            random.uniform(
+                20,
+                39),
+            2))
     return passed, value_measured, "%", 40, 60
 
 
@@ -135,14 +149,6 @@ def handle_procedure(
         run_passed=run_passed,
         steps=steps,
         sub_units=sub_units,
-        report_variables=(
-            {
-                "variable1": "X",
-                "variable2": "Y",
-            }
-            if procedure_id == "FVT2"
-            else None
-        ),
     )
 
     return run_passed, failed_step
@@ -181,4 +187,5 @@ def main():
     )
 
 
-main()
+if __name__ == "__main__":
+    main()

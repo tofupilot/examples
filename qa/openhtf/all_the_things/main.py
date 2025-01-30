@@ -1,14 +1,12 @@
 import os.path
 import time
 
-from tofupilot.openhtf import TofuPilot
-
 import openhtf as htf
 from openhtf import util
 from openhtf.output import callbacks
-from openhtf.output.callbacks import console_summary
-from openhtf.output.callbacks import json_factory
+from openhtf.output.callbacks import console_summary, json_factory
 from openhtf.util import units
+from tofupilot.openhtf import TofuPilot
 
 
 @htf.measures(
@@ -35,7 +33,8 @@ def hello_world(test):
 
 # Timeout if this phase takes longer than 10 seconds.
 @htf.PhaseOptions(timeout_s=10)
-@htf.measures(*(htf.Measurement("level_%s" % i) for i in ["none", "some", "all"]))
+@htf.measures(*(htf.Measurement("level_%s" % i)
+              for i in ["none", "some", "all"]))
 def set_measurements(test):
     """Test phase that sets a measurement."""
     test.measurements.level_none = 0
@@ -60,15 +59,22 @@ def dimensions(test):
     """Phase with dimensioned measurements."""
     for dim in range(5):
         test.measurements.dimensions[dim] = 1 << dim
-    for x, y, z in zip(list(range(1, 5)), list(range(21, 25)), list(range(101, 105))):
+    for x, y, z in zip(
+        list(
+            range(
+            1, 5)), list(
+                range(
+                    21, 25)), list(
+                        range(
+                            101, 105))):
         test.measurements.lots_of_dims[x, y, z] = x + y + z
 
 
 @htf.measures(
-    htf.Measurement("replaced_min_only").in_range("{minimum}", 5, type=int),
-    htf.Measurement("replaced_max_only").in_range(0, "{maximum}", type=int),
-    htf.Measurement("replaced_min_max").in_range("{minimum}", "{maximum}", type=int),
-)
+    htf.Measurement("replaced_min_only").in_range(
+        "{minimum}", 5, type=int), htf.Measurement("replaced_max_only").in_range(
+            0, "{maximum}", type=int), htf.Measurement("replaced_min_max").in_range(
+                "{minimum}", "{maximum}", type=int), )
 def measures_with_args(test, minimum, maximum):
     """Phase with measurement with arguments."""
     del minimum  # Unused.
@@ -99,7 +105,9 @@ def measures_with_marginal_args(test, marginal_minimum, marginal_maximum):
 
 
 def attachments(test):
-    test.attach("test_attachment", "This is test attachment data.".encode("utf-8"))
+    test.attach(
+        "test_attachment",
+        "This is test attachment data.".encode("utf-8"))
     test.attach_from_file("data/oscilloscope.jpeg")
 
     test_attachment = test.get_attachment("test_attachment")
@@ -124,8 +132,8 @@ def analysis(test):  # pylint: disable=missing-function-docstring
         (4, 24, 104, 132),
     ]
     test.logger.info(
-        "Pandas datafram of lots_of_dims \n:%s", lots_of_dims.value.to_dataframe()
-    )
+        "Pandas datafram of lots_of_dims \n:%s",
+        lots_of_dims.value.to_dataframe())
 
 
 def teardown(test):
@@ -162,9 +170,8 @@ def main():
     )
     test.add_output_callbacks(
         json_factory.OutputToJSON(
-            "./{dut_id}.{metadata[test_name]}.{start_time_millis}.json", indent=4
-        )
-    )
+            "./{dut_id}.{metadata[test_name]}.{start_time_millis}.json",
+            indent=4))
     test.add_output_callbacks(console_summary.ConsoleSummary())
 
     with TofuPilot(test):

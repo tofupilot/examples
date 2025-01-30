@@ -1,6 +1,6 @@
+import random
 from datetime import datetime, timedelta
 from random import randint
-import random
 
 from tofupilot import TofuPilotClient
 

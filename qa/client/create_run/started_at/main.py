@@ -1,6 +1,7 @@
-from tofupilot import TofuPilotClient
-from datetime import datetime, timedelta
 import random
+from datetime import datetime, timedelta
+
+from tofupilot import TofuPilotClient
 
 client = TofuPilotClient()
 
@@ -27,8 +28,15 @@ def check_voltage():
 def check_soc():
     passed = simulate_test_result(95)
     value_measured = (
-        round(random.uniform(50, 55), 0) if passed else round(random.uniform(20, 39), 2)
-    )
+        round(
+            random.uniform(
+                50,
+                55),
+            0) if passed else round(
+            random.uniform(
+                20,
+                39),
+            2))
     return passed, value_measured, "%", 40, 60
 
 
@@ -113,16 +121,8 @@ def handle_test():
         run_passed=all(step["step_passed"] for step in steps),
         started_at=datetime.now() - timedelta(days=1),
         steps=steps,
-        attachments=["data/oscilloscope.jpeg"],
-        report_variables={
-            "var1": serial_number,
-            "var2": "first_var",
-            "var3": "second_var",
-            "var4": "third_var",
-        },
     )
 
 
 if __name__ == "__main__":
-    for _ in range(1):
-        handle_test()
+    handle_test()

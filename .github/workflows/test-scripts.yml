@@ -22,28 +22,30 @@ on:
 
 jobs:
   execute-python-scripts:
-    runs-on: ubuntu-latest
+    # Running on both ubuntu and windows
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
 
     env:
       # Storing the user-supplied URL
-      # TOFUPILOT_URL: https://www.tofupilot.app
       TOFUPILOT_URL: ${{ secrets.TOFUPILOT_URL }}
+      # Forcing Python to run in UTF-8 mode for all steps in this job
+      PYTHONUTF8: "1"
 
     steps:
       # Checking out the repository
       - name: Checking out the repository
         uses: actions/checkout@v3
 
+      - name: Changing code page to UTF-8 (Windows only)
+        if: runner.os == 'Windows'
+        run: chcp 65001
+
       # Setting the appropriate API key based on environment choice
       - name: Setting TOFUPILOT_API_KEY
-        # run: |
-        #   if [ "${{ github.event.inputs.environment }}" = "production" ] || [ -z "${{ github.event.inputs.environment }}" ]; then
-        #     # Using the production key if environment is production or not defined
-        #     echo "TOFUPILOT_API_KEY=${{ secrets.PRODUCTION_API_KEY }}" >> $GITHUB_ENV
-        #   else
-        #     # Using the preview key otherwise
-        #     echo "TOFUPILOT_API_KEY=${{ secrets.PREVIEW_API_KEY }}" >> $GITHUB_ENV
-        #   fi
+        shell: bash
         run: |
           if [ "${{ github.event.inputs.environment }}" = "preview" ]; then
             echo "TOFUPILOT_API_KEY=${{ secrets.PREVIEW_API_KEY }}" >> $GITHUB_ENV
@@ -57,22 +59,33 @@ jobs:
         with:
           python-version: "3.11"
 
-      # Installing dependencies and the tofupilot client for the given version
+      # Installing dependencies
       - name: Installing dependencies
+        shell: bash
         run: |
           pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          # pip install -i https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ tofupilot==1.9.0.dev3
 
-      # Finding and running all Python scripts in the scripts folder and subfolders
+      # Running all Python scripts
       - name: Running all Python scripts
+        shell: bash
         run: |
-          echo "Testing branch ${{ env.TOFUPILOT_URL }}..."
-          # Executing every `main.py` files, excluding virtual environment and hidden directories
+          echo "Testing branch ${{ env.TOFUPILOT_URL }}"
           find . -type f -name 'main.py' \
             -not -path '*/venv/*' \
             -not -path '*/.*/*' \
             -print0 | while IFS= read -r -d '' file; do
-            echo "Running $file with TOFUPILOT_API_KEY and environment=${{ github.event.inputs.environment }}"
-            python "$file"
+
+            directory="$(dirname "$file")"
+
+            if [ -f "$directory/requirements.txt" ]; then
+              pip install -r "$directory/requirements.txt"
+            fi
+
+            echo "Running files in $directory"
+
+            (
+              cd "$directory" || exit
+              python main.py
+            )
           done

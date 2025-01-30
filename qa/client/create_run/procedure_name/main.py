@@ -1,6 +1,7 @@
-from tofupilot import TofuPilotClient
-from datetime import datetime, timedelta
 import random
+from datetime import datetime, timedelta
+
+from tofupilot import TofuPilotClient
 
 client = TofuPilotClient()
 
@@ -27,8 +28,15 @@ def check_voltage():
 def check_soc():
     passed = simulate_test_result(100)
     value_measured = (
-        round(random.uniform(50, 55), 0) if passed else round(random.uniform(20, 39), 2)
-    )
+        round(
+            random.uniform(
+                50,
+                55),
+            0) if passed else round(
+            random.uniform(
+                20,
+                39),
+            2))
     return passed, value_measured, "%", 40, 60
 
 
@@ -111,8 +119,8 @@ def handle_test():
         },
         run_passed=all(step["step_passed"] for step in steps),
         steps=steps,
-        report_variables={"var1": serial_number},
     )
 
 
-handle_test()
+if __name__ == "__main__":
+    handle_test()

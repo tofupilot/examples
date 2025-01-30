@@ -1,40 +1,33 @@
-name: Auto-Format Python Code
+name: Format Python Code
 
-on:
-  push:
-    branches:
-      - main  # Trigger when code is pushed or merged into `main`
+on: push
 
 jobs:
-  auto-format:
+  python-code-format:
     runs-on: ubuntu-latest
-
     steps:
-      # Step 1: Check out the code
-      - name: Checkout Code
-        uses: actions/checkout@v3
+      - name: Checking out the repository
+        uses: actions/checkout@v4
 
-      # Step 2: Set up Python
-      - name: Set up Python
+      - name: Setting up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.x'
+          python-version: "3.11"
 
-      # Step 3: Install dependencies
-      - name: Install Black
-        run: pip install black
+      - name: Install packages
+        run: pip install black autopep8 isort
 
-      # Step 4: Run the formatter
-      - name: Format Python Code
-        run: black .
-
-      # Step 5: Push formatted code back to `main`
-      - name: Commit and Push Changes
+      - name: Formatter
         run: |
-          git config --global user.name "GitHub Actions Bot"
-          git config --global user.email "actions@github.com"
-          git add .
-          git commit -m "Auto-format Python code"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          black .
+          autopep8 --recursive --in-place --aggressive --aggressive .
+          isort .
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3
+        with:
+          commit-message: Auto code format
+          title: Fixes by format action
+          body: This is an auto-generated PR with fixes.
+          labels: automated pr
+          branch: python-code-format-patches

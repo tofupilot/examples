@@ -1,7 +1,7 @@
-from tofupilot import TofuPilotClient
-from datetime import datetime
 import time
+from datetime import datetime
 
+from tofupilot import TofuPilotClient
 
 client = TofuPilotClient()
 
@@ -53,24 +53,20 @@ def run_all_tests():
         if not passed:
             all_tests_passed = False
 
-        report_variables = {
-            "visual_inspection": "Pass",
-            "current": "3.31 V",
-        }
-
-        attachments = ["data/oscilloscope.jpeg"]
-
-    return all_tests_passed, steps, report_variables, attachments
+    return all_tests_passed, steps
 
 
-# Run the tests and create the run
-run_passed, steps, report_variables, attachments = run_all_tests()
+def main():
+    # Run the tests and create the run
+    run_passed, steps = run_all_tests()
 
-client.create_run(
-    procedure_id="FVT1",
-    unit_under_test={"part_number": "PCB01", "serial_number": "00121"},
-    run_passed=run_passed,
-    steps=steps,
-    report_variables=report_variables,
-    attachments=attachments,
-)
+    client.create_run(
+        procedure_id="FVT1",
+        unit_under_test={"part_number": "PCB01", "serial_number": "00121"},
+        run_passed=run_passed,
+        steps=steps,
+    )
+
+
+if __name__ == "__main__":
+    main()
