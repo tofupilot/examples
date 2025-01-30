@@ -335,4 +335,4 @@ def execute_procedures(end):
 
 
 if __name__ == "__main__":
-    execute_procedures(20)
+    execute_procedures(10)

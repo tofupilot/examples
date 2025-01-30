@@ -114,4 +114,5 @@ def handle_test():
     )
 
 
-handle_test()
+if __name__ == "__main__":
+    handle_test()
