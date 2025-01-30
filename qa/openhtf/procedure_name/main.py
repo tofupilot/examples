@@ -129,7 +129,7 @@ def main():
             "var1": "123",
             "var2": "second_var",
             "var3": "var3",
-            "var4": "\(some_text_with_parenthesis_around\)",
+            "var4": "(some_text_with_parenthesis_around)",
         },
     )
 
