@@ -63,12 +63,11 @@ def phase_voltage_measurements(test):
     .with_units(units.OHM),
 )
 def ir_test(test):
-    test.measurements.internal_resistance_value = round(
-        random.uniform(0.007, 0.012), 3)
+    test.measurements.internal_resistance_value = round(random.uniform(0.007, 0.012), 3)
 
 
 def teardown(test):
-    test.logger.info("Running teardown")  # to remove
+    test.logger.info("Running teardown")
 
 
 def make_test():
