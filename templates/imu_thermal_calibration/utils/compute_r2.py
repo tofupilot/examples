@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def compute_r2(data: np.ndarray, fit_model: np.ndarray) -> float:
     """
     Computes R-squared to evaluate how well a model fits the data.
@@ -18,10 +19,10 @@ def compute_r2(data: np.ndarray, fit_model: np.ndarray) -> float:
 
     # Total variation in the data.
     total_variation = np.sum((data - np.mean(data)) ** 2)
-    
+
     # Variation not explained by the model.
     residual_variation = np.sum(residuals**2)
-    
+
     # R²: fraction of variance explained by the model.
     r2 = 1 - residual_variation / total_variation
     return r2

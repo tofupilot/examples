@@ -11,8 +11,8 @@ def main():
         unit_under_test={
             "serial_number": "PCB1A002",
             "part_number": "PCB1",
-            "revision": "A",             # optional
-            "batch_number": "12-24",     # optional
+            "revision": "A",  # optional
+            "batch_number": "12-24",  # optional
         },
         phases=phases,
         run_passed=True,

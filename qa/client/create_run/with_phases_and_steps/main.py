@@ -1,6 +1,6 @@
+import random
 from datetime import datetime, timedelta
 from random import randint
-import random
 
 from tofupilot import TofuPilotClient
 
@@ -28,13 +28,15 @@ client.create_run(
         {
             "name": "step_connect",  # First step
             "step_passed": True,  # Status of the step
-            "duration": timedelta(seconds=5, milliseconds=12),  # Duration of the step
+            # Duration of the step
+            "duration": timedelta(seconds=5, milliseconds=12),
             "started_at": datetime.now(),  # Start time of the step
         },
         {
             "name": "step_string2",  # First step
             "step_passed": True,  # Status of the step
-            "duration": timedelta(seconds=5, milliseconds=12),  # Duration of the step
+            # Duration of the step
+            "duration": timedelta(seconds=5, milliseconds=12),
             "started_at": datetime.now(),  # Start time of the step
             "measurement_value": "This is a string",
         },
@@ -55,7 +57,8 @@ client.create_run(
                 seconds=1, milliseconds=100
             ),  # Duration of the step (<1s)
             "started_at": datetime.now()
-            + timedelta(seconds=2, milliseconds=500),  # Start time of the third step
+            # Start time of the third step
+            + timedelta(seconds=2, milliseconds=500),
             "measurement_value": randint(-5, 20),  # Measured temperature value
             "measurement_unit": "°C",  # Unit of the measurement (temperature)
             "limit_low": 0,  # Lower limit of acceptable temperature
@@ -117,7 +120,8 @@ client.create_run(
                 {
                     "name": "initial_temperature",
                     "outcome": "PASS",  # Measurement outcome
-                    "measured_value": randint(-5, 20),  # Measured temperature value
+                    # Measured temperature value
+                    "measured_value": randint(-5, 20),
                     "units": "°C",  # Unit of the measurement
                     "lower_limit": 0,  # Lower limit
                     "upper_limit": None,
@@ -125,7 +129,8 @@ client.create_run(
                 {
                     "name": "initial_temperature_2",
                     "outcome": "FAIL",  # Measurement outcome
-                    "measured_value": randint(-5, 20),  # Measured temperature value
+                    # Measured temperature value
+                    "measured_value": randint(-5, 20),
                     "units": "°C",  # Unit of the measurement
                     "lower_limit": 0,  # Lower limit
                     "upper_limit": 15,  # Upper limit
@@ -145,7 +150,8 @@ client.create_run(
                 {
                     "name": "initial_temperature",
                     "outcome": "PASS",  # Measurement outcome
-                    "measured_value": randint(-5, 20),  # Measured temperature value
+                    # Measured temperature value
+                    "measured_value": randint(-5, 20),
                     "units": "°C",  # Unit of the measurement
                     "lower_limit": 0,  # Lower limit
                     "upper_limit": None,

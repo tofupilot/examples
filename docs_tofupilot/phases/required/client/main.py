@@ -1,5 +1,6 @@
-from tofupilot import TofuPilotClient, PhaseOutcome
 from datetime import datetime, timedelta
+
+from tofupilot import PhaseOutcome, TofuPilotClient
 
 client = TofuPilotClient()
 
@@ -21,9 +22,12 @@ def main():
 
     client.create_run(
         procedure_id="FVT1",
-        unit_under_test={"serial_number": "PCB1A001", "part_number": "PCB1"},
+        unit_under_test={
+            "serial_number": "PCB1A001",
+            "part_number": "PCB1"},
         phases=phases,
-        run_passed=all(phase["outcome"] == PhaseOutcome.PASS for phase in phases),
+        run_passed=all(
+            phase["outcome"] == PhaseOutcome.PASS for phase in phases),
     )
 
 

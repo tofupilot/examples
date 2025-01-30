@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def compute_temp_sensitivity(
     data: np.ndarray, temperatures: np.ndarray, temp_ref: float = 25
 ) -> dict:
@@ -18,7 +19,7 @@ def compute_temp_sensitivity(
     """
     # Calculate temperature changes between consecutive samples.
     d_temp = np.diff(temperatures)
-    
+
     # Ignore negligible temperature changes to avoid division errors.
     valid_idx = np.abs(d_temp) > 1e-5
 
@@ -30,7 +31,8 @@ def compute_temp_sensitivity(
     ref_idx = np.argmin(np.abs(temperatures - temp_ref))
 
     # Select a range around the reference temperature for averaging.
-    ref_range = slice(max(ref_idx - 10, 0), min(ref_idx + 10, len(sensitivities)))
+    ref_range = slice(max(ref_idx - 10, 0),
+                      min(ref_idx + 10, len(sensitivities)))
 
     # Average sensitivities near the reference temperature.
     sensitivity_ref = np.mean(sensitivities[ref_range])

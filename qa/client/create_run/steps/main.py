@@ -1,7 +1,7 @@
-from tofupilot import TofuPilotClient
-from datetime import datetime
 import time
+from datetime import datetime
 
+from tofupilot import TofuPilotClient
 
 client = TofuPilotClient()
 

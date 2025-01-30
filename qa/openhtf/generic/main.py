@@ -1,9 +1,10 @@
+import random
+import time
+from datetime import datetime, timedelta
+
 import openhtf as htf
 from openhtf.util import units
-import random
 from tofupilot.openhtf import TofuPilot
-from datetime import datetime, timedelta
-import time
 
 
 # Utility function to simulate the test result with a given pass probability
@@ -31,7 +32,8 @@ def check_led_switch_on(test):
     # time.sleep(1)
 
 
-@htf.measures(htf.Measurement("input_voltage").in_range(4.5, 5).with_units(units.VOLT))
+@htf.measures(htf.Measurement("input_voltage").in_range(4.5,
+              5).with_units(units.VOLT))
 def test_voltage_input(test):
     passed = simulate_test_result(0.99)
     test.measurements.input_voltage = (
@@ -84,15 +86,22 @@ def test_converter_efficiency(test):
     passed = simulate_test_result(0.99)
     input_power = 500
     output_power = (
-        round(random.uniform(450, 480)) if passed else round(random.uniform(400, 425))
-    )
-    test.measurements.efficiency = round(((output_power / input_power) * 100), 1)
+        round(
+            random.uniform(
+                450,
+                480)) if passed else round(
+            random.uniform(
+                400,
+                425)))
+    test.measurements.efficiency = round(
+        ((output_power / input_power) * 100), 1)
     # time.sleep(5)
 
 
 @htf.measures(htf.Measurement("power_mode_functional").equals("on"))
 def test_power_saving_mode(test):
-    test.measurements.power_mode_functional = "on" if simulate_test_result(1) else "off"
+    test.measurements.power_mode_functional = "on" if simulate_test_result(
+        1) else "off"
     # time.sleep(1)
 
 

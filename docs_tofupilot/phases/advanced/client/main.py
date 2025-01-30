@@ -1,6 +1,6 @@
-from tofupilot import TofuPilotClient, PhaseOutcome, MeasurementOutcome
 from datetime import datetime, timedelta
 
+from tofupilot import MeasurementOutcome, PhaseOutcome, TofuPilotClient
 
 client = TofuPilotClient()
 
