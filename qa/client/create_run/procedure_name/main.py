@@ -111,7 +111,6 @@ def handle_test():
         },
         run_passed=all(step["step_passed"] for step in steps),
         steps=steps,
-        report_variables={"var1": serial_number},
     )
 
 

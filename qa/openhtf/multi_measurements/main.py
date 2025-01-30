@@ -124,10 +124,6 @@ def main():
         revision="B",
         batch_number="1124-0001",
         sub_units=[{"serial_number": "00102"}],
-        report_variables={
-            "var1": "other automatic text from the script !!!!!???1234567890'±“#Ç[]|{}≠¿≠}{|][‘§æ¢]}≤–…«¶æ¢¬‘§πø¡°†®€∑œ¬∆ºª@ƒ∂ßå«µ~∫√©≈¥",
-            "var2": "I'm an automatic text from the script",
-        },
     )
 
     # Generate random Serial Number

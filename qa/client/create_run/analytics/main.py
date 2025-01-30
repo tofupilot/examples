@@ -135,14 +135,6 @@ def handle_procedure(
         run_passed=run_passed,
         steps=steps,
         sub_units=sub_units,
-        report_variables=(
-            {
-                "variable1": "X",
-                "variable2": "Y",
-            }
-            if procedure_id == "FVT2"
-            else None
-        ),
     )
 
     return run_passed, failed_step

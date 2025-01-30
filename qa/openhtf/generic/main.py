@@ -126,12 +126,6 @@ def main():
         revision="B",
         batch_number="1024-0001",
         sub_units=[{"serial_number": "00102"}],
-        report_variables={
-            "var1": "first_var",
-            "var2": "var2",
-            "var3": "123",
-            "var4": "456",
-        },
     )
 
     # Generate random Serial Number
