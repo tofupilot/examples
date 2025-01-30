@@ -92,8 +92,11 @@ def make_test():
 def main():
     test = make_test()
 
+    random_digits = "".join([str(random.randint(0, 9)) for _ in range(3)])
+    serial_number = f"PCB01A{random_digits}"
+
     with TofuPilot(test):
-        test.execute(lambda: "PCB01A001")
+        test.execute(lambda: serial_number)
 
 
 if __name__ == "__main__":
