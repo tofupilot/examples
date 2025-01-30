@@ -1,4 +1,4 @@
-name: Run Python Get-Started Mock-up Script
+name: Run Python Mock-up Data Script
 
 on:
   schedule:
