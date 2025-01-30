@@ -1,6 +1,7 @@
+import random
+
 import openhtf as htf
 from openhtf.util import units
-import random
 from tofupilot.openhtf import TofuPilot
 
 
@@ -17,7 +18,8 @@ def string_test(test):
     test.measurements.firmware_version = (
         "1.4.3" if simulate_test_result(0.99) else "1.4.2"
     )
-    test.measurements.power_mode_functional = "on" if simulate_test_result(1) else "off"
+    test.measurements.power_mode_functional = "on" if simulate_test_result(
+        1) else "off"
 
 
 @htf.measures(htf.Measurement("button_status").equals(True))
@@ -33,10 +35,13 @@ def phaseresult_test():
 
 
 @htf.measures(
-    htf.Measurement("two_limits").in_range(4.5, 5).with_units(units.VOLT),
-    htf.Measurement("one_limit").in_range(maximum=1.5).with_units(units.AMPERE),
-    htf.Measurement("percentage").in_range(85, 98).with_units(units.Unit("%")),
-)
+    htf.Measurement("two_limits").in_range(
+        4.5, 5).with_units(
+            units.VOLT), htf.Measurement("one_limit").in_range(
+                maximum=1.5).with_units(
+                    units.AMPERE), htf.Measurement("percentage").in_range(
+                        85, 98).with_units(
+                            units.Unit("%")), )
 def measure_test_with_limits(test):
     passed = simulate_test_result(0.99)
     test.measurements.two_limits = (
@@ -51,9 +56,15 @@ def measure_test_with_limits(test):
     )
     input_power = 500
     output_power = (
-        round(random.uniform(450, 480)) if passed else round(random.uniform(400, 425))
-    )
-    test.measurements.percentage = round(((output_power / input_power) * 100), 1)
+        round(
+            random.uniform(
+                450,
+                480)) if passed else round(
+            random.uniform(
+                400,
+                425)))
+    test.measurements.percentage = round(
+        ((output_power / input_power) * 100), 1)
 
 
 def phase_with_attachment(test):
@@ -64,11 +75,11 @@ def phase_with_attachment(test):
         return htf.PhaseResult.STOP
 
 
-@htf.measures(
-    htf.Measurement("is_connected").equals(True),
-    htf.Measurement("firmware_version").equals("1.2.7"),
-    htf.Measurement("temperature").in_range(20, 25).with_units(units.DEGREE_CELSIUS),
-)
+@htf.measures(htf.Measurement("is_connected").equals(True),
+              htf.Measurement("firmware_version").equals("1.2.7"),
+              htf.Measurement("temperature").in_range(20,
+                                                      25).with_units(units.DEGREE_CELSIUS),
+              )
 def phase_multi_measurements(test):
     test.measurements.is_connected = True
     test.measurements.firmware_version = (
@@ -89,7 +100,14 @@ def dimensions(test):
     """Phase with dimensioned measurements."""
     for dim in range(5):
         test.measurements.dimensions[dim] = 1 << dim
-    for x, y, z in zip(list(range(1, 5)), list(range(21, 25)), list(range(101, 105))):
+    for x, y, z in zip(
+        list(
+            range(
+            1, 5)), list(
+                range(
+                    21, 25)), list(
+                        range(
+                            101, 105))):
         test.measurements.lots_of_dims[x, y, z] = x + y + z
 
 

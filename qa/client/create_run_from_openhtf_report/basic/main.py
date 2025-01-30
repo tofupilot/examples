@@ -1,6 +1,6 @@
-from openhtf import Test, PhaseResult
-from openhtf.plugs import user_input
+from openhtf import PhaseResult, Test
 from openhtf.output.callbacks import json_factory
+from openhtf.plugs import user_input
 from tofupilot import TofuPilotClient
 
 client = TofuPilotClient()

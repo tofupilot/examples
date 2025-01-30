@@ -26,4 +26,5 @@ client.create_run(
 )
 
 # Update unit "00102" by adding unit "00103" as a sub-unit
-client.update_unit(serial_number="00102", sub_units=[{"serial_number": "00103"}])
+client.update_unit(serial_number="00102",
+                   sub_units=[{"serial_number": "00103"}])

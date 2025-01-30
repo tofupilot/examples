@@ -1,13 +1,20 @@
 import os
+
 import matplotlib
+import matplotlib.pyplot as plt
 
 matplotlib.use("Agg")  # Use 'Agg' backend to avoid GUI operations
-import matplotlib.pyplot as plt
 
 
 def plot_sensor_data(
-    temp, actual, fitted, residuals, axis_label, y_label, sensor_type, save_path
-):
+        temp,
+        actual,
+        fitted,
+        residuals,
+        axis_label,
+        y_label,
+        sensor_type,
+        save_path):
     plt.figure(figsize=(10, 8))
     plt.subplot(3, 1, 1)
     plt.plot(temp, actual, label="Actual")

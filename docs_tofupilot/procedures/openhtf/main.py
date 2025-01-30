@@ -9,7 +9,8 @@ def main():
         part_number="PCB1",
     )
     with TofuPilot(test):
-        test.execute(lambda: "PCB1A001")  # Duration calculated during execution
+        # Duration calculated during execution
+        test.execute(lambda: "PCB1A001")
 
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
-from tofupilot import TofuPilotClient
 import random
 import time
+
+from tofupilot import TofuPilotClient
 
 client = TofuPilotClient()
 
@@ -27,8 +28,15 @@ def check_voltage():
 def check_soc():
     passed = simulate_test_result(95)
     measured_value = (
-        round(random.uniform(50, 55), 0) if passed else round(random.uniform(20, 39), 2)
-    )
+        round(
+            random.uniform(
+                50,
+                55),
+            0) if passed else round(
+            random.uniform(
+                20,
+                39),
+            2))
     return passed, measured_value, "%", 40, 60
 
 
@@ -61,7 +69,7 @@ def run_test(test):
 
     end_time_millis = int(time.time() * 1000)
 
-    if passed == True:
+    if passed:
         outcome = "PASS"
     elif passed == False:
         outcome = "FAIL"

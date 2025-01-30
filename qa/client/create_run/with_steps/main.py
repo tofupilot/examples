@@ -1,16 +1,17 @@
 """
 Example script demonstrating how to create a test run in TofuPilot with detailed steps.
 
-This script runs a series of test functions, records the results and duration of each step, 
-and then creates a test run in TofuPilot. Each step includes detailed information such as 
+This script runs a series of test functions, records the results and duration of each step,
+and then creates a test run in TofuPilot. Each step includes detailed information such as
 the measured value, unit, and thresholds.
 
 Ensure your API key is stored in the environment variables as per the documentation:
 https://tofupilot.com/docs/user-management#api-key
 """
 
-from tofupilot import TofuPilotClient
 from datetime import datetime
+
+from tofupilot import TofuPilotClient
 
 # Initialize the TofuPilot client
 client = TofuPilotClient()

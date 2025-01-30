@@ -1,7 +1,8 @@
-from tofupilot.openhtf import TofuPilot
+import random
+
 import openhtf as htf
 from openhtf.util import units
-import random
+from tofupilot.openhtf import TofuPilot
 
 
 # Simulate passing probability for a test result
@@ -62,7 +63,8 @@ def phase_voltage_measurements(test):
     .with_units(units.OHM),
 )
 def ir_test(test):
-    test.measurements.internal_resistance_value = round(random.uniform(0.007, 0.012), 3)
+    test.measurements.internal_resistance_value = round(
+        random.uniform(0.007, 0.012), 3)
 
 
 def teardown(test):
