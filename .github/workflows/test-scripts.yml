@@ -25,17 +25,23 @@ jobs:
     # Running on both ubuntu and windows
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest]
+        os: [windows-latest]
     runs-on: ${{ matrix.os }}
 
     env:
       # Storing the user-supplied URL
       TOFUPILOT_URL: ${{ secrets.TOFUPILOT_URL }}
+      # Forcing Python to run in UTF-8 mode for all steps in this job
+      PYTHONUTF8: "1"
 
     steps:
       # Checking out the repository
       - name: Checking out the repository
         uses: actions/checkout@v3
+
+      - name: Changing code page to UTF-8 (Windows only)
+        if: runner.os == 'Windows'
+        run: chcp 65001
 
       # Setting the appropriate API key based on environment choice
       - name: Setting TOFUPILOT_API_KEY
