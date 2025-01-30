@@ -22,7 +22,11 @@ on:
 
 jobs:
   execute-python-scripts:
-    runs-on: ubuntu-latest
+    # Run on both ubuntu and windows
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
 
     env:
       # Storing the user-supplied URL
@@ -66,6 +70,7 @@ jobs:
 
       # Finding and running all Python scripts in the scripts folder and subfolders
       - name: Running all Python scripts
+        shell: bash
         run: |
           echo "Testing branch ${{ env.TOFUPILOT_URL }}..."
           # Finding every `main.py` files, excluding virtual environment and hidden directories
