@@ -1,16 +1,9 @@
-"""
-Example demonstrating how to create a test run using the TofuPilotClient.
-
-This script initializes a test run for a unit with the serial number "00102" and part number "PCB01".
-The test run is marked as successful (passed).
-"""
-
-from typing import Optional
 from datetime import timedelta
 from tofupilot import TofuPilotClient
 
+from typing import Optional
 
-def simple(api_key: Optional[str], url: Optional[str]):
+def main(api_key: Optional[str], url: Optional[str]):
 
     # Initialize the TofuPilot client.
     client = TofuPilotClient(api_key=api_key, url=url)
