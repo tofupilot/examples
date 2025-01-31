@@ -17,13 +17,9 @@ def check_mcu_power(test):
 
 
 @htf.measures(
-    htf.Measurement("i2c_response").equals(True),
-    htf.Measurement("adc_accuracy")
-    .in_range(0.95, 1.05)
-    .with_units(units.PERCENT),
-    htf.Measurement("temperature")
-    .in_range(-10, 85)
-    .with_units(units.CELSIUS),
+    htf.Measurement("i2c_test").equals(True),
+    htf.Measurement("adc_accuracy").in_range(0.95, 1.05).with_units(units.PERCENT),
+    htf.Measurement("temperature").in_range(-10, 85).with_units(units.CELSIUS),
 )
 def check_sensors(test):
     test.measurements.i2c_response = True
