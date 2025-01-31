@@ -1,105 +1,63 @@
 import random
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from tofupilot import MeasurementOutcome, PhaseOutcome, TofuPilotClient
 
-
-def calculate_measurement_outcome(value, lower_limit, upper_limit):
-    if (lower_limit is not None and value < lower_limit) or (
-        upper_limit is not None and value > upper_limit
-    ):
-        return MeasurementOutcome.FAIL
-    return MeasurementOutcome.PASS
-
-
-def setup_battery_test():
-    return {}
-
-
-def flash_firmware_and_check_version():
-    return {"firmware_version": ("prod_2.5.1", None, None, None)}
-
-
-def configure_gauge_parameters():
-    return {
-        "gauge_syspress": (True, None, None, None),
-        "calibration_current_CCGain": (3.631, None, None, None),
-    }
-
-
-def measure_battery_state():
-    return {
-        "input_voltage": (round(random.uniform(3.1, 3.6), 2), "V", 3.1, 3.5),
-        "output_current": (round(random.uniform(0.5, 0.660), 3), "A", None, 0.655),
-        "state_of_health": (round(random.uniform(0.94, 0.99), 2), "%", 0.95, None),
-    }
-
-
-# Créer la phase en intégrant les tests
-def create_phase(test_function):
-    test = test_function()
-    measurements = []
-    phase_outcome = PhaseOutcome.PASS
+def main():
+    client = TofuPilotClient()
     start_time_millis = datetime.now().timestamp() * 1000
 
-    # Évaluer chaque mesure et son outcome
-    for measure_name, (value, unit, lower, upper) in test.items():
-        outcome = calculate_measurement_outcome(value, lower, upper)
-        measurements.append(
-            {
-                "name": measure_name,
-                "measured_value": value,
-                "units": unit,
-                "outcome": outcome,
-                "lower_limit": lower,
-                "upper_limit": upper,
-            }
-        )
-        if outcome == MeasurementOutcome.FAIL:
-            phase_outcome = PhaseOutcome.FAIL
-
-    # Retourner la phase avec son outcome et les mesures
-    return {
-        "name": test_function.__name__,
-        "outcome": phase_outcome,
+    # Motor test
+    motor_running = random.choice([True, False])
+    motor_outcome = MeasurementOutcome.PASS if motor_running else MeasurementOutcome.FAIL
+    motor_phase = {
+        "name": "check_motor",
+        "outcome": motor_outcome,
         "start_time_millis": start_time_millis,
-        "end_time_millis": start_time_millis + 3000,
-        "measurements": measurements,
+        "end_time_millis": start_time_millis + 3000, # example duration
+        "measurements": [{
+            "name": "motor_running",
+            "measured_value": motor_running,
+            "outcome": motor_outcome,
+        }],
     }
 
+    # Battery test
+    battery_voltage = round(random.uniform(11.0, 12.6), 2)
+    battery_current = round(random.uniform(1.0, 2.5), 2)
+    battery_voltage_outcome = MeasurementOutcome.PASS if 11.0 <= battery_voltage <= 12.6 else MeasurementOutcome.FAIL
+    battery_current_outcome = MeasurementOutcome.PASS if 1.0 <= battery_current <= 2.5 else MeasurementOutcome.FAIL
+    battery_phase = {
+        "name": "check_battery",
+        "outcome": PhaseOutcome.PASS if battery_voltage_outcome == MeasurementOutcome.PASS and battery_current_outcome == MeasurementOutcome.PASS else PhaseOutcome.FAIL,
+        "start_time_millis": start_time_millis,
+        "end_time_millis": start_time_millis + 3000, # example duration
+        "measurements": [
+            {
+                "name": "battery_voltage",
+                "measured_value": battery_voltage,
+                "units": "V",
+                "outcome": battery_voltage_outcome,
+                "lower_limit": 11.0,
+                "upper_limit": 12.6,
+            },
+            {
+                "name": "battery_current",
+                "measured_value": battery_current,
+                "units": "A",
+                "outcome": battery_current_outcome,
+                "lower_limit": 1.0,
+                "upper_limit": 2.5,
+            },
+        ],
+    }
 
-# Fonction principale pour exécuter toutes les phases
-def main():
-    # Liste des phases de test
-    tests = [
-        setup_battery_test,
-        flash_firmware_and_check_version,
-        configure_gauge_parameters,
-        measure_battery_state,
-    ]
-
-    # Initialiser le client TofuPilot
-    client = TofuPilotClient()
-
-    # Générer les phases à partir des tests
-    phases = [create_phase(test) for test in tests]
-
-    # Créer le run dans TofuPilot
+    # Create run
+    phases = [motor_phase, gps_phase, battery_phase]
     client.create_run(
-        procedure_name="Battery PCBA Testing",
-        procedure_id="FVT1",
-        unit_under_test={
-            "serial_number": f"PCB01A{random.randint(100, 999)}",
-            "part_number": "PCB01",
-            "part_name": "Battery PCBA Motherboard",
-            "revision": "A",
-            "batch_number": "12-24",
-        },
+        procedure_name="Drone Test",
+        unit_under_test={"serial_number": f"DR{random.randint(100, 999)}"},
         phases=phases,
-        run_passed=all(
-            phase["outcome"] == PhaseOutcome.PASS for phase in phases),
+        run_passed=all(phase["outcome"] == PhaseOutcome.PASS for phase in phases),
     )
 
-
-if __name__ == "__main__":
-    main()

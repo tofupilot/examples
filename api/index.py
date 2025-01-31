@@ -57,9 +57,9 @@ class Handler(BaseHTTPRequestHandler):
 
         # Calling the appropriate function based on the framework
         if framework == "client":
-            client.simple(api_key, url)
+            client.main(api_key, url)
         elif framework == "openhtf":
-            openhtf.simple(api_key, url)
+            openhtf.main(api_key, url)
 
         # Sending success response
         self.send_response(200)

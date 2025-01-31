@@ -55,6 +55,3 @@ def main():
     with TofuPilot(test):
         test.execute(lambda: generate_serial_number())
 
-
-if __name__ == "__main__":
-    main()
