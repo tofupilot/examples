@@ -54,4 +54,3 @@ def main():
 
     with TofuPilot(test):
         test.execute(lambda: generate_serial_number())
-
