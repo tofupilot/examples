@@ -17,8 +17,11 @@ on:
           - production
 
   push:
-
+    branches:
+      - main
   pull_request:
+    branches:
+      - main
 
 jobs:
   execute-python-scripts:
