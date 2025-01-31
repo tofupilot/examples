@@ -1,8 +1,7 @@
 import json
+import os
+import subprocess
 from http.server import BaseHTTPRequestHandler
-
-import welcome_aboard.client as client
-import welcome_aboard.openhtf as openhtf
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -10,9 +9,7 @@ class Handler(BaseHTTPRequestHandler):
     def _set_cors_headers(self):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
-        self.send_header(
-            "Access-Control-Allow-Headers",
-            "Authorization, Content-Type")
+        self.send_header("Access-Control-Allow-Headers", "Authorization, Content-Type")
 
     # Sending error response with appropriate CORS headers
     def _send_error_response(self, status_code, message):
@@ -40,8 +37,7 @@ class Handler(BaseHTTPRequestHandler):
         try:
             _, api_key = auth_header.split(" ")
         except ValueError:
-            self._send_error_response(
-                400, "Invalid Authorization header format")
+            self._send_error_response(400, "Invalid Authorization header format")
             return
 
         # Reading and parsing request body
@@ -55,11 +51,16 @@ class Handler(BaseHTTPRequestHandler):
         url = body_data.get("url", None)
         framework = body_data.get("framework", "openhtf")
 
+        # Copying current environment variables
+        env = os.environ.copy()
+        env["TOFUPILOT_URL"] = url
+        env["TOFUPILOT_API_KEY"] = api_key
+
         # Calling the appropriate function based on the framework
         if framework == "client":
-            client.main(api_key, url)
+            subprocess.run(["python", "welcome_aboard/client.py"], env=env)
         elif framework == "openhtf":
-            openhtf.main(api_key, url)
+            subprocess.run(["python", "welcome_aboard/openhtf.py"], env=env)
 
         # Sending success response
         self.send_response(200)
