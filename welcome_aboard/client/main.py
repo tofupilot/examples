@@ -53,11 +53,17 @@ def main():
     }
 
     # Create run
-    phases = [motor_phase, gps_phase, battery_phase]
+    phases = [motor_phase, battery_phase]
     client.create_run(
         procedure_name="Drone Test",
-        unit_under_test={"serial_number": f"DR{random.randint(100, 999)}"},
+        unit_under_test={
+            "serial_number": f"DR{random.randint(100, 999)}",
+            "part_number": "DR01",
+        },
         phases=phases,
         run_passed=all(phase["outcome"] == PhaseOutcome.PASS for phase in phases),
     )
 
+
+if __name__ == "__main__":
+    main()
