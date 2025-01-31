@@ -1,21 +1,6 @@
 name: Run Python Scripts
 
 on:
-  workflow_dispatch:
-    inputs:
-      url:
-        description: "Url to be used during script execution"
-        required: true
-        type: string
-      environment:
-        description: "Which API Key to use"
-        default: preview
-        required: true
-        type: choice
-        options:
-          - preview
-          - production
-
   push:
     branches:
       - main
