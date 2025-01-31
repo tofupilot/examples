@@ -32,8 +32,7 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     env:
-      # Storing the user-supplied URL
-      TOFUPILOT_URL: ${{ secrets.TOFUPILOT_URL }}
+      TOFUPILOT_API_KEY: ${{ secrets.PRODUCTION_API_KEY}}
       # Forcing Python to run in UTF-8 mode for all steps in this job
       PYTHONUTF8: "1"
 
@@ -45,16 +44,6 @@ jobs:
       - name: Changing code page to UTF-8 (Windows only)
         if: runner.os == 'Windows'
         run: chcp 65001
-
-      # Setting the appropriate API key based on environment choice
-      - name: Setting TOFUPILOT_API_KEY
-        shell: bash
-        run: |
-          if [ "${{ github.event.inputs.environment }}" = "preview" ]; then
-            echo "TOFUPILOT_API_KEY=${{ secrets.PREVIEW_API_KEY }}" >> $GITHUB_ENV
-          else
-            echo "TOFUPILOT_API_KEY=${{ secrets.PRODUCTION_API_KEY }}" >> $GITHUB_ENV
-          fi
 
       # Setting up Python
       - name: Setting up Python
@@ -73,7 +62,6 @@ jobs:
       - name: Running all Python scripts
         shell: bash
         run: |
-          echo "Testing branch ${{ env.TOFUPILOT_URL }}"
           find . -type f -name 'main.py' \
             -not -path '*/venv/*' \
             -not -path '*/.*/*' \
