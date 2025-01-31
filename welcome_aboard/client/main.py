@@ -75,8 +75,8 @@ def main():
     client.create_run(
         procedure_name="Drone Test",
         unit_under_test={
-            "serial_number": f"DR{random.randint(100, 999)}",
-            "part_number": "DR01",
+            "serial_number": f"FP01{random.randint(100, 999)}",
+            "part_number": "FP01",
         },
         phases=phases,
         run_passed=all(
