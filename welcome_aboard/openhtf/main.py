@@ -23,7 +23,7 @@ def check_mcu_power(test):
     .with_units(units.PERCENT),
     htf.Measurement("sensor_temperature_reading")
     .in_range(-10, 85)
-    .with_units(units.CELSIUS),
+    .with_units(units.DEGREE_CELSIUS),
 )
 def check_sensors(test):
     test.measurements.sensor_i2c_response = True
@@ -53,4 +53,8 @@ def main():
     )
 
     with TofuPilot(test):
-        test.execute(lambda: generate_serial_number())
+        test.execute(generate_serial_number)
+
+
+if __name__ == "__main__":
+    main()

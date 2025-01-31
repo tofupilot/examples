@@ -1,8 +1,7 @@
 import json
+import os
+import subprocess
 from http.server import BaseHTTPRequestHandler
-
-import welcome_aboard.client as client
-import welcome_aboard.openhtf as openhtf
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -55,11 +54,16 @@ class Handler(BaseHTTPRequestHandler):
         url = body_data.get("url", None)
         framework = body_data.get("framework", "openhtf")
 
+        # Copying current environment variables
+        env = os.environ.copy()
+        env["TOFUPILOT_URL"] = url
+        env["TOFUPILOT_API_KEY"] = api_key
+
         # Calling the appropriate function based on the framework
         if framework == "client":
-            client.main(api_key, url)
+            subprocess.run(["python", "welcome_aboard/client.py"], env=env)
         elif framework == "openhtf":
-            openhtf.main(api_key, url)
+            subprocess.run(["python", "welcome_aboard/openhtf.py"], env=env)
 
         # Sending success response
         self.send_response(200)
