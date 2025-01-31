@@ -1,6 +1,7 @@
-from datetime import datetime
-from tofupilot import TofuPilotClient, PhaseOutcome, MeasurementOutcome
 import random
+from datetime import datetime
+
+from tofupilot import MeasurementOutcome, PhaseOutcome, TofuPilotClient
 
 
 def simulate_test_result(yield_percentage):
@@ -194,7 +195,8 @@ def main():
             "revision": "A",
             "batch_number": "12-24",
         },
-        run_passed=all(phase["outcome"] == PhaseOutcome.PASS for phase in phases),
+        run_passed=all(
+            phase["outcome"] == PhaseOutcome.PASS for phase in phases),
         phases=phases,
     )
 
