@@ -1,6 +1,5 @@
 import json
 from http.server import BaseHTTPRequestHandler
-
 import welcome_aboard.client as client
 import welcome_aboard.openhtf as openhtf
 

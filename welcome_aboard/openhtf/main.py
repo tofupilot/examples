@@ -17,25 +17,20 @@ def check_mcu_power(test):
 
 
 @htf.measures(
-    htf.Measurement("sensor_i2c_response").equals(True),
-    htf.Measurement("sensor_adc_accuracy")
+    htf.Measurement("i2c_response").equals(True),
+    htf.Measurement("adc_accuracy")
     .in_range(0.95, 1.05)
     .with_units(units.PERCENT),
-    htf.Measurement("sensor_temperature_reading")
+    htf.Measurement("temperature")
     .in_range(-10, 85)
     .with_units(units.CELSIUS),
 )
 def check_sensors(test):
-    test.measurements.sensor_i2c_response = True
-    test.measurements.sensor_adc_accuracy = round(
+    test.measurements.i2c_response = True
+    test.measurements.adc_accuracy = round(
         random.uniform(0.95, 1.05), 2)
-    test.measurements.sensor_temperature_reading = round(
+    test.measurements.temperature = round(
         random.uniform(-10, 85), 1)
-
-
-def generate_serial_number():
-    random_digits = "".join([str(random.randint(0, 9)) for _ in range(3)])
-    return f"PCBA123{random_digits}"
 
 
 def main():
@@ -43,14 +38,14 @@ def main():
         check_mcu_power,
         check_sensors,
         # Procedure information
-        test_name="PCBA Functional Testing",
-        procedure_id="PCBA_FVT1",  # optional
-        # Unit Under Test information
-        part_number="PCBA123",
+        test_name="PCBA Test",
+        procedure_id="FVT1",  # optional
+        # UUT
+        part_number="PCBA01",
         part_name="PCBA Control Board",  # optional
         revision="B",  # optional
         batch_number="01-25",  # optional
     )
 
     with TofuPilot(test):
-        test.execute(lambda: generate_serial_number())
+        test.execute(lambda: f"PCBA01{''.join(str(random.randint(0, 9)) for _ in range(3))}")
