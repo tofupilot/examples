@@ -9,9 +9,7 @@ class Handler(BaseHTTPRequestHandler):
     def _set_cors_headers(self):
         self.send_header("Access-Control-Allow-Origin", "*")
         self.send_header("Access-Control-Allow-Methods", "POST, OPTIONS")
-        self.send_header(
-            "Access-Control-Allow-Headers",
-            "Authorization, Content-Type")
+        self.send_header("Access-Control-Allow-Headers", "Authorization, Content-Type")
 
     # Sending error response with appropriate CORS headers
     def _send_error_response(self, status_code, message):
@@ -39,8 +37,7 @@ class Handler(BaseHTTPRequestHandler):
         try:
             _, api_key = auth_header.split(" ")
         except ValueError:
-            self._send_error_response(
-                400, "Invalid Authorization header format")
+            self._send_error_response(400, "Invalid Authorization header format")
             return
 
         # Reading and parsing request body
@@ -61,9 +58,13 @@ class Handler(BaseHTTPRequestHandler):
 
         # Calling the appropriate function based on the framework
         if framework == "client":
-            subprocess.run(["python", "welcome_aboard/client.py"], env=env)
+            subprocess.run(
+                ["python", "welcome_aboard/client/main.py"], env=env, check=True
+            )
         elif framework == "openhtf":
-            subprocess.run(["python", "welcome_aboard/openhtf.py"], env=env)
+            subprocess.run(
+                ["python", "welcome_aboard/openhtf/main.py"], env=env, check=True
+            )
 
         # Sending success response
         self.send_response(200)
