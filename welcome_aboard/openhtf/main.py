@@ -42,10 +42,14 @@ def main():
         procedure_id="FVT1",  # optional
         # UUT
         part_number="PCBA01",
-        part_name="PCBA Control Board",  # optional
-        revision="B",  # optional
+        part_name="PCBA",  # optional
+        revision="A",  # optional
         batch_number="01-25",  # optional
     )
 
     with TofuPilot(test):
-        test.execute(lambda: f"PCBA01{''.join(str(random.randint(0, 9)) for _ in range(3))}")
+        test.execute(lambda: f"PCBA01{random.randint(100, 999)}")
+
+
+if __name__ == "__main__":
+    main()
