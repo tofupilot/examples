@@ -1,6 +1,7 @@
 import random
-from datetime import timedelta, datetime
-from tofupilot import TofuPilotClient, PhaseOutcome, MeasurementOutcome
+from datetime import datetime, timedelta
+
+from tofupilot import MeasurementOutcome, PhaseOutcome, TofuPilotClient
 
 
 def calculate_measurement_outcome(value, lower_limit, upper_limit):
@@ -95,7 +96,8 @@ def main():
             "batch_number": "12-24",
         },
         phases=phases,
-        run_passed=all(phase["outcome"] == PhaseOutcome.PASS for phase in phases),
+        run_passed=all(
+            phase["outcome"] == PhaseOutcome.PASS for phase in phases),
     )
 
 
