@@ -29,7 +29,7 @@ def check_sensors(test):
         random.uniform(-10, 85), 1)
 
 
-def main(serial_number: str = f"PCBA01{random.randint(100, 999)}"):
+def main(serial_number: str):
     test = htf.Test(
         check_mcu_power,
         check_sensors,
@@ -44,4 +44,4 @@ def main(serial_number: str = f"PCBA01{random.randint(100, 999)}"):
 
 
 if __name__ == "__main__":
-    main()
+    main(f"PCBA01{random.randint(100, 999)}")
