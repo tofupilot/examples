@@ -29,22 +29,18 @@ def check_sensors(test):
         random.uniform(-10, 85), 1)
 
 
-def main():
+def main(serial_number: str = f"PCBA01{random.randint(100, 999)}"):
     test = htf.Test(
         check_mcu_power,
         check_sensors,
-        # Procedure information
-        test_name="PCBA Test",
-        procedure_id="FVT1",  # optional
-        # UUT
+        procedure_name="PCBA Test",
         part_number="PCBA01",
         part_name="PCBA",  # optional
         revision="A",  # optional
-        batch_number="01-25",  # optional
     )
 
     with TofuPilot(test):
-        test.execute(lambda: f"PCBA01{random.randint(100, 999)}")
+        test.execute(lambda: serial_number)
 
 
 if __name__ == "__main__":

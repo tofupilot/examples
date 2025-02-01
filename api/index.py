@@ -2,7 +2,7 @@ import json
 import os
 from http.server import BaseHTTPRequestHandler
 
-import welcome_aboard.client.main as client
+import welcome_aboard.vanilla.main as vanilla
 import welcome_aboard.openhtf.main as openhtf
 
 
@@ -52,15 +52,16 @@ class Handler(BaseHTTPRequestHandler):
 
         url = body_data.get("url", None)
         framework = body_data.get("framework", "openhtf")
+        serial_number = body_data.get("serial_number", None)
 
         os.environ["TOFUPILOT_URL"] = url
         os.environ["TOFUPILOT_API_KEY"] = api_key
 
         # Calling the appropriate function based on the framework
-        if framework == "client":
-            client.main()
+        if framework == "vanilla":
+            vanilla.main(serial_number)
         elif framework == "openhtf":
-            openhtf.main()
+            openhtf.main(serial_number)
 
         # Sending success response
         self.send_response(200)
