@@ -77,6 +77,7 @@ def main(serial_number: str = f"FP01{random.randint(100, 999)}"):
         unit_under_test={
             "serial_number": serial_number,
             "part_number": "FP01",
+            part_name="Drone Assembly",  # optional
         },
         phases=phases,
         run_passed=all(
