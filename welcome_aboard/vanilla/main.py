@@ -4,7 +4,7 @@ from datetime import datetime
 from tofupilot import MeasurementOutcome, PhaseOutcome, TofuPilotClient
 
 
-def main():
+def main(serial_number: str):
     client = TofuPilotClient()
     start_time_millis = datetime.now().timestamp() * 1000
 
@@ -75,8 +75,9 @@ def main():
     client.create_run(
         procedure_name="Drone Test",
         unit_under_test={
-            "serial_number": f"FP01{random.randint(100, 999)}",
+            "serial_number": serial_number,
             "part_number": "FP01",
+            "part_name": "Drone Assembly",  # optional
         },
         phases=phases,
         run_passed=all(
@@ -85,4 +86,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    main(f"FP01{random.randint(100, 999)}")

@@ -16,36 +16,31 @@ def check_mcu_power(test):
     test.measurements.flash_integrity = True
 
 
-@htf.measures(
-    htf.Measurement("i2c_response").equals(True),
-    htf.Measurement("adc_accuracy").in_range(0.95, 1.05).with_units(units.PERCENT),
-    htf.Measurement("temperature_value").in_range(-10, 85).with_units(units.DEGREE_CELSIUS),
-)
+@htf.measures(htf.Measurement("i2c_response").equals(True),
+              htf.Measurement("adc_accuracy").in_range(0.95,
+                                                       1.05).with_units(units.PERCENT),
+              htf.Measurement("temperature_value") .in_range(-10,
+                                                             85) .with_units(units.DEGREE_CELSIUS),
+              )
 def check_sensors(test):
     test.measurements.i2c_response = True
-    test.measurements.adc_accuracy = round(
-        random.uniform(0.95, 1.05), 2)
-    test.measurements.temperature_value = round(
-        random.uniform(-10, 85), 1)
+    test.measurements.adc_accuracy = round(random.uniform(0.95, 1.05), 2)
+    test.measurements.temperature_value = round(random.uniform(-10, 85), 1)
 
 
-def main():
+def main(serial_number: str):
     test = htf.Test(
         check_mcu_power,
         check_sensors,
-        # Procedure information
-        test_name="PCBA Test",
-        procedure_id="FVT1",  # optional
-        # UUT
+        procedure_name="PCBA Test",
         part_number="PCBA01",
         part_name="PCBA",  # optional
         revision="A",  # optional
-        batch_number="01-25",  # optional
     )
 
     with TofuPilot(test):
-        test.execute(lambda: f"PCBA01{random.randint(100, 999)}")
+        test.execute(lambda: serial_number)
 
 
 if __name__ == "__main__":
-    main()
+    main(f"PCBA01{random.randint(100, 999)}")
