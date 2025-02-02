@@ -16,16 +16,15 @@ def check_mcu_power(test):
     test.measurements.flash_integrity = True
 
 
-@htf.measures(htf.Measurement("i2c_response").equals(True),
-              htf.Measurement("adc_accuracy").in_range(0.95,
-                                                       1.05).with_units(units.PERCENT),
-              htf.Measurement("temperature_value") .in_range(-10,
-                                                             85) .with_units(units.DEGREE_CELSIUS),
-              )
+@htf.measures(
+    htf.Measurement("i2c_response").equals(True),
+    htf.Measurement("acc").in_range(0.95, 1.05).with_units(units.PERCENT),
+    htf.Measurement("temp").in_range(-10, 85).with_units(units.DEGREE_CELSIUS),
+)
 def check_sensors(test):
     test.measurements.i2c_response = True
-    test.measurements.adc_accuracy = round(random.uniform(0.95, 1.05), 2)
-    test.measurements.temperature_value = round(random.uniform(-10, 85), 1)
+    test.measurements.acc = round(random.uniform(0.95, 1.05), 2)
+    test.measurements.temp = round(random.uniform(-10, 85), 1)
 
 
 def main(serial_number: str):
