@@ -19,7 +19,7 @@ jobs:
 
       - name: Formatter
         run: |
-          black .
+          black --preview .
           autopep8 --recursive --in-place --aggressive --aggressive .
           isort .
 
