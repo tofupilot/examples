@@ -35,7 +35,8 @@ jobs:
           run: |
             for i in {1..10}; do
               echo "Execution $i"
-              python welcome_aboard/battery-testing/main.py
+              python welcome_aboard/battery_testing/main.py
             done
+        
         
  
