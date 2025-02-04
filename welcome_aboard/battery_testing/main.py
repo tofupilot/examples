@@ -15,15 +15,8 @@ def simulate_test_result(passed_prob):
 def esr_test():
     passed = simulate_test_result(0.98)
     value_measured = (
-        round(
-            random.uniform(
-                5,
-                10),
-            2) if passed else round(
-            random.uniform(
-                15,
-                20),
-            2))
+        round(random.uniform(5, 10), 2) if passed else round(random.uniform(15, 20), 2)
+    )
     return passed, value_measured, "mΩ", 5, 15
 
 
@@ -40,15 +33,8 @@ def cell_voltage_test():
 def ir_test():
     passed = simulate_test_result(0.98)
     value_measured = (
-        round(
-            random.uniform(
-                5,
-                10),
-            2) if passed else round(
-            random.uniform(
-                15,
-                20),
-            2))
+        round(random.uniform(5, 10), 2) if passed else round(random.uniform(15, 20), 2)
+    )
     return passed, value_measured, "mΩ", 5, 15
 
 
@@ -139,30 +125,16 @@ def voltage_value():
 def internal_resistance():
     passed = simulate_test_result(0.98)
     value_measured = (
-        round(
-            random.uniform(
-                5,
-                10),
-            2) if passed else round(
-            random.uniform(
-                15,
-                20),
-            2))
+        round(random.uniform(5, 10), 2) if passed else round(random.uniform(15, 20), 2)
+    )
     return passed, value_measured, "mΩ", 5, 15
 
 
 def thermal_runaway_detection():
     passed = simulate_test_result(0.98)
     value_measured = (
-        round(
-            random.uniform(
-                55,
-                65),
-            2) if passed else round(
-            random.uniform(
-                66,
-                70),
-            2))
+        round(random.uniform(55, 65), 2) if passed else round(random.uniform(66, 70), 2)
+    )
     return passed, value_measured, "°C", 55, 65
 
 
@@ -179,15 +151,8 @@ def state_of_health():
 def state_of_charge():
     passed = simulate_test_result(0.98)
     value_measured = (
-        round(
-            random.uniform(
-                40,
-                60),
-            1) if passed else round(
-            random.uniform(
-                25,
-                35),
-            1))
+        round(random.uniform(40, 60), 1) if passed else round(random.uniform(25, 35), 1)
+    )
     return passed, value_measured, "%", 40, 60
 
 
@@ -290,12 +255,9 @@ def execute_procedures(end):
         revision_pcb = "B"
         revision_assembly = "B"
         static_segment = "4J"
-        random_digits_cell = "".join(
-            [str(random.randint(0, 9)) for _ in range(5)])
-        random_digits_pcb = "".join(
-            [str(random.randint(0, 9)) for _ in range(5)])
-        random_digits_assembly = "".join(
-            [str(random.randint(0, 9)) for _ in range(5)])
+        random_digits_cell = "".join([str(random.randint(0, 9)) for _ in range(5)])
+        random_digits_pcb = "".join([str(random.randint(0, 9)) for _ in range(5)])
+        random_digits_assembly = "".join([str(random.randint(0, 9)) for _ in range(5)])
         serial_number_cell = (
             f"{part_number_cell}{revision_cell}{static_segment}{random_digits_cell}"
         )
@@ -324,7 +286,7 @@ def execute_procedures(end):
             revision_pcb,
             batch_number,
             None,
-            ["welcome_aboard/battery_testing/data/pcb_coating.jpeg"],
+            ["data/pcb_coating.jpeg"],
         )
         if not passed_pcb:
             continue
