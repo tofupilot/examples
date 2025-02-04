@@ -324,7 +324,7 @@ def execute_procedures(end):
             revision_pcb,
             batch_number,
             None,
-            ["welcome_aboard/battery_testing/data/pcb_coating.jpeg"],
+            ["data/pcb_coating.jpeg"],
         )
         if not passed_pcb:
             continue
