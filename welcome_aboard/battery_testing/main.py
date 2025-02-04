@@ -324,7 +324,7 @@ def execute_procedures(end):
             revision_pcb,
             batch_number,
             None,
-            ["data/pcb_coating.jpeg"],
+            ["welcome_aboard/battery_testing/data/pcb_coating.jpeg"],
         )
         if not passed_pcb:
             continue
@@ -359,7 +359,7 @@ def execute_procedures(end):
             (state_of_charge, timedelta(seconds=2)),
         ]
         handle_procedure(
-            "FVT3",
+            "FVT4",
             tests_assembly,
             serial_number_assembly,
             part_number_assembly,
