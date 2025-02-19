@@ -24,7 +24,7 @@ def main():
             "part_number": "SI0364A",
             "serial_number": serial_number,
         },
-        procedure_name="PCBA Test",
+        procedure_name="PCBA Test",  # Can create a procedure with name
         procedure_version="1.2.178",  # Can create a procedure version
         phases=[
             {
