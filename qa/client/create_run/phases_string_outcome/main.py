@@ -5,12 +5,8 @@ from tofupilot import TofuPilotClient
 client = TofuPilotClient()
 
 
-def simulate_test_result(yield_percentage):
-    return random.random() < (yield_percentage / 100.0)
-
-
 def flash_firmware():
-    passed = simulate_test_result(90)
+    passed = bool(random.randint(0, 1))
     measured_value = "1.2.4" if passed else "1.2.0"
     return passed, measured_value, None, None, None
 
