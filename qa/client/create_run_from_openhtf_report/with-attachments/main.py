@@ -1,12 +1,11 @@
+import openhtf as htf
 from openhtf import PhaseResult, Test
 from openhtf.output.callbacks import json_factory
 from openhtf.plugs import user_input
 from tofupilot import TofuPilotClient
+from tofupilot.openhtf import TofuPilot
 
 client = TofuPilotClient()
-
-import openhtf as htf
-from tofupilot.openhtf import TofuPilot
 
 
 # Define a test phase to simulate the power-on procedure
@@ -14,14 +13,20 @@ def power_on_test(test):
     print("Power on.")
     return PhaseResult.CONTINUE
 
+
 # Define a phase that attaches a file
 def phase_file_attachment(test):
     test.attach_from_file("data/sample_file.txt")
     return htf.PhaseResult.CONTINUE
 
+
 # Function to execute the test and save results to a JSON file
 def execute_test(file_path):
-    test = Test(power_on_test, phase_file_attachment, procedure_id="FVT7", serial_number="PCB01")
+    test = Test(
+        power_on_test,
+        phase_file_attachment,
+        procedure_id="FVT7",
+        serial_number="PCB01")
 
     # Set output callback to save the test results as a JSON file
     test.add_output_callbacks(json_factory.OutputToJSON(file_path))
