@@ -1,6 +1,6 @@
 import random
 import time
-
+from datetime import datetime, timedelta
 from tofupilot import TofuPilotClient
 
 
@@ -8,8 +8,7 @@ def main():
     client = TofuPilotClient()
 
     # Generate SN
-    random_digits = "".join([str(random.randint(0, 9)) for _ in range(5)])
-    serial_number = f"SI0364A{random_digits}"
+    serial_number = f"SI0364A{random.randint(10000, 99999)}"
 
     # 1 Phase test
     start_time_millis = int(time.time() * 1000)
@@ -21,11 +20,13 @@ def main():
 
     client.create_run(
         unit_under_test={
-            "part_number": "SI0364A",
+            "part_number": "SI0364",
             "serial_number": serial_number,
+            "revision": "A",
         },
-        procedure_name="PCBA Test",  # Can create a procedure with name
-        procedure_version="1.2.178",  # Can create a procedure version
+        procedure_id="FVT1",  # No need to specify the ID
+        procedure_name="PCB Testing",  # Create procedure name
+        procedure_version="1.2.20",  # Create procedure version
         phases=[
             {
                 "name": "test_voltage",
