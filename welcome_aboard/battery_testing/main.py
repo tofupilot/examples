@@ -359,7 +359,7 @@ def execute_procedures(end):
             (state_of_charge, timedelta(seconds=2)),
         ]
         handle_procedure(
-            "FVT3",
+            "FVT4",
             tests_assembly,
             serial_number_assembly,
             part_number_assembly,
