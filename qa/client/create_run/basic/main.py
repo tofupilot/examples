@@ -10,13 +10,18 @@ https://tofupilot.com/docs/user-management#api-key
 
 from tofupilot import TofuPilotClient
 
-# Initialize the TofuPilot client.
-client = TofuPilotClient()
 
-# Create a test run for the unit with serial number "00102" and part
-# number "PCB01"
-client.create_run(
-    procedure_id="FVT1",
-    unit_under_test={"serial_number": "00102", "part_number": "PCB01"},
-    run_passed=True,
-)
+def main():
+    # Initialize the TofuPilot client.
+    client = TofuPilotClient()
+    # Create a test run for the unit with serial number "00102" and part
+    # number "PCB01"
+    client.create_run(
+        procedure_id="FVT1",
+        unit_under_test={"serial_number": "00102", "part_number": "PCB01"},
+        run_passed=True,
+    )
+
+
+if __name__ == "__main__":
+    main()
