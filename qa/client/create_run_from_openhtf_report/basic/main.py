@@ -23,9 +23,14 @@ def execute_test(file_path):
     test.execute(lambda: "0001")
 
 
-# Specify the file path for saving test results
-file_path = "./test_result.json"
-execute_test(file_path)
+def main():
+    # Specify the file path for saving test results
+    file_path = "./test_result.json"
+    execute_test(file_path)
 
-# Upload the test results to TofuPilot, specifying the importer type
-client.create_run_from_openhtf_report(file_path)
+    # Upload the test results to TofuPilot, specifying the importer type
+    client.create_run_from_openhtf_report(file_path)
+
+
+if __name__ == "__main__":
+    main()
