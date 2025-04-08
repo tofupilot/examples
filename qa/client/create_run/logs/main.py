@@ -8,9 +8,12 @@ Logs are handled using a custom handler.
 Ensure your API key is stored in the environment variables as per the documentation:
 https://tofupilot.com/docs/user-management#api-key
 """
+
 import logging
 import sys
+
 from tofupilot import TofuPilotClient
+
 
 class JsonCaptureHandler(logging.Handler):
     def __init__(self):
