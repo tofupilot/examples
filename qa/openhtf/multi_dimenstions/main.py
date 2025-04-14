@@ -1,10 +1,11 @@
-import openhtf as htf
-from openhtf.util import units
-from tofupilot.openhtf import TofuPilot
-from openhtf.output.callbacks import json_factory
 import random
 import time
+
 import numpy as np
+import openhtf as htf
+from openhtf.output.callbacks import json_factory
+from openhtf.util import units
+from tofupilot.openhtf import TofuPilot
 
 
 @htf.measures(
@@ -19,11 +20,16 @@ def phase_array(test):
 
 
 @htf.measures(
-    htf.Measurement("voltage").with_dimensions(units.SECOND).with_units(units.VOLT),
-    htf.Measurement("average_voltage").with_units(units.VOLT).in_range(3.3, 3.5),
+    htf.Measurement("voltage").with_dimensions(
+        units.SECOND).with_units(units.VOLT),
+    htf.Measurement("average_voltage").with_units(
+        units.VOLT).in_range(
+        3.3, 3.5),
     htf.Measurement("sinus").with_dimensions(units.SECOND, units.AMPERE),  # !
-    htf.Measurement("neg_x_axis").with_dimensions(units.SECOND).with_units(units.VOLT),
-    htf.Measurement("neg_y_axis").with_dimensions(units.SECOND).with_units(units.VOLT),
+    htf.Measurement("neg_x_axis").with_dimensions(
+        units.SECOND).with_units(units.VOLT),
+    htf.Measurement("neg_y_axis").with_dimensions(
+        units.SECOND).with_units(units.VOLT),
 )
 def phase_2_dim(test):
     len = 50
@@ -59,7 +65,8 @@ def phase_more_than_2_dim(test):
         voltage = round(random.uniform(3.3, 3.5), 2)
         current = round(random.uniform(0.3, 0.8), 3)
         resistance = voltage / current
-        test.measurements.current_and_voltage_over_time[timestamp, voltage, current] = t
+        test.measurements.current_and_voltage_over_time[timestamp,
+                                                        voltage, current] = t
         test.measurements.current_voltage_resistence_over_time[
             timestamp, voltage, current, resistance
         ] = 0
@@ -83,7 +90,9 @@ def main():
     random_digits = "".join([str(random.randint(0, 9)) for _ in range(5)])
     serial_number = f"00220D4K{random_digits}"
 
-    test.add_output_callbacks(json_factory.OutputToJSON("test_result.json", indent=2))
+    test.add_output_callbacks(
+        json_factory.OutputToJSON(
+            "test_result.json", indent=2))
 
     start = time.time()
     # Execute the test
