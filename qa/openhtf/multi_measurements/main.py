@@ -18,7 +18,7 @@ def boolean_test(test):
     test.measurements.button_status = True
 
 
-def phaseresult_test(test):
+def phaseresult_test():
     return htf.PhaseResult.CONTINUE
 
 
