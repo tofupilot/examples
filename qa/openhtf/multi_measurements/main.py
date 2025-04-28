@@ -88,12 +88,7 @@ def main():
         measure_test_with_limits,
         not_working_multi_measurements,
         procedure_id="FVT9",
-        procedure_name="Functional Testing",
         part_number="00220D",
-        part_name="Motherboard PCB Drone",
-        revision="B",
-        batch_number="1124-0001",
-        sub_units=[{"serial_number": "00102"}],
     )
 
     # Generate random Serial Number
