@@ -13,15 +13,11 @@ def main():
         check_button,
         procedure_id="FVT1",
         # REGEX is defined in the Settings from Serial Number for:
-        # part_number="00221",
-        # revision="B",
-        # batch="4K"
+        # part_number="PCB01",
     )
 
-    serial_number = f"00221B4K{random.randint(10000, 99999)}"
-
     with TofuPilot(test):
-        test.execute(lambda: serial_number)
+        test.execute(lambda: "PCB01A123")
 
 
 if __name__ == "__main__":
