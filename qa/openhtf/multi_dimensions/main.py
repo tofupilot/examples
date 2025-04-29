@@ -1,10 +1,11 @@
-import openhtf as htf
-from openhtf.util import units
-from tofupilot.openhtf import TofuPilot
-from openhtf.output.callbacks import json_factory
 import random
 import time
+
 import numpy as np
+import openhtf as htf
+from openhtf.output.callbacks import json_factory
+from openhtf.util import units
+from tofupilot.openhtf import TofuPilot
 
 
 @htf.measures(
@@ -65,7 +66,8 @@ def power_phase(test):
         voltage = round(random.uniform(3.3, 3.5), 2)
         current = round(random.uniform(0.3, 0.8), 3)
         resistance = voltage / current
-        test.measurements.current_and_voltage_over_time[timestamp, voltage] = current
+        test.measurements.current_and_voltage_over_time[timestamp,
+                                                        voltage] = current
         test.measurements.current_voltage_resistence_over_time[
             timestamp, voltage, current
         ] = resistance
@@ -84,7 +86,9 @@ def main():
     random_digits = "".join([str(random.randint(0, 9)) for _ in range(5)])
     serial_number = f"00220D4K{random_digits}"
 
-    test.add_output_callbacks(json_factory.OutputToJSON("test_result.json", indent=2))
+    test.add_output_callbacks(
+        json_factory.OutputToJSON(
+            "test_result.json", indent=2))
 
     start = time.time()
     # Execute the test

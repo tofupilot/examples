@@ -8,8 +8,9 @@ Ensure your API key is stored in the environment variables as per the documentat
 https://tofupilot.com/docs/user-management#api-key
 """
 
-from tofupilot import TofuPilotClient
 import random
+
+from tofupilot import TofuPilotClient
 
 
 def main():
@@ -21,7 +22,9 @@ def main():
     serial_number = f"00220D4K{random_digits}"
     client.create_run(
         procedure_id="FVT1",
-        unit_under_test={"serial_number": serial_number, "part_number": "PCB01"},
+        unit_under_test={
+            "serial_number": serial_number,
+            "part_number": "PCB01"},
         run_passed=True,
     )
 
