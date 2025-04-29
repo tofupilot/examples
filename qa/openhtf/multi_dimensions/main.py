@@ -1,8 +1,9 @@
+import random
+
+import numpy as np
 import openhtf as htf
 from openhtf.util import units
 from tofupilot.openhtf import TofuPilot
-import random
-import numpy as np
 
 
 @htf.measures(
@@ -46,7 +47,8 @@ def power_phase(test):
         voltage = round(random.uniform(3.3, 3.5), 2)
         current = round(random.uniform(0.3, 0.8), 3)
         resistance = voltage / current
-        test.measurements.current_and_voltage_over_time[timestamp, voltage] = current
+        test.measurements.current_and_voltage_over_time[timestamp,
+                                                        voltage] = current
         test.measurements.current_voltage_resistence_over_time[
             timestamp, voltage, current
         ] = resistance
