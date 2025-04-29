@@ -12,7 +12,6 @@ def main():
     test = htf.Test(
         check_button,
         procedure_id="FVT1",  # No need to specify the ID
-        procedure_name="PCB Testing",  # Create procedure name
         procedure_version="1.2.20",  # Create procedure version
         part_number="00220",
     )

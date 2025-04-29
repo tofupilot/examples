@@ -1,60 +1,32 @@
 import random
 import time
 from datetime import datetime, timedelta
-
 import openhtf as htf
 from openhtf.util import units
 from tofupilot.openhtf import TofuPilot
 
 
-# Utility function to simulate the test result with a given pass probability
-def simulate_test_result(passed_prob):
-    return random.random() < passed_prob
-
-
 @htf.measures(htf.Measurement("firmware_version").equals("1.4.3"))
 def pcba_firmware_version(test):
-    test.measurements.firmware_version = (
-        "1.4.3" if simulate_test_result(0.99) else "1.4.2"
-    )
-    # time.sleep(1)
+    test.measurements.firmware_version = "1.4.3" if random.random() < 0.99 else "1.4.2"
 
 
 @htf.measures(htf.Measurement("button_status").equals(True))
 def check_button(test):
-    test.measurements.button_status = simulate_test_result(1)
-    time.sleep(3)
+    test.measurements.button_status = random.choice([True, False])
+    time.sleep(1)
 
 
-@htf.measures(htf.Measurement("led_status").equals(True))
-def check_led_switch_on(test):
-    test.measurements.led_status = simulate_test_result(1)
-    # time.sleep(1)
-
-
-@htf.measures(htf.Measurement("input_voltage").in_range(4.5,
-              5).with_units(units.VOLT))
+@htf.measures(htf.Measurement("input_voltage").in_range(4.5, 5).with_units(units.VOLT))
 def test_voltage_input(test):
-    passed = simulate_test_result(0.99)
-    test.measurements.input_voltage = (
-        round(random.uniform(4.7, 4.9), 2)
-        if passed
-        else round(random.uniform(3.0, 3.8), 2)
-    )
-    # time.sleep(3)
+    test.measurements.input_voltage = round(random.uniform(3.7, 4.9), 2)
 
 
 @htf.measures(
     htf.Measurement("output_voltage").in_range(3.2, 3.4).with_units(units.VOLT)
 )
 def test_voltage_output(test):
-    passed = simulate_test_result(1)
-    test.measurements.output_voltage = (
-        round(random.uniform(3.25, 3.35), 2)
-        if passed
-        else round(random.uniform(0.1, 0.3), 2)
-    )
-    # time.sleep(5)
+    test.measurements.output_voltage = round(random.uniform(2.95, 3.35), 2)
 
 
 @htf.measures(
@@ -63,17 +35,12 @@ def test_voltage_output(test):
     .with_units(units.AMPERE)
 )
 def test_overcurrent_protection(test):
-    passed = simulate_test_result(0.80)
-    test.measurements.current_protection_triggered = (
-        round(random.uniform(1.0, 1.4), 3)
-        if passed
-        else round(random.uniform(1.7, 1.8), 3)
-    )
-    # time.sleep(5)
+    test.measurements.current_protection_triggered = round(random.uniform(1.0, 1.7), 3)
+    time.sleep(1)
 
 
 def test_battery_switch():
-    if simulate_test_result(0.98):
+    if random.random() < 0.9:
         return htf.PhaseResult.CONTINUE
     else:
         return htf.PhaseResult.STOP
@@ -83,37 +50,18 @@ def test_battery_switch():
     htf.Measurement("efficiency").in_range(85, 98).with_units(units.Unit("%"))
 )
 def test_converter_efficiency(test):
-    passed = simulate_test_result(0.99)
     input_power = 500
-    output_power = (
-        round(
-            random.uniform(
-                450,
-                480)) if passed else round(
-            random.uniform(
-                400,
-                425)))
-    test.measurements.efficiency = round(
-        ((output_power / input_power) * 100), 1)
-    # time.sleep(5)
-
-
-@htf.measures(htf.Measurement("power_mode_functional").equals("on"))
-def test_power_saving_mode(test):
-    test.measurements.power_mode_functional = "on" if simulate_test_result(
-        1) else "off"
-    # time.sleep(1)
+    output_power = round(random.uniform(425, 480))
+    test.measurements.efficiency = round(((output_power / input_power) * 100), 1)
+    time.sleep(1)
 
 
 def visual_control_pcb_coating(test):
-    if simulate_test_result(1):
-        test.attach_from_file("data/oscilloscope.jpeg")
+    if random.random() < 0.98:
+        test.attach_from_file("qa/openhtf/generic/data/oscilloscope.jpeg")
         return htf.PhaseResult.CONTINUE
     else:
         return htf.PhaseResult.STOP
-
-
-# time.sleep(1)
 
 
 def main():
@@ -121,20 +69,17 @@ def main():
     test = htf.Test(
         pcba_firmware_version,
         check_button,
-        check_led_switch_on,
         test_voltage_input,
         test_voltage_output,
         test_overcurrent_protection,
         test_battery_switch,
         test_converter_efficiency,
-        test_power_saving_mode,
         visual_control_pcb_coating,
-        procedure_id="FVT9",
-        procedure_name="Test QA",
+        procedure_id="FVT1",
         part_number="00220",
-        revision="B",
-        batch_number="1024-0001",
-        sub_units=[{"serial_number": "00102"}],
+        revision="A",
+        # batch_number="1024-0001",
+        # sub_units=[{"serial_number": "00102"}],
     )
 
     # Generate random Serial Number
@@ -142,10 +87,9 @@ def main():
     serial_number = f"00220B4K{random_digits}"
 
     # Execute the test
-    with TofuPilot(test, stream=False):
+    with TofuPilot(test):
         test.execute(lambda: serial_number)
 
 
 if __name__ == "__main__":
-    for _ in range(1):
-        main()
+    main()

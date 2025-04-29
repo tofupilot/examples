@@ -1,13 +1,7 @@
-import random
-
 import openhtf as htf
 from openhtf.util import units
 from tofupilot.openhtf import TofuPilot
-
-
-# Utility function to simulate the test result with a given pass probability
-def simulate_test_result(passed_prob):
-    return random.random() < passed_prob
+import random
 
 
 @htf.measures(
@@ -15,71 +9,37 @@ def simulate_test_result(passed_prob):
     htf.Measurement("power_mode_functional").equals("on"),
 )
 def string_test(test):
-    test.measurements.firmware_version = (
-        "1.4.3" if simulate_test_result(0.99) else "1.4.2"
-    )
-    test.measurements.power_mode_functional = "on" if simulate_test_result(
-        1) else "off"
+    test.measurements.firmware_version = "1.4.3" if random.random() < 0.99 else "1.4.2"
+    test.measurements.power_mode_functional = "on"
 
 
 @htf.measures(htf.Measurement("button_status").equals(True))
 def boolean_test(test):
-    test.measurements.button_status = simulate_test_result(1)
+    test.measurements.button_status = True
 
 
 def phaseresult_test():
-    if simulate_test_result(0.98):
-        return htf.PhaseResult.CONTINUE
-    else:
-        return htf.PhaseResult.STOP
+    return htf.PhaseResult.CONTINUE
 
 
 @htf.measures(
-    htf.Measurement("two_limits").in_range(
-        4.5, 5).with_units(
-            units.VOLT), htf.Measurement("one_limit").in_range(
-                maximum=1.5).with_units(
-                    units.AMPERE), htf.Measurement("percentage").in_range(
-                        85, 98).with_units(
-                            units.Unit("%")), )
+    htf.Measurement("two_limits").in_range(4.5, 5).with_units(units.VOLT),
+    htf.Measurement("one_limit").in_range(maximum=1.5).with_units(units.AMPERE),
+    htf.Measurement("percentage").in_range(85, 98).with_units(units.Unit("%")),
+)
 def measure_test_with_limits(test):
-    passed = simulate_test_result(0.99)
-    test.measurements.two_limits = (
-        round(random.uniform(4.7, 4.9), 2)
-        if passed
-        else round(random.uniform(3.0, 3.8), 2)
-    )
-    test.measurements.one_limit = (
-        round(random.uniform(1.0, 1.4), 3)
-        if passed
-        else round(random.uniform(1.7, 1.8), 3)
-    )
+    test.measurements.two_limits = round(random.uniform(3.8, 4.9), 2)
+    test.measurements.one_limit = round(random.uniform(1.0, 1.6), 3)
     input_power = 500
-    output_power = (
-        round(
-            random.uniform(
-                450,
-                480)) if passed else round(
-            random.uniform(
-                400,
-                425)))
-    test.measurements.percentage = round(
-        ((output_power / input_power) * 100), 1)
+    output_power = round(random.uniform(425, 480))
+    test.measurements.percentage = round(((output_power / input_power) * 100), 1)
 
 
-def phase_with_attachment(test):
-    if simulate_test_result(1):
-        test.attach_from_file("data/oscilloscope.jpeg")
-        return htf.PhaseResult.CONTINUE
-    else:
-        return htf.PhaseResult.STOP
-
-
-@htf.measures(htf.Measurement("is_connected").equals(True),
-              htf.Measurement("firmware_version").equals("1.2.7"),
-              htf.Measurement("temperature").in_range(20,
-                                                      25).with_units(units.DEGREE_CELSIUS),
-              )
+@htf.measures(
+    htf.Measurement("is_connected").equals(True),
+    htf.Measurement("firmware_version").equals("1.2.7"),
+    htf.Measurement("temperature").in_range(20, 25).with_units(units.DEGREE_CELSIUS),
+)
 def phase_multi_measurements(test):
     test.measurements.is_connected = True
     test.measurements.firmware_version = (
@@ -100,14 +60,7 @@ def dimensions(test):
     """Phase with dimensioned measurements."""
     for dim in range(5):
         test.measurements.dimensions[dim] = 1 << dim
-    for x, y, z in zip(
-        list(
-            range(
-            1, 5)), list(
-                range(
-                    21, 25)), list(
-                        range(
-                            101, 105))):
+    for x, y, z in zip(list(range(1, 5)), list(range(21, 25)), list(range(101, 105))):
         test.measurements.lots_of_dims[x, y, z] = x + y + z
 
 
@@ -133,15 +86,9 @@ def main():
         boolean_test,
         phaseresult_test,
         measure_test_with_limits,
-        phase_with_attachment,
         not_working_multi_measurements,
         procedure_id="FVT9",
-        procedure_name="Test QA",
         part_number="00220D",
-        part_name="OpenHTF Script",
-        revision="B",
-        batch_number="1124-0001",
-        sub_units=[{"serial_number": "00102"}],
     )
 
     # Generate random Serial Number

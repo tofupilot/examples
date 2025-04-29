@@ -4,8 +4,7 @@ from tofupilot.openhtf import TofuPilot
 
 def main():
     test = htf.Test(
-        procedure_id="FVT1",
-        procedure_name="PCB Testing",  # By default set as "openhtf_test"
+        procedure_id="FVT1",  # Procedure name set by default as "openhtf_test"
         part_number="PCB1",
     )
     with TofuPilot(test):
