@@ -9,19 +9,17 @@ from tofupilot.openhtf import TofuPilot
 @htf.measures(htf.Measurement("firmware_version").equals("1.4.3"))
 def pcba_firmware_version(test):
     test.measurements.firmware_version = "1.4.3" if random.random() < 0.99 else "1.4.2"
-    # time.sleep(1)
 
 
 @htf.measures(htf.Measurement("button_status").equals(True))
 def check_button(test):
     test.measurements.button_status = random.choice([True, False])
-    time.sleep(3)
+    time.sleep(1)
 
 
 @htf.measures(htf.Measurement("input_voltage").in_range(4.5, 5).with_units(units.VOLT))
 def test_voltage_input(test):
     test.measurements.input_voltage = round(random.uniform(3.7, 4.9), 2)
-    # time.sleep(3)
 
 
 @htf.measures(
@@ -29,7 +27,6 @@ def test_voltage_input(test):
 )
 def test_voltage_output(test):
     test.measurements.output_voltage = round(random.uniform(2.95, 3.35), 2)
-    # time.sleep(5)
 
 
 @htf.measures(
@@ -39,7 +36,7 @@ def test_voltage_output(test):
 )
 def test_overcurrent_protection(test):
     test.measurements.current_protection_triggered = round(random.uniform(1.0, 1.7), 3)
-    time.sleep(5)
+    time.sleep(1)
 
 
 def test_battery_switch():
@@ -56,16 +53,15 @@ def test_converter_efficiency(test):
     input_power = 500
     output_power = round(random.uniform(425, 480))
     test.measurements.efficiency = round(((output_power / input_power) * 100), 1)
-    time.sleep(5)
+    time.sleep(1)
 
 
 def visual_control_pcb_coating(test):
     if random.random() < 0.98:
-        # test.attach_from_file("qa/openhtf/generic/data/oscilloscope.jpeg")
+        test.attach_from_file("qa/openhtf/generic/data/oscilloscope.jpeg")
         return htf.PhaseResult.CONTINUE
     else:
         return htf.PhaseResult.STOP
-    # time.sleep(1)
 
 
 def main():
@@ -96,5 +92,4 @@ def main():
 
 
 if __name__ == "__main__":
-    for _ in range(1):
-        main()
+    main()
