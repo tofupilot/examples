@@ -9,8 +9,7 @@ def main():
     start_time_millis = datetime.now().timestamp() * 1000
 
     client.create_run(
-        procedure_id="FVT1",
-        procedure_name="PCB Testing",
+        procedure_id="FVT1",  # First create procedure in Application
         unit_under_test={
             "serial_number": "PCB1A002",
             "part_number": "PCB1",

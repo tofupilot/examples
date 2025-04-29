@@ -76,9 +76,7 @@ def main():
         multi_dimension_phase,
         power_phase,
         procedure_id="FVT2",
-        procedure_name="Functional Testing",
         part_number="00220S",
-        part_name="Motherboard PCB",
         revision="B",
         batch_number="1124-0001",
     )

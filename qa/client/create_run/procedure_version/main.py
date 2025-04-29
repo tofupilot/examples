@@ -24,8 +24,7 @@ def main():
             "serial_number": serial_number,
             "revision": "A",
         },
-        procedure_id="FVT1",  # No need to specify the ID
-        procedure_name="PCB Testing",  # Create procedure name
+        procedure_id="FVT1",  # First create procedure in Application
         procedure_version="1.2.20",  # Create procedure version
         phases=[
             {

@@ -11,11 +11,9 @@ def handle_test():
     for testnumber in range(2):
         client.create_run(
             procedure_id="FVT112",
-            procedure_name="FPY",
             started_at=datetime.now(),
             unit_under_test={
                 "part_number": "FPY",
-                "part_name": "TestFPY",
                 "serial_number": "FPY-0123410",
             },
             # First Good, Second KO, to check FPY

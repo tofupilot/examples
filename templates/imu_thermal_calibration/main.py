@@ -213,10 +213,8 @@ def main():
         get_calibration_data,
         compute_sensors_calibration,
         save_calibration,
-        procedure_id="FVT1",
-        procedure_name="IMU Thermal Calibration",
+        procedure_id="FVT1",  # First create procedure in Application
         part_number="PCB01",
-        part_name="Motherboard PCBA",
     )
 
     with TofuPilot(test):

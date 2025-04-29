@@ -8,8 +8,7 @@ from tofupilot.openhtf import TofuPilot
 
 def main():
     test = Test(
-        procedure_id="FVT2",
-        procedure_name="Camera Assembly",
+        procedure_id="FVT2",  # First create procedure in Application
         part_number="CAM1",
         sub_units=[{"serial_number": "PCB1A001"}, {"serial_number": "LEN1A001"}],
     )
