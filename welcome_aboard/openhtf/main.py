@@ -31,9 +31,8 @@ def main(serial_number: str):
     test = htf.Test(
         check_mcu_power,
         check_sensors,
-        procedure_name="PCBA Test",
+        procedure_id="OPENHTF",
         part_number="PCBA01",
-        part_name="PCBA",  # optional
         revision="A",  # optional
     )
 
