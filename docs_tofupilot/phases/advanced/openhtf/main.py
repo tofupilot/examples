@@ -16,9 +16,11 @@ def phase_firmware_version_check(test):
 
 # Phase with multiple measurements
 @htf.measures(
-    htf.Measurement("input_voltage").in_range(3.1, 3.5).with_units(units.VOLT),
-    htf.Measurement("output_voltage").in_range(1.1, 1.3).with_units(units.VOLT),
-)
+    htf.Measurement("input_voltage").in_range(
+        3.1, 3.5).with_units(
+            units.VOLT), htf.Measurement("output_voltage").in_range(
+                1.1, 1.3).with_units(
+                    units.VOLT), )
 def phase_voltage_measurements(test):
     test.measurements.input_voltage = 3.3
     test.measurements.output_voltage = 1.2

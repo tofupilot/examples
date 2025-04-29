@@ -1,6 +1,7 @@
 import random
 import time
 from datetime import datetime, timedelta
+
 import openhtf as htf
 from openhtf.util import units
 from tofupilot.openhtf import TofuPilot
@@ -17,7 +18,8 @@ def check_button(test):
     time.sleep(1)
 
 
-@htf.measures(htf.Measurement("input_voltage").in_range(4.5, 5).with_units(units.VOLT))
+@htf.measures(htf.Measurement("input_voltage").in_range(4.5,
+              5).with_units(units.VOLT))
 def test_voltage_input(test):
     test.measurements.input_voltage = round(random.uniform(3.7, 4.9), 2)
 
@@ -35,7 +37,8 @@ def test_voltage_output(test):
     .with_units(units.AMPERE)
 )
 def test_overcurrent_protection(test):
-    test.measurements.current_protection_triggered = round(random.uniform(1.0, 1.7), 3)
+    test.measurements.current_protection_triggered = round(
+        random.uniform(1.0, 1.7), 3)
     time.sleep(1)
 
 
@@ -52,7 +55,8 @@ def test_battery_switch():
 def test_converter_efficiency(test):
     input_power = 500
     output_power = round(random.uniform(425, 480))
-    test.measurements.efficiency = round(((output_power / input_power) * 100), 1)
+    test.measurements.efficiency = round(
+        ((output_power / input_power) * 100), 1)
     time.sleep(1)
 
 
