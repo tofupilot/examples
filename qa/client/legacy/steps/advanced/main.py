@@ -8,7 +8,6 @@ def main():
 
     client.create_run(
         procedure_id="FVT1",
-        procedure_name="PCB Testing",
         unit_under_test={
             "serial_number": "PCB1A002",
             "part_number": "PCB1",

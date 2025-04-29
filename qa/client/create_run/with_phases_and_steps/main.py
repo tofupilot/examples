@@ -20,7 +20,6 @@ client.create_run(
     unit_under_test={
         "serial_number": "SN17",
         "part_number": "PNrstsrtsr",
-        "part_name": "Never seen before",
         "batch_number": "B",
     },
     run_passed=True,  # Overall run status
