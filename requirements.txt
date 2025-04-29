@@ -1,3 +1,4 @@
 openhtf
 six
 tofupilot
+numpy
