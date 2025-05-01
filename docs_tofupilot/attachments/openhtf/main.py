@@ -11,8 +11,9 @@ def phase_file_attachment(test):
 def main():
     test = htf.Test(
         phase_file_attachment,
-        procedure_id="FVT1",
-        part_number="PCB1")
+        procedure_id="FVT1",  # Create the procedure first in the Application
+        part_number="PCB1",
+    )
 
     with TofuPilot(test):
         test.execute(lambda: "PCB1A001")
