@@ -1,6 +1,7 @@
-from datetime import datetime
-from tofupilot import MeasurementOutcome, PhaseOutcome, TofuPilotClient
 import random
+from datetime import datetime
+
+from tofupilot import MeasurementOutcome, PhaseOutcome, TofuPilotClient
 
 client = TofuPilotClient()
 
@@ -34,7 +35,8 @@ def main():
         procedure_id="FVT1",  # Create the procedure first in the Application
         unit_under_test={"serial_number": "PCB1A001", "part_number": "PCB1"},
         phases=phases,
-        run_passed=all(phase["outcome"] == PhaseOutcome.PASS for phase in phases),
+        run_passed=all(
+            phase["outcome"] == PhaseOutcome.PASS for phase in phases),
     )
 
 

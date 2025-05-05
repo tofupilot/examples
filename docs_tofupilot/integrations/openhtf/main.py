@@ -7,7 +7,9 @@ def phase_one():
 
 
 def main():
-    test = htf.Test(phase_one, procedure_id="FVT1", part_number="PCB01") # Specify procedure and part_number
+    test = htf.Test(
+        phase_one, procedure_id="FVT1", part_number="PCB01"
+    )  # Specify procedure and part_number
 
     with TofuPilot(test):  # One-line integration
         test.execute(lambda: "PCB1A001")

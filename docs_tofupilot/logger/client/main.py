@@ -1,18 +1,20 @@
 import logging
 import sys
 from datetime import datetime
+
 from tofupilot import TofuPilotClient
 
 
 class TofuPilotLogHandler(logging.Handler):
     """Handler that captures logs in a format compatible with TofuPilot API."""
-    
+
     def __init__(self):
         super().__init__()
         self.logs = []
 
     def emit(self, record):
-        # Format log with ISO-8601 timestamp (millisecond precision) for TofuPilot API
+        # Format log with ISO-8601 timestamp (millisecond precision) for
+        # TofuPilot API
         log_entry = {
             "level": record.levelname,
             "timestamp": f"{datetime.fromtimestamp(record.created).isoformat(timespec='milliseconds')}Z",
@@ -26,7 +28,8 @@ class TofuPilotLogHandler(logging.Handler):
 # Initialize the TofuPilot client to report test results
 client = TofuPilotClient()
 
-# Set up local logger with custom name and prevent propagation to parent loggers
+# Set up local logger with custom name and prevent propagation to parent
+# loggers
 local_logger = logging.getLogger("test_logger")
 local_logger.setLevel(logging.DEBUG)
 local_logger.propagate = False
