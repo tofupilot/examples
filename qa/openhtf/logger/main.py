@@ -1,7 +1,8 @@
-import openhtf as htf
-from tofupilot.openhtf import TofuPilot
-from openhtf.output.callbacks import json_factory
 import random
+
+import openhtf as htf
+from openhtf.output.callbacks import json_factory
+from tofupilot.openhtf import TofuPilot
 
 
 @htf.measures(htf.Measurement("button_status").equals(True))
@@ -40,7 +41,9 @@ def main():
     random_digits = "".join([str(random.randint(0, 9)) for _ in range(5)])
     serial_number = f"00220D4K{random_digits}"
 
-    test.add_output_callbacks(json_factory.OutputToJSON("test_result.json", indent=2))
+    test.add_output_callbacks(
+        json_factory.OutputToJSON(
+            "test_result.json", indent=2))
 
     # Execute the test
     with TofuPilot(test):

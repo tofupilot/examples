@@ -1,6 +1,7 @@
 import random
 from datetime import datetime
-from tofupilot import TofuPilotClient, PhaseOutcome, MeasurementOutcome
+
+from tofupilot import MeasurementOutcome, PhaseOutcome, TofuPilotClient
 
 client = TofuPilotClient()
 

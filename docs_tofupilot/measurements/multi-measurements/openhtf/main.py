@@ -1,14 +1,16 @@
+import random
+
 import openhtf as htf
 from openhtf.util import units
 from tofupilot.openhtf import TofuPilot
-import random
 
 
 @htf.measures(
     htf.Measurement("is_connected").equals(True),  # Boolean measure
     htf.Measurement("firmware_version").equals("1.2.7"),  # String measure
     htf.Measurement("input_voltage").in_range(3.2, 3.4).with_units(units.VOLT),
-    htf.Measurement("input_current").in_range(maximum=1.5).with_units(units.AMPERE),
+    htf.Measurement("input_current").in_range(
+        maximum=1.5).with_units(units.AMPERE),
 )
 def phase_multi_measurements(test):
     test.measurements.is_connected = True
