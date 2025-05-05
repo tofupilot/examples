@@ -2,21 +2,20 @@ import openhtf as htf
 from tofupilot.openhtf import TofuPilot
 
 
-def phase_file_attachment(test):
-    # Replace with your file path
-    test.attach_from_file("data/temperature-map.png")
-    return htf.PhaseResult.CONTINUE
+@htf.measures(htf.Measurement("is_led_switch_on").equals(True))
+def phase_led(test):
+    test.measurements.is_led_switch_on = True
 
 
 def main():
     test = htf.Test(
-        phase_file_attachment,
+        phase_led,
         procedure_id="FVT1",  # Create the procedure first in the Application
         part_number="PCB1",
     )
 
     with TofuPilot(test):
-        test.execute(lambda: "PCB1A001")
+        test.execute(lambda: "PCB001")
 
 
 if __name__ == "__main__":
