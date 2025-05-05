@@ -1,7 +1,8 @@
+import random
+
 import openhtf as htf
 from openhtf.util import units
 from tofupilot.openhtf import TofuPilot
-import random
 
 
 @htf.measures(
