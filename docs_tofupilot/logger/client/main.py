@@ -16,7 +16,10 @@ class TofuPilotLogHandler(logging.Handler):
         # Format log with ISO-8601 timestamp (UTC, ms) for TofuPilot API
         log_entry = {
             "level": record.levelname,
-            "timestamp": datetime.utcfromtimestamp(record.created).isoformat(timespec="milliseconds") + "Z",
+            "timestamp": datetime.utcfromtimestamp(record.created).isoformat(
+                timespec="milliseconds"
+            )
+            + "Z",
             "message": record.getMessage(),
             "source_file": record.filename,
             "line_number": record.lineno,
