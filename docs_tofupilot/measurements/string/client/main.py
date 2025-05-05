@@ -18,7 +18,6 @@ def phase_firmware():
                     "name": "temperature",
                     "measured_value": "1.2.4",
                     "outcome": MeasurementOutcome.PASS,
-                    "equals": "1.2.4",
                 }
             ],
         }
