@@ -1,7 +1,7 @@
 import random
-import numpy as np
 from datetime import datetime
 
+import numpy as np
 from tofupilot import MeasurementOutcome, PhaseOutcome, TofuPilotClient
 
 client = TofuPilotClient()
@@ -11,7 +11,7 @@ def standard():
     """Python lists approach - one point at a time"""
     start = datetime.now().timestamp() * 1000
     measurements = []
-    
+
     for t in range(100):
         timestamp = t / 100  # Time dimension
         voltage = round(random.uniform(3.3, 3.5), 2)  # Voltage dimension
@@ -23,38 +23,44 @@ def standard():
         "outcome": PhaseOutcome.PASS,
         "start_time_millis": start,
         "end_time_millis": start + 30000,
-        "measurements": [{
-            "name": "current_voltage_resistance_over_time",
-            "units": ["s", "V", "A", "Ohm"],
-            "measured_value": measurements,
-            "outcome": MeasurementOutcome.PASS,
-        }],
+        "measurements": [
+            {
+                "name": "current_voltage_resistance_over_time",
+                "units": ["s", "V", "A", "Ohm"],
+                "measured_value": measurements,
+                "outcome": MeasurementOutcome.PASS,
+            }
+        ],
     }
 
 
 def numpy_way():
     """NumPy approach - all points at once"""
     start = datetime.now().timestamp() * 1000
-    
+
     # Generate all dimensions simultaneously
     timestamps = np.linspace(0, 0.99, 100)
     voltages = np.round(np.random.uniform(3.3, 3.5, 100), 2)
     currents = np.round(np.random.uniform(0.3, 0.8, 100), 3)
-    
-    measurements = [tuple(x) for x in np.column_stack(
-        (timestamps, voltages, currents, voltages / currents))]
+
+    measurements = [
+        tuple(x)
+        for x in np.column_stack((timestamps, voltages, currents, voltages / currents))
+    ]
 
     return {
         "name": "vector_approach",
         "outcome": PhaseOutcome.PASS,
         "start_time_millis": start,
         "end_time_millis": start + 30000,
-        "measurements": [{
-            "name": "current_voltage_resistance_over_time",
-            "units": ["s", "V", "A", "Ohm"],
-            "measured_value": measurements,
-            "outcome": MeasurementOutcome.PASS,
-        }],
+        "measurements": [
+            {
+                "name": "current_voltage_resistance_over_time",
+                "units": ["s", "V", "A", "Ohm"],
+                "measured_value": measurements,
+                "outcome": MeasurementOutcome.PASS,
+            }
+        ],
     }
 
 

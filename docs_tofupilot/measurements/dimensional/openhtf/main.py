@@ -7,7 +7,9 @@ from tofupilot.openhtf import TofuPilot
 
 @htf.measures(
     htf.Measurement("current_voltage_resistance_over_time")
-    .with_dimensions(units.SECOND, units.VOLT, units.AMPERE)  # Input axes: time, voltage, current
+    .with_dimensions(
+        units.SECOND, units.VOLT, units.AMPERE
+    )  # Input axes: time, voltage, current
     .with_units(units.OHM)  # Output unit: resistance in ohms
 )
 def power_phase(test):
