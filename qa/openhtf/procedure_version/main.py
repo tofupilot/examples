@@ -1,4 +1,5 @@
 import random
+
 import openhtf as htf
 from tofupilot.openhtf import TofuPilot
 
@@ -14,6 +15,7 @@ def main():
         procedure_id="FVT1",  # No need to specify the ID
         procedure_version="1.2.20",  # Create procedure version
         part_number="00220",
+        revision="B",
     )
 
     # Generate random Serial Number
