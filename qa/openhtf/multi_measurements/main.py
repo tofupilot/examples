@@ -1,7 +1,8 @@
+import random
+
 import openhtf as htf
 from openhtf.util import units
 from tofupilot.openhtf import TofuPilot
-import random
 
 
 @htf.measures(
@@ -23,23 +24,27 @@ def phaseresult_test():
 
 
 @htf.measures(
-    htf.Measurement("two_limits").in_range(4.5, 5).with_units(units.VOLT),
-    htf.Measurement("one_limit").in_range(maximum=1.5).with_units(units.AMPERE),
-    htf.Measurement("percentage").in_range(85, 98).with_units(units.Unit("%")),
-)
+    htf.Measurement("two_limits").in_range(
+        4.5, 5).with_units(
+            units.VOLT), htf.Measurement("one_limit").in_range(
+                maximum=1.5).with_units(
+                    units.AMPERE), htf.Measurement("percentage").in_range(
+                        85, 98).with_units(
+                            units.Unit("%")), )
 def measure_test_with_limits(test):
     test.measurements.two_limits = round(random.uniform(3.8, 4.9), 2)
     test.measurements.one_limit = round(random.uniform(1.0, 1.6), 3)
     input_power = 500
     output_power = round(random.uniform(425, 480))
-    test.measurements.percentage = round(((output_power / input_power) * 100), 1)
+    test.measurements.percentage = round(
+        ((output_power / input_power) * 100), 1)
 
 
-@htf.measures(
-    htf.Measurement("is_connected").equals(True),
-    htf.Measurement("firmware_version").equals("1.2.7"),
-    htf.Measurement("temperature").in_range(20, 25).with_units(units.DEGREE_CELSIUS),
-)
+@htf.measures(htf.Measurement("is_connected").equals(True),
+              htf.Measurement("firmware_version").equals("1.2.7"),
+              htf.Measurement("temperature").in_range(20,
+                                                      25).with_units(units.DEGREE_CELSIUS),
+              )
 def phase_multi_measurements(test):
     test.measurements.is_connected = True
     test.measurements.firmware_version = (
@@ -60,7 +65,14 @@ def dimensions(test):
     """Phase with dimensioned measurements."""
     for dim in range(5):
         test.measurements.dimensions[dim] = 1 << dim
-    for x, y, z in zip(list(range(1, 5)), list(range(21, 25)), list(range(101, 105))):
+    for x, y, z in zip(
+        list(
+            range(
+            1, 5)), list(
+                range(
+                    21, 25)), list(
+                        range(
+                            101, 105))):
         test.measurements.lots_of_dims[x, y, z] = x + y + z
 
 
