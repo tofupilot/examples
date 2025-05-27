@@ -9,12 +9,13 @@ https://tofupilot.com/docs/user-management#api-key
 """
 
 from tofupilot import TofuPilotClient
+import json
 
 # Initialize the TofuPilot client
 client = TofuPilotClient()
 
 # Define the serial number of the unit under test
-serial_number = "SN00102"
+serial_number = "SN00106"
 
 client.create_run(
     procedure_id="FVT1",
@@ -23,4 +24,11 @@ client.create_run(
 )
 
 # Fetch the created run using the serial number
-client.get_runs(serial_number=serial_number)
+response = client.get_runs(serial_number=serial_number)
+
+
+# Save JSON response locally
+with open("response_saved.json", "w") as f:
+    json.dump(response, f, indent=2)
+
+print("Response saved to response_saved.json")
