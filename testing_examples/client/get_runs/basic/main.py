@@ -8,8 +8,9 @@ Ensure your API key is stored in the environment variables as per the documentat
 https://tofupilot.com/docs/user-management#api-key
 """
 
-from tofupilot import TofuPilotClient
 import json
+
+from tofupilot import TofuPilotClient
 
 # Initialize the TofuPilot client
 client = TofuPilotClient()

@@ -1,6 +1,7 @@
-from tofupilot import TofuPilotClient
-import requests
 from pathlib import Path
+
+import requests
+from tofupilot import TofuPilotClient
 
 
 def main():
@@ -11,7 +12,9 @@ def main():
 
     client.create_run(
         procedure_id="FVT1",
-        unit_under_test={"serial_number": serial_number, "part_number": "PCB01"},
+        unit_under_test={
+            "serial_number": serial_number,
+            "part_number": "PCB01"},
         run_passed=True,
         attachments=[
             "qa/client/get_runs/basic/data/temperature-map.png"
