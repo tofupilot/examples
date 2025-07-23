@@ -158,6 +158,7 @@ def make_test():
         test_description="OpenHTF Example Test",
         test_version="1.0.0",
         part_number="PCB01",
+        procedure_id="FVT1",
     )
 
 
