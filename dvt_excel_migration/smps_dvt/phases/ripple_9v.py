@@ -16,6 +16,5 @@ def ripple_9v(measurements, scope):
     measurements.ripple_9v_waveform.x_axis = times
     measurements.ripple_9v_waveform.y_axis.ripple = values
     # The same ceiling as the transcribed figure, checked against the trace.
-    measurements.ripple_9v_waveform.y_axis.ripple.aggregations.peak_to_peak = (
-        max(values) - min(values)
-    )
+    measurements.ripple_9v_waveform.y_axis.ripple.aggregations.peak_to_peak = max(
+        values) - min(values)

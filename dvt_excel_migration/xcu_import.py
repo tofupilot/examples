@@ -84,7 +84,8 @@ def parse_stacked(cell: object) -> list[list[float]]:
     return rows
 
 
-def extract_images(workbook_path: Path, out_dir: Path) -> dict[int, list[Path]]:
+def extract_images(workbook_path: Path,
+                   out_dir: Path) -> dict[int, list[Path]]:
     """Pull embedded PNGs out of the .xlsx and group them by anchor row.
 
     openpyxl drops images on load, so the drawing XML is read straight from the
@@ -99,7 +100,8 @@ def extract_images(workbook_path: Path, out_dir: Path) -> dict[int, list[Path]]:
         for name in z.namelist():
             if re.fullmatch(r"xl/drawings/_rels/drawing\d+\.xml\.rels", name):
                 body = z.read(name).decode("utf8", "ignore")
-                rels[name] = re.findall(r'Id="([^"]+)"[^>]*?media/([^"]+)"', body)
+                rels[name] = re.findall(
+                    r'Id="([^"]+)"[^>]*?media/([^"]+)"', body)
 
         for name in z.namelist():
             if not re.fullmatch(r"xl/drawings/drawing\d+\.xml", name):
@@ -154,7 +156,12 @@ def read_report(path: Path, images: dict[int, list[Path]]) -> list[Reading]:
         if not description:
             continue
 
-        limits = [sheet.cell(row=row, column=col).value for col in (10, 12)]  # J, L
+        limits = [
+            sheet.cell(
+                row=row,
+                column=col).value for col in (
+                10,
+                12)]  # J, L
         lower, upper = (
             float(v) if isinstance(v, (int, float)) else None for v in limits
         )
@@ -206,7 +213,8 @@ def to_outcome(raw: str) -> str:
     return "UNSET"
 
 
-def build_phases(readings: list[Reading], waveforms: Path | None) -> list[dict]:
+def build_phases(readings: list[Reading],
+                 waveforms: Path | None) -> list[dict]:
     phases: dict[str, dict] = {}
 
     for reading in readings:
@@ -228,13 +236,16 @@ def build_phases(readings: list[Reading], waveforms: Path | None) -> list[dict]:
 
         validators = []
         if reading.lower is not None:
-            validators.append({"operator": ">=", "expected_value": reading.lower})
+            validators.append(
+                {"operator": ">=", "expected_value": reading.lower})
         if reading.upper is not None:
-            validators.append({"operator": "<=", "expected_value": reading.upper})
+            validators.append(
+                {"operator": "<=", "expected_value": reading.upper})
 
         curve = None
         if waveforms:
-            candidate = waveforms / f"{reading.test_number}_{reading.sample}.csv"
+            candidate = waveforms / \
+                f"{reading.test_number}_{reading.sample}.csv"
             if candidate.exists():
                 curve = load_waveform(candidate)
 
@@ -248,7 +259,8 @@ def build_phases(readings: list[Reading], waveforms: Path | None) -> list[dict]:
             # A real curve carries its own axes, so it stays comparable across
             # samples and temperatures rather than being a picture of a result.
             times, amplitudes = curve
-            measurement["x_axis"] = {"name": "Time", "units": "s", "data": times}
+            measurement["x_axis"] = {
+                "name": "Time", "units": "s", "data": times}
             measurement["y_axis"] = [
                 {
                     "name": reading.description,
@@ -290,12 +302,12 @@ def main() -> None:
     curves = sum(1 for p in phases for m in p["measurements"] if "y_axis" in m)
     print(
         f"{len(readings)} readings across {len(phases)} phases "
-        f"({curves} as waveforms, {sum(len(v) for v in images.values())} plots)"
-    )
+        f"({curves} as waveforms, {sum(len(v) for v in images.values())} plots)")
 
     if args.dry_run:
         for phase in phases:
-            print(f"  {phase['name']}: {len(phase['measurements'])} measurements")
+            print(
+                f"  {phase['name']}: {len(phase['measurements'])} measurements")
         return
 
     now = datetime.now(timezone.utc)
@@ -305,7 +317,8 @@ def main() -> None:
 
     with TofuPilot(**client_options) as client:
         run = client.runs.create(
-            outcome="FAIL" if any(p["outcome"] == "FAIL" for p in phases) else "PASS",
+            outcome="FAIL" if any(
+                p["outcome"] == "FAIL" for p in phases) else "PASS",
             procedure_id=args.procedure_id,
             started_at=now,
             ended_at=now,
