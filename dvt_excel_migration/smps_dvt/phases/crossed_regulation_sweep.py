@@ -24,12 +24,16 @@ def crossed_regulation_sweep(measurements, scope, ac_source):
     measurements.rail_23v_vs_mains.x_axis = mains
     measurements.rail_23v_vs_mains.y_axis.rail_23v = rail_23v
     # The sweep passes when the rail stays inside its limits at every point.
-    measurements.rail_23v_vs_mains.y_axis.rail_23v.aggregations.min = min(rail_23v)
-    measurements.rail_23v_vs_mains.y_axis.rail_23v.aggregations.max = max(rail_23v)
+    measurements.rail_23v_vs_mains.y_axis.rail_23v.aggregations.min = min(
+        rail_23v)
+    measurements.rail_23v_vs_mains.y_axis.rail_23v.aggregations.max = max(
+        rail_23v)
 
     measurements.rail_9v_vs_mains.x_axis = mains
     measurements.rail_9v_vs_mains.y_axis.rail_9v = rail_9v
-    measurements.rail_9v_vs_mains.y_axis.rail_9v.aggregations.min = min(rail_9v)
-    measurements.rail_9v_vs_mains.y_axis.rail_9v.aggregations.max = max(rail_9v)
+    measurements.rail_9v_vs_mains.y_axis.rail_9v.aggregations.min = min(
+        rail_9v)
+    measurements.rail_9v_vs_mains.y_axis.rail_9v.aggregations.max = max(
+        rail_9v)
 
     ac_source.set_voltage(230)
