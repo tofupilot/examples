@@ -1,0 +1,132 @@
+name: SMPS Regulation and Ripple
+version: 1.0.0
+
+unit:
+  auto_identify: true
+  serial_number:
+    default_value: "SN-0001"
+  part_number:
+    default_value: "PCB-REV-A"
+
+plugs:
+  - key: scope
+    name: Oscilloscope
+    python: plugs.scope:Oscilloscope
+  - key: ac_source
+    name: AC Source
+    python: plugs.ac_source:ACSource
+
+main:
+  - name: Crossed Regulation
+    python: phases.crossed_regulation
+    measurements:
+      # Rail limits come straight from the report's Min./Max. criteria columns.
+      - name: Rail 23V
+        unit: V
+        validators:
+          - operator: ">="
+            expected_value: 21.9
+          - operator: "<="
+            expected_value: 23.1
+      - name: Rail 9V
+        unit: V
+        validators:
+          - operator: ">="
+            expected_value: 8.5
+          - operator: "<="
+            expected_value: 9.5
+
+  - name: Crossed Regulation Sweep
+    python: phases.crossed_regulation_sweep
+    measurements:
+      # The rows a report fills in one at a time become a regulation curve.
+      - name: Rail 23V vs Mains
+        title: 23V rail across the mains range
+        x_axis:
+          legend: Mains
+          unit: Vac
+        y_axis:
+          - legend: Rail 23V
+            unit: V
+            aggregations:
+              - type: min
+                validators:
+                  - operator: ">="
+                    expected_value: 21.9
+              - type: max
+                validators:
+                  - operator: "<="
+                    expected_value: 23.1
+      - name: Rail 9V vs Mains
+        title: 9V rail across the mains range
+        x_axis:
+          legend: Mains
+          unit: Vac
+        y_axis:
+          - legend: Rail 9V
+            unit: V
+            aggregations:
+              - type: min
+                validators:
+                  - operator: ">="
+                    expected_value: 8.5
+              - type: max
+                validators:
+                  - operator: "<="
+                    expected_value: 9.5
+
+  - name: Ripple 23V
+    python: phases.ripple_23v
+    measurements:
+      # The two figures a hand-written report transcribes off the scope screen.
+      - name: Ripple 23V Peak-to-Peak
+        unit: mV
+        validators:
+          - operator: "<="
+            expected_value: 400
+      - name: Ripple 23V RMS
+        unit: mV
+        validators:
+          - operator: "<="
+            expected_value: 100
+      # ...and the trace they were measured on, kept as data.
+      - name: Ripple 23V Waveform
+        title: 23V ripple
+        x_axis:
+          legend: Time
+          unit: s
+        y_axis:
+          - legend: Ripple
+            unit: mV
+            aggregations:
+              - type: peak_to_peak
+                validators:
+                  - operator: "<="
+                    expected_value: 400
+
+  - name: Ripple 9V
+    python: phases.ripple_9v
+    measurements:
+      - name: Ripple 9V Peak-to-Peak
+        unit: mV
+        validators:
+          - operator: "<="
+            expected_value: 400
+      - name: Ripple 9V RMS
+        unit: mV
+        validators:
+          - operator: "<="
+            expected_value: 100
+      - name: Ripple 9V Waveform
+        title: 9V ripple
+        x_axis:
+          legend: Time
+          unit: s
+        y_axis:
+          - legend: Ripple
+            unit: mV
+            aggregations:
+              - type: peak_to_peak
+                validators:
+                  - operator: "<="
+                    expected_value: 400
