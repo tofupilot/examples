@@ -133,7 +133,8 @@ class Oscilloscope:
         times, values = [], []
         for index in range(points):
             moment = index * step
-            fundamental = amplitude * math.sin(2 * math.pi * ripple_hz * moment)
+            fundamental = amplitude * \
+                math.sin(2 * math.pi * ripple_hz * moment)
             # Switching noise rides on the rectified ripple.
             noise = random.gauss(0, amplitude * 0.06)
             times.append(round(moment, 6))
