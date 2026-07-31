@@ -21,6 +21,7 @@ from __future__ import annotations
 import argparse
 import os
 import re
+import struct
 import zipfile
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
@@ -84,15 +85,42 @@ def parse_stacked(cell: object) -> list[list[float]]:
     return rows
 
 
+# Letterheads and icons sit in the drawing layer next to the real captures.
+# A scope screenshot is a full window grab, so it is wide, roughly landscape,
+# and never a small banner. Filtering on pixels rather than file size keeps a
+# lightly-compressed plot and drops a detailed logo.
+MIN_PLOT_WIDTH = 600
+MIN_PLOT_HEIGHT = 300
+
+
+def png_size(payload: bytes) -> tuple[int, int] | None:
+    """Width and height from a PNG's IHDR, without a decoder dependency."""
+    if len(payload) < 24 or payload[:8] != b"\x89PNG\r\n\x1a\n":
+        return None
+    width, height = struct.unpack(">II", payload[16:24])
+    return width, height
+
+
+def is_plot(payload: bytes) -> bool:
+    size = png_size(payload)
+    if size is None:
+        return True  # not a PNG we can measure; let it through rather than lose data
+    width, height = size
+    return width >= MIN_PLOT_WIDTH and height >= MIN_PLOT_HEIGHT
+
+
 def extract_images(workbook_path: Path, out_dir: Path) -> dict[int, list[Path]]:
     """Pull embedded PNGs out of the .xlsx and group them by anchor row.
 
     openpyxl drops images on load, so the drawing XML is read straight from the
     zip. The anchor row is what ties a plot to the test it proves — the whole
     reason these cannot go in as one undifferentiated pile.
+
+    Logos are skipped, and an image repeated across rows is only kept once.
     """
     out_dir.mkdir(parents=True, exist_ok=True)
     by_row: dict[int, list[Path]] = {}
+    seen: set[str] = set()
 
     with zipfile.ZipFile(workbook_path) as z:
         rels = {}
@@ -117,9 +145,17 @@ def extract_images(workbook_path: Path, out_dir: Path) -> dict[int, list[Path]]:
                 target = media.get(anchor.group(2))
                 if not target:
                     continue
+
+                payload = z.read(f"xl/media/{target}")
+                if not is_plot(payload):
+                    continue  # letterhead or icon, not a capture
+                if target in seen:
+                    continue  # same image anchored on several rows
+
+                seen.add(target)
                 dest = out_dir / target
                 if not dest.exists():
-                    dest.write_bytes(z.read(f"xl/media/{target}"))
+                    dest.write_bytes(payload)
                 by_row.setdefault(row, []).append(dest)
 
     return by_row
