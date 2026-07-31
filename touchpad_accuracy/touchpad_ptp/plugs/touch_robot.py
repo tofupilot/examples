@@ -6,6 +6,8 @@ error is the distance between the two, so both have to come from the same press.
 """
 
 # Motion controller on the bench LAN.
+import random
+
 ROBOT_RESOURCE = "TCPIP0::192.0.2.20::inst0::INSTR"
 
 # Pad geometry, mm. The border strip where the spec relaxes its limit.
@@ -14,8 +16,6 @@ EDGE_BAND = 3.5
 
 # Probe force held constant across the grid so error stays comparable.
 PROBE_FORCE_G = 60.0
-
-import random
 
 
 class TouchRobot:

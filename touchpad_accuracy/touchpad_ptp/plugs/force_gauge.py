@@ -1,12 +1,12 @@
 """Inline load cell reading the force at which the dome switch actuates."""
 
 # Load cell indicator on the bench LAN.
+import random
+
 GAUGE_RESOURCE = "TCPIP0::192.0.2.21::inst0::INSTR"
 
 # Ramp until the switch reports, or give up.
 RAMP_LIMIT_G = 120.0
-
-import random
 
 
 class ForceGauge:
