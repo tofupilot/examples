@@ -1,0 +1,89 @@
+name: Touchpad Positional Accuracy
+version: 1.0.0
+
+unit:
+  auto_identify: true
+  serial_number:
+    default_value: "SN-0001"
+  part_number:
+    default_value: "TPAD-REV-A"
+
+plugs:
+  - key: robot
+    name: Touch Robot
+    python: plugs.touch_robot:TouchRobot
+  - key: gauge
+    name: Force Gauge
+    python: plugs.force_gauge:ForceGauge
+
+main:
+  - name: Home Fixture
+    key: home_fixture
+    python: phases.home_fixture
+
+  # Every press is referenced to the homed position, so the grid phases wait
+  # for it rather than racing it.
+  - name: Center Linearity
+    python: phases.center_linearity
+    depends_on:
+      - home_fixture
+    measurements:
+      # Precision Touchpad linearity: 0.5 mm edge to edge, away from the border.
+      - name: Center Positional Error
+        title: Positional error across the central region
+        x_axis:
+          legend: Target
+        y_axis:
+          - legend: Error
+            unit: mm
+            aggregations:
+              - type: max
+                validators:
+                  - operator: "<="
+                    expected_value: 0.5
+              - type: mean
+                validators:
+                  - operator: "<="
+                    expected_value: 0.35
+
+  - name: Edge Band Linearity
+    python: phases.edge_band_linearity
+    depends_on:
+      - home_fixture
+    measurements:
+      # Within 3.5 mm of an edge the same spec relaxes to 1.5 mm.
+      - name: Edge Positional Error
+        title: Positional error along the 3.5 mm edge band
+        x_axis:
+          legend: Target
+        y_axis:
+          - legend: Error
+            unit: mm
+            aggregations:
+              - type: max
+                validators:
+                  - operator: "<="
+                    expected_value: 1.5
+              - type: mean
+                validators:
+                  - operator: "<="
+                    expected_value: 1.1
+      # The worst single target is what fails a unit, so it is kept on its own.
+      - name: Worst Edge Error
+        unit: mm
+        validators:
+          - operator: "<="
+            expected_value: 1.5
+
+  - name: Click Actuation Force
+    python: phases.click_actuation_force
+    depends_on:
+      - home_fixture
+    measurements:
+      - name: Actuation Force
+        unit: g
+        validators:
+          - operator: ">="
+            expected_value: 50
+          - operator: "<="
+            expected_value: 70
